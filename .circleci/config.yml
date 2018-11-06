@@ -1,0 +1,88 @@
+version: 2
+jobs:
+  test:
+    machine: true
+    steps:
+      - checkout
+
+      - run:
+          name: Setup
+          command: docker login -u="$DOCKER_LOGIN" -p="$DOCKER_PASS" quay.io
+
+      - run:
+          name: Build image
+          command: make pull-staging build-staging
+
+      - run:
+          name: Prepare containers
+          command: ./prepare_containers.sh
+
+      - run:
+          name: Run tests
+          command: make test
+
+  deploy:
+    machine: true
+    steps:
+      - checkout
+
+      - run:
+          name: Setup system
+          command: |
+            docker login -u="$DOCKER_LOGIN" -p="$DOCKER_PASS" quay.io
+            pip install ebs-deploy==2.0.1
+
+      - run:
+          name: Install kops
+          command: |
+            sudo curl -L -o /usr/local/bin/kops https://github.com/kubernetes/kops/releases/download/1.10.0/kops-linux-amd64
+            sudo chmod +x /usr/local/bin/kops
+      - run:
+          name: Install gcloud and kubectl
+          command: |
+            sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
+            sudo /opt/google-cloud-sdk/bin/gcloud --quiet components install kubectl
+            sudo chown circleci:circleci ~/.config/gcloud/ -R
+
+      - run:
+          name: Build and deploy
+          command: |
+            # Fix incorrect boto config in circleci
+            export BOTO_CONFIG=/dev/null
+
+            make decrypt
+
+            if [ "$CIRCLE_BRANCH" = "devel" ]; then
+              kops export kubecfg --name=k8s.syncano.rocks --state=s3://k8s-syncano-rocks-state-store
+              make pull-staging build-staging deploy-staging push-staging
+
+            elif [ "$CIRCLE_BRANCH" = "master" ]; then
+              kops export kubecfg --name=k8s.syncano.io --state=s3://k8s-syncano-io-state-store
+              echo $GCLOUD_EU1_SERVICE_KEY > gcloud-service-key.json
+              gcloud auth activate-service-account --key-file=gcloud-service-key.json
+              gcloud container clusters get-credentials syncano-eu1 --zone europe-west1 --project pioner-syncano-prod-9cfb
+
+              make pull-production build-production deploy-production push-production
+            fi
+
+            make clean
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test:
+          filters:
+            branches:
+              ignore:
+                - master
+                - devel
+
+  deploy:
+    jobs:
+      - deploy:
+          filters:
+            branches:
+              only:
+                - master
+                - devel

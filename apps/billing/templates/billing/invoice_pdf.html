@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Invoice</title>
+    <meta charset="utf-8">
+    <style type="text/css">
+      body {
+        padding: 20px;
+        font-family: sans-serif;
+        font-size: 16px;
+      }
+      table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        text-align: left;
+        margin: 2em 0;
+      }
+      th,
+      td {
+        padding: 8px;
+        border: 1px solid black;
+      }
+      .customer-info {
+        float: left;
+      }
+      .company-info {
+        float: right;
+      }
+      .table {
+        width: 100%;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+      }
+      .info {
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h2 class="no-margin">Receipt</h2>
+
+    <p>
+        <small>
+            Invoice ID: {{ data.id }}<br/>
+            Period: {{ data.period }}
+        </small>
+    </p>
+
+    <div class="info">
+      <div class="customer-info">
+        <strong>Account</strong>
+        <br />
+        {% if billing_profile.company_name %}
+          {{ billing_profile.company_name }}<br />
+        {% endif %}
+        {% if billing_profile.first_name or billing_profile.last_name %}
+          {{ billing_profile.first_name }} {{ billing_profile.last_name }}<br />
+        {% endif %}
+        {% if billing_profile.address_line1 %}
+          {{ billing_profile.address_line1 }}<br />
+        {% endif %}
+        {% if billing_profile.address_line2 %}
+          {{ billing_profile.address_line2 }}<br />
+        {% endif %}
+        {% if billing_profile.address_city or billing_profile.address_state or billing_profile.address_zip %}
+          {{ billing_profile.address_zip }} {{ billing_profile.address_city }} {{ billing_profile.address_state }}<br />
+        {% endif %}
+        {% if billing_profile.address_country %}
+          {{ billing_profile.address_country }}<br />
+        {% endif %}
+        {% if billing_profile.tax_number %}
+          Tax number: {{ billing_profile.tax_number }}<br />
+        {% endif %}
+        {{ admin.email }}<br />
+      </div>
+      <div class="company-info">
+        <strong>Syncano, Inc.</strong>
+        <br />120 East 23rd St., 5th Floor
+        <br />New York, NY 10010
+      </div>
+    </div>
+
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th width="60%">Item</th>
+          <th width="20%" align="right">Quantity</th>
+          <th width="20%" align="right">Price</th>
+          <th width="20%" align="right">Amount</th>
+        </tr>
+      </thead>
+      {% for item in data.items %}
+      <tr>
+        <td>
+            {{ item.source }}
+            {% if item.instance_name %}
+              - {{ item.instance_name }}
+            {% endif %}
+        </td>
+        <td align="right">{{ item.quantity }}</td>
+        <td align="right">
+            {% if item.price %}
+              {{ item.price }}
+            {% else %}
+              {{ item.amount }}
+            {% endif %}
+        </td>
+        <td align="right">{{ item.amount }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <p><strong>Thank You!</strong></p>
+
+  </body>
+</html>

@@ -1,0 +1,15 @@
+.coverage
+coverage*.out
+dev
+*.swagger.json
+*.unenc
+build/
+coverage_report/
+dist/
+media/
+static/
+*.egg-info/
+*.pyc
+*.pyo
+*.pyd
+*.pid

@@ -1,0 +1,66 @@
+[
+    {
+        "pk": 1,
+        "model": "admins.admin",
+        "fields": {
+            "email": "admin@syncano.com",
+            "key": "fec060a02b83a0ca18fef98472396951a0fd847e",
+            "first_name": "Syncano",
+            "last_name": "Superuser",
+            "is_active": true,
+            "is_superuser": true,
+            "is_staff": true,
+            "last_login": "2014-01-01T00:00:00.000Z",
+            "password": "pbkdf2_sha256$15000$cjHy2n8H5CxE$LmIxjJwekaHHmPUoY6RoO0fAyd0xY1dUnXdWPscIZWA=",
+            "created_at": "2014-01-01T00:00:00.000Z",
+            "last_access": "2014-01-01T00:00:00.000Z"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "admins.admin",
+        "fields": {
+            "email": "robert.kopaczewski@syncano.com",
+            "key": "688f3c9d4fc2cad3005867bef676dd4d2fdcfb42",
+            "first_name": "Robert",
+            "last_name": "Kopaczewski",
+            "is_active": true,
+            "is_superuser": true,
+            "is_staff": true,
+            "last_login": "2014-01-01T00:00:00.000Z",
+            "password": "pbkdf2_sha256$15000$HTBgmimquDrc$7bkgkEk2Wxo8y7mcxB8m5TOq5wZlbKZt6gAip0HmQ0A=",
+            "created_at": "2014-01-01T00:00:00.000Z",
+            "last_access": "2014-01-01T00:00:00.000Z"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "admins.admininstancerole",
+        "fields": {
+            "admin": 1,
+            "role": 1,
+            "instance": 1
+        }
+    },
+    {
+        "pk": 2,
+        "model": "admins.admininstancerole",
+        "fields": {
+            "admin": 2,
+            "role": 1,
+            "instance": 1
+        }
+    },
+    {
+        "pk": 1,
+        "model": "instances.Instance",
+        "fields": {
+            "created_at": "2014-01-01T00:00:00.000Z",
+            "updated_at": "2014-01-01T00:00:00.000Z",
+            "owner": 1,
+            "name": "syncano",
+            "description": "Syncano Inc.",
+            "schema_name": "1_syncano"
+        }
+    }
+]

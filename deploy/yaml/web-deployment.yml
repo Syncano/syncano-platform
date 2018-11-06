@@ -1,0 +1,62 @@
+kind: Deployment
+apiVersion: apps/v1beta1
+metadata:
+  name: platform-web
+  labels:
+    app: platform
+    type: web
+spec:
+  replicas: ${REPLICAS}
+  selector:
+    matchLabels:
+      app: platform
+      type: web
+  progressDeadlineSeconds: 600
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 50%
+    type: RollingUpdate
+
+  template:
+    metadata:
+      labels:
+        buildtime: ${BUILDTIME}
+        app: platform
+        type: web
+    spec:
+      terminationGracePeriodSeconds: 360
+      imagePullSecrets:
+        - name: syncano-k8s-pull-secret
+      containers:
+        - name: web
+          image: ${DOCKERIMAGE}:${VERSION}
+          securityContext:
+            privileged: true
+          resources:
+            requests:
+              memory: "1000Mi"
+              cpu: 1
+          ports:
+            - name: http
+              containerPort: 80
+            - name: http-long
+              containerPort: 81
+          env:
+            - name: INSTANCE_TYPE
+              value: web
+          envFrom:
+            - configMapRef:
+                name: platform
+            - secretRef:
+                name: platform
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 5
