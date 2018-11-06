@@ -20,8 +20,8 @@ class TestWebhookHandler(TestCase):
         'TASK_CLASS': 'apps.webhooks.tasks.WebhookTask',
     }
 
-    @mock.patch('apps.async.handlers.gevent.spawn', mock.MagicMock())
-    @mock.patch('apps.async.handlers.redis', mock.MagicMock())
+    @mock.patch('apps.async_tasks.handlers.gevent.spawn', mock.MagicMock())
+    @mock.patch('apps.async_tasks.handlers.redis', mock.MagicMock())
     @mock.patch('apps.webhooks.handlers.import_class', mock.MagicMock())
     def process_codebox(self):
         self.handler = WebhookHandler()
@@ -30,10 +30,10 @@ class TestWebhookHandler(TestCase):
         return self.handler.process_task('abc', 2, 'payload_key', 'meta_key', 1, 'webhook')
 
     def test_timeout_on_subscription_retries(self):
-        with mock.patch('apps.async.handlers.Event', mock.Mock()) as e_mock:
+        with mock.patch('apps.async_tasks.handlers.Event', mock.Mock()) as e_mock:
             event_mock = mock.Mock(side_effect=[False, False, True])
             e_mock().wait = event_mock
-            with mock.patch('apps.async.handlers.Queue') as queue_mock:
+            with mock.patch('apps.async_tasks.handlers.Queue') as queue_mock:
                 queue_mock().get = mock.Mock(side_effect=queue.Empty)
 
                 with self.assertRaises(RequestTimeout):
@@ -41,9 +41,9 @@ class TestWebhookHandler(TestCase):
                 self.assertEqual(event_mock.call_count, 3)
 
     def test_timeout_on_getting_results_raises_exception(self):
-        with mock.patch('apps.async.handlers.Queue') as queue_mock:
+        with mock.patch('apps.async_tasks.handlers.Queue') as queue_mock:
             queue_mock().get = mock.Mock(side_effect=queue.Empty)
-            with mock.patch('apps.async.handlers.Event', mock.Mock()) as e_mock:
+            with mock.patch('apps.async_tasks.handlers.Event', mock.Mock()) as e_mock:
                 e_mock().wait = mock.Mock(return_value=True)
 
                 with self.assertRaises(RequestTimeout) as cm:

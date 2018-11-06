@@ -105,7 +105,7 @@ FROM   pg_class c
 JOIN   pg_namespace n ON n.oid = c.relnamespace
 JOIN   pg_index i ON i.indexrelid = c.oid
 WHERE  n.nspname = '{schema_name}'
-AND    c.relname LIKE 'data\_klass\_{klass_pk}\_%'
+AND    c.relname LIKE 'data\\_klass\\_{klass_pk}\\_%'
 """
 
 CONCURRENTLY_KEYWORD = 'CONCURRENTLY'

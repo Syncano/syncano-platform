@@ -2,7 +2,7 @@
 import rapidjson as json
 from django.http import HttpResponse
 
-from apps.async.exceptions import UwsgiValueError
+from apps.async_tasks.exceptions import UwsgiValueError
 from apps.batch.decorators import disallow_batching
 from apps.core.helpers import get_tracing_attrs, redis
 from apps.core.mixins.views import ValidateRequestSizeMixin

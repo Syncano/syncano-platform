@@ -243,7 +243,7 @@ class SocketImporter:
                     key=key, min=min_val, max=max_val,
                 ), lineno=lineno)
 
-    def process_script_dependency(self, name, spec, path, allow_empty=False):
+    def process_script_dependency(self, name, spec, path, allow_empty=False):  # noqa: C901
         """
         Process script dependency from YAML. Returns dependency dict.
         """
@@ -386,7 +386,7 @@ class SocketImporter:
             event_handlers.append(script_dep)
         return event_handlers
 
-    def parse_event_handler_name(self, name):  # flake8: noqa
+    def parse_event_handler_name(self, name):  # noqa: C901
         """
         Parse and validate event handler name. Return event handler dependency created from it.
         """

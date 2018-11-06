@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from gevent.queue import Empty
 from rest_framework import status
 
-from apps.async.handlers import RedisPubSubHandler
+from apps.async_tasks.handlers import RedisPubSubHandler
 from apps.core.exceptions import RequestTimeout
 from apps.core.helpers import generate_key, import_class
 

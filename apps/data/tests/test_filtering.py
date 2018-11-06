@@ -278,7 +278,7 @@ class TestLikeFiltering(FilteringTestBase):
         self.assert_query_lookup({'str': {'_like': '%S%'}}, 3)
         self.assert_query_lookup({'str': {'_like': 'ab%'}}, 1)
         self.assert_query_lookup({'str': {'_like': 'ab_'}}, 1)
-        self.assert_query_lookup({'str': {'_like': 'data\%\_a'}}, 1)
+        self.assert_query_lookup({'str': {'_like': 'data\\%\\_a'}}, 1)
 
     def test_ilike_filtering(self):
         self.assert_query_lookup({'str': {'_ilike': 'Star'}}, 1)

@@ -10,7 +10,7 @@ from gevent.queue import Empty, Full, Queue
 from gevent.select import select
 from rest_framework import exceptions, status
 
-from apps.async.clients import WebSocketClient
+from apps.async_tasks.clients import WebSocketClient
 from apps.core.helpers import redis
 from apps.core.response import JSONResponse
 

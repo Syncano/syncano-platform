@@ -5,7 +5,7 @@ from gevent.event import Event
 from gevent.queue import Queue
 from munch import Munch
 
-from apps.async.handlers import BasicHandler, RedisPubSubHandler, WebSocketHandler
+from apps.async_tasks.handlers import BasicHandler, RedisPubSubHandler, WebSocketHandler
 from apps.core.exceptions import RequestTimeout
 from apps.core.response import JSONResponse
 
@@ -14,15 +14,15 @@ class TestBasicHandler(TestCase):
     def setUp(self):
         self.handler = BasicHandler()
 
-    @mock.patch('apps.async.handlers.BasicHandler.get_response', side_effect=RequestTimeout())
+    @mock.patch('apps.async_tasks.handlers.BasicHandler.get_response', side_effect=RequestTimeout())
     def test_application_processing_error(self, get_request_mock):
         response = self.handler.application(Munch(environ={}))
         self.assertTrue(get_request_mock.called)
         self.assertEqual(response.content, b'{"detail":"Request timeout."}')
         self.assertEqual(response.status_code, 408)
 
-    @mock.patch('apps.async.handlers.logger', mock.Mock())
-    @mock.patch('apps.async.handlers.BasicHandler.get_response', side_effect=Exception('something'))
+    @mock.patch('apps.async_tasks.handlers.logger', mock.Mock())
+    @mock.patch('apps.async_tasks.handlers.BasicHandler.get_response', side_effect=Exception('something'))
     def test_application_processing_unknown_error(self, get_request_mock):
         response = self.handler.application(Munch(environ={}))
         self.assertTrue(get_request_mock.called)
@@ -30,9 +30,9 @@ class TestBasicHandler(TestCase):
         self.assertEqual(response.status_code, 500)
 
 
-@mock.patch('apps.async.handlers.Event', mock.Mock())
+@mock.patch('apps.async_tasks.handlers.Event', mock.Mock())
 class TestRedisPubSubHandler(TestCase):
-    @mock.patch('apps.async.handlers.redis', mock.Mock())
+    @mock.patch('apps.async_tasks.handlers.redis', mock.Mock())
     def setUp(self):
         self.handler = RedisPubSubHandler()
         self.handler.pubsub.reset_mock()
@@ -111,7 +111,7 @@ class TestWebSocketHandler(TestCase):
     def setUp(self):
         self.handler = WebSocketHandler()
 
-    @mock.patch('apps.async.handlers.select')
+    @mock.patch('apps.async_tasks.handlers.select')
     def test_listener_func_sets_recv_event_after_timeout(self, select_mock):
         recv_event = Event()
 
@@ -119,8 +119,8 @@ class TestWebSocketHandler(TestCase):
         self.assertTrue(select_mock.called)
         self.assertTrue(recv_event.is_set())
 
-    @mock.patch('apps.async.handlers.uwsgi')
-    @mock.patch('apps.async.handlers.gevent')
+    @mock.patch('apps.async_tasks.handlers.uwsgi')
+    @mock.patch('apps.async_tasks.handlers.gevent')
     def test_handle_recv_event_puts_data_in_queue(self, gevent_mock, uwsgi_mock):
         recv_event = Event()
         recv_queue = Queue()
@@ -136,7 +136,7 @@ class TestWebSocketHandler(TestCase):
         for d in data[:2]:
             self.assertEqual(recv_queue.get_nowait(), d)
 
-    @mock.patch('apps.async.handlers.uwsgi')
+    @mock.patch('apps.async_tasks.handlers.uwsgi')
     def test_handle_recv_event_sets_connected_flag_on_error(self, uwsgi_mock):
         recv_event = Event()
         client_mock = mock.Mock()
@@ -145,8 +145,8 @@ class TestWebSocketHandler(TestCase):
         self.handler.handle_recv_event(client_mock, recv_event, None)
         self.assertFalse(client_mock.connected)
 
-    @mock.patch('apps.async.handlers.uwsgi')
-    @mock.patch('apps.async.handlers.gevent')
+    @mock.patch('apps.async_tasks.handlers.uwsgi')
+    @mock.patch('apps.async_tasks.handlers.gevent')
     def test_handle_send_event_calls_websocket_send(self, gevent_mock, uwsgi_mock):
         send_event = Event()
         send_event.set()
@@ -158,7 +158,7 @@ class TestWebSocketHandler(TestCase):
         self.assertTrue(send_queue.empty())
         self.assertFalse(send_event.is_set())
 
-    @mock.patch('apps.async.handlers.uwsgi')
+    @mock.patch('apps.async_tasks.handlers.uwsgi')
     def test_handle_send_event_sets_connected_flag_on_error(self, uwsgi_mock):
         send_queue = Queue()
         send_queue.put('abc')
@@ -172,8 +172,8 @@ class TestWebSocketHandler(TestCase):
         response = self.handler.application(Munch(environ={}))
         self.assertIsInstance(response, JSONResponse)
 
-    @mock.patch('apps.async.handlers.uwsgi')
-    @mock.patch('apps.async.handlers.gevent')
+    @mock.patch('apps.async_tasks.handlers.uwsgi')
+    @mock.patch('apps.async_tasks.handlers.gevent')
     def test_application_returns_when_handler_is_ready(self, gevent_mock, uwsgi_mock):
         handler_mock = mock.Mock()
         listener_mock = mock.Mock()
@@ -185,10 +185,10 @@ class TestWebSocketHandler(TestCase):
         self.assertTrue(handler_mock.ready.called)
         self.assertTrue(listener_mock.kill.called)
 
-    @mock.patch('apps.async.handlers.Event')
-    @mock.patch('apps.async.handlers.uwsgi')
-    @mock.patch('apps.async.handlers.gevent')
-    @mock.patch('apps.async.handlers.WebSocketHandler.client')
+    @mock.patch('apps.async_tasks.handlers.Event')
+    @mock.patch('apps.async_tasks.handlers.uwsgi')
+    @mock.patch('apps.async_tasks.handlers.gevent')
+    @mock.patch('apps.async_tasks.handlers.WebSocketHandler.client')
     def test_application_returns_when_client_disconnects(self, client_mock, gevent_mock, uwsgi_mock, event_mock):
         handler_mock = mock.Mock()
         listener_mock = mock.Mock()
@@ -202,10 +202,10 @@ class TestWebSocketHandler(TestCase):
         self.assertTrue(handler_mock.join.called)
         self.assertTrue(listener_mock.kill.called)
 
-    @mock.patch('apps.async.handlers.Event')
-    @mock.patch('apps.async.handlers.uwsgi')
-    @mock.patch('apps.async.handlers.gevent', mock.Mock())
-    @mock.patch('apps.async.handlers.WebSocketHandler.handle_recv_event', mock.Mock(side_effect=IOError()))
+    @mock.patch('apps.async_tasks.handlers.Event')
+    @mock.patch('apps.async_tasks.handlers.uwsgi')
+    @mock.patch('apps.async_tasks.handlers.gevent', mock.Mock())
+    @mock.patch('apps.async_tasks.handlers.WebSocketHandler.handle_recv_event', mock.Mock(side_effect=IOError()))
     def test_application_calls_handle_recv_event_when_recv_event_is_set(self, uwsgi_mock, event_mock):
         send_event_mock = mock.Mock()
         recv_event_mock = mock.Mock()
@@ -215,10 +215,10 @@ class TestWebSocketHandler(TestCase):
             self.handler.application(Munch(environ={'HTTP_SEC_WEBSOCKET_KEY': 1}))
         self.assertTrue(recv_event_mock.is_set.called)
 
-    @mock.patch('apps.async.handlers.Event')
-    @mock.patch('apps.async.handlers.uwsgi')
-    @mock.patch('apps.async.handlers.gevent', mock.Mock())
-    @mock.patch('apps.async.handlers.WebSocketHandler.handle_send_event', mock.Mock(side_effect=IOError()))
+    @mock.patch('apps.async_tasks.handlers.Event')
+    @mock.patch('apps.async_tasks.handlers.uwsgi')
+    @mock.patch('apps.async_tasks.handlers.gevent', mock.Mock())
+    @mock.patch('apps.async_tasks.handlers.WebSocketHandler.handle_send_event', mock.Mock(side_effect=IOError()))
     def test_application_calls_handle_send_event_when_send_event_is_set(self, uwsgi_mock, event_mock):
         send_event_mock = mock.Mock()
         recv_event_mock = mock.Mock()

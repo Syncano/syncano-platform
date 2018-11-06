@@ -2,7 +2,7 @@ from django.test import TestCase
 from gevent.event import Event
 from gevent.queue import Queue
 
-from apps.async.clients import WebSocketClient
+from apps.async_tasks.clients import WebSocketClient
 
 
 class TestWebSocketClient(TestCase):

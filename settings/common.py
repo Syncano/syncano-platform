@@ -60,7 +60,7 @@ SHARED_APPS = (
     'apps.admins',
     'apps.metrics',
     'apps.billing',
-    'apps.async',
+    'apps.async_tasks',
     'apps.analytics',
     'apps.batch',
     'apps.controlpanel',

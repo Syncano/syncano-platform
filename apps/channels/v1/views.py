@@ -10,7 +10,7 @@ from rest_framework_extensions.mixins import DetailSerializerMixin
 
 from apps.admins.permissions import AdminHasPermissions
 from apps.apikeys.permissions import IsApiKeyAccess, IsApiKeyAllowingAnonymousRead, IsApiKeyIgnoringAcl
-from apps.async.exceptions import UwsgiValueError
+from apps.async_tasks.exceptions import UwsgiValueError
 from apps.batch.decorators import disallow_batching
 from apps.billing.permissions import OwnerInGoodStanding
 from apps.channels.exceptions import IncorrectLastId, RoomRequired
@@ -177,7 +177,7 @@ class ChannelViewSet(CacheableObjectMixin,
                 if current_last_id < last_id:
                     raise IncorrectLastId()
                 if current_last_id == last_id:
-                    # Return an async handler to subscribe and wait for results
+                    # Return an async_tasks handler to subscribe and wait for results
                     return self.create_uwsgi_response(request, channel, last_id, room)
 
                 # Check if we got message cached
@@ -192,7 +192,7 @@ class ChannelViewSet(CacheableObjectMixin,
                 return Response(
                     ChangeSerializer(change_list[0], excluded_fields=('links', 'room',)).data)
 
-        # No results found, return an async handler to subscribe and wait for results
+        # No results found, return an async_tasks handler to subscribe and wait for results
         return self.create_uwsgi_response(request, channel, last_id, room)
 
     @detail_route(methods=['post'],

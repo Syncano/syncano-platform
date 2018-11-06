@@ -7,7 +7,7 @@ from django.conf import settings
 from gevent.queue import Empty
 from rest_framework import exceptions, status
 
-from apps.async.handlers import RedisPubSubHandler, WebSocketHandler
+from apps.async_tasks.handlers import RedisPubSubHandler, WebSocketHandler
 from apps.channels.exceptions import IncorrectLastId
 from apps.channels.tasks import GetChangeTask
 from apps.core.exceptions import RequestTimeout

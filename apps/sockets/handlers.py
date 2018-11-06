@@ -8,7 +8,7 @@ import requests
 import zipstream
 from django.http import StreamingHttpResponse
 
-from apps.async.handlers import BasicHandler
+from apps.async_tasks.handlers import BasicHandler
 
 try:
     # try to import uwsgi first as that module is not be available outside of uwsgi context (e.g. during tests)

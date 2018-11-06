@@ -20,7 +20,7 @@ from rest_framework_extensions.mixins import DetailSerializerMixin
 from retrying import retry
 
 from apps.apikeys.models import ApiKey
-from apps.async.exceptions import UwsgiValueError
+from apps.async_tasks.exceptions import UwsgiValueError
 from apps.billing.models import AdminLimit
 from apps.billing.permissions import OwnerInGoodStanding
 from apps.channels.models import Channel
