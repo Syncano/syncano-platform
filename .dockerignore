@@ -1,0 +1,6 @@
+.*
+coverage_report
+db
+deploy
+dev
+media/**

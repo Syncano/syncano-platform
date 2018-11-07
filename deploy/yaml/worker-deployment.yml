@@ -1,0 +1,69 @@
+kind: Deployment
+apiVersion: apps/v1beta1
+metadata:
+  name: platform-worker
+  labels:
+    app: platform
+    type: worker
+spec:
+  replicas: ${REPLICAS}
+  selector:
+    matchLabels:
+      app: platform
+      type: worker
+  progressDeadlineSeconds: 600
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 50%
+    type: RollingUpdate
+
+  template:
+    metadata:
+      labels:
+        buildtime: ${BUILDTIME}
+        app: platform
+        type: worker
+    spec:
+      volumes:
+        - name: cert-data
+          nfs:
+            server: ${CERTS_NFS}
+            path: /
+            readOnly: false
+        - name: acme
+          secret:
+            secretName: platform-acme
+
+      terminationGracePeriodSeconds: 360
+      imagePullSecrets:
+        - name: syncano-k8s-pull-secret
+      containers:
+        - name: worker
+          image: ${DOCKERIMAGE}:${VERSION}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: cert-data
+              mountPath: "/acme/certs"
+              subPath: certs
+            - name: acme
+              mountPath: "/acme/config/account.key"
+              readOnly: true
+              subPath: account.key
+            - name: acme
+              mountPath: "/acme/config/account.thumb"
+              readOnly: true
+              subPath: account.thumb
+          resources:
+            requests:
+              memory: "1500Mi"
+              cpu: 1
+          env:
+            - name: INSTANCE_TYPE
+              value: worker
+          envFrom:
+            - configMapRef:
+                name: platform
+            - secretRef:
+                name: platform

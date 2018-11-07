@@ -1,0 +1,29 @@
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: platform-migration
+spec:
+  template:
+    metadata:
+      name: platform-migration
+    spec:
+      imagePullSecrets:
+        - name: syncano-k8s-pull-secret
+      restartPolicy: Never
+      containers:
+        - name: platform-web
+          image: ${DOCKERIMAGE}:${VERSION}
+          command:
+            - "./run_care.sh"
+            - "${CARE_ARGUMENTS}"
+          securityContext:
+            privileged: true
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: 1
+          envFrom:
+            - configMapRef:
+                name: platform
+            - secretRef:
+                name: platform

@@ -1,0 +1,20 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: platform-web
+  labels:
+    k8s-app: platform-web
+spec:
+  type: ClusterIP
+  selector:
+    app: platform
+    type: web
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http
+    - name: http-long
+      protocol: TCP
+      port: 81
+      targetPort: http-long

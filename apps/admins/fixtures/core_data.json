@@ -1,0 +1,23 @@
+[
+    {
+        "pk":1,
+        "model":"admins.role",
+        "fields":{
+            "name": "full"
+        }
+    },
+    {
+        "pk":2,
+        "model":"admins.role",
+        "fields":{
+            "name": "write"
+        }
+    },
+    {
+        "pk":3,
+        "model":"admins.role",
+        "fields":{
+            "name": "read"
+        }
+    }
+]

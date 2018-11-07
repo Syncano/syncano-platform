@@ -1,0 +1,49 @@
+[
+    {
+        "pk": 1,
+        "model": "admins.admin",
+        "fields": {
+            "email": "admin@syncano.com",
+            "key": "def0123456789876543210def012345678987654",
+            "first_name": "Syncano",
+            "last_name": "Superuser",
+            "is_active": true,
+            "is_superuser": true,
+            "is_staff": true,
+            "last_login": "2014-01-01T00:00:00.000Z",
+            "password": "pbkdf2_sha256$100000$gC8GrOKVSLY7$YCAf7zmU47720yPtvmpjgWiRm+2yCTpx7O+LZ1mjYIs=",
+            "created_at": "2014-01-01T00:00:00.000Z",
+            "last_access": "2014-01-01T00:00:00.000Z"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "admins.admininstancerole",
+        "fields": {
+            "admin": 1,
+            "role": 1,
+            "instance": 1
+        }
+    },
+    {
+        "pk": 2,
+        "model": "admins.admininstancerole",
+        "fields": {
+            "admin": 2,
+            "role": 1,
+            "instance": 1
+        }
+    },
+    {
+        "pk": 1,
+        "model": "instances.Instance",
+        "fields": {
+            "created_at": "2014-01-01T00:00:00.000Z",
+            "updated_at": "2014-01-01T00:00:00.000Z",
+            "owner": 1,
+            "name": "syncano",
+            "description": "Syncano Inc.",
+            "schema_name": "1_syncano"
+        }
+    }
+]
