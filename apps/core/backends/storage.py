@@ -1,4 +1,5 @@
 # coding=UTF8
+from botocore.handlers import set_list_objects_encoding_type_url
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.db import DEFAULT_DB_ALIAS, connections
@@ -59,6 +60,15 @@ class S3BotoStorageWithTransactionSupport(StorageWithTransactionSupportMixin, S3
             self.copy(content.name, cleaned_name)
             return cleaned_name
         return super()._save(name, content)
+
+    @property
+    def connection(self):
+        connection = getattr(self._connections, 'connection', None)
+        if connection is None:
+            connection = super().connection
+            connection.meta.client.meta.events.unregister('before-parameter-build.s3.ListObjects',
+                                                          set_list_objects_encoding_type_url)
+        return connection
 
 
 class DefaultStorage(LazyObject):

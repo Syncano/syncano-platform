@@ -81,6 +81,11 @@ class TestRegisterView(CleanupTestCaseMixin, APITestCase):
         response = self.client.post(self.url, self.credentials)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    @override_settings(REGISTRATION_ENABLED=False)
+    def test_post_returns_400_on_registration_disabled(self):
+        response = self.client.post(self.url, self.credentials)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_post_creates_admin(self):
         response = self.client.post(self.url, self.credentials)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
