@@ -95,6 +95,10 @@ class KlassViewSet(AutocompleteMixin,
                 raise KlassCountExceeded(klass_limit)
             serializer.save()
 
+    def perform_destroy(self, instance):
+        instance.clean()
+        super().perform_destroy(instance)
+
 
 class ObjectViewSet(AtomicMixin,
                     InstanceBasedMixin,
