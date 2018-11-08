@@ -152,11 +152,8 @@ class SocketViewSet(ValidateRequestSizeMixin, DetailSerializerMixin, AtomicMixin
             raise SocketLocked()
 
         old_env = socket.environment
-        with transaction.atomic():
-            Instance.objects.select_for_update().get(pk=self.request.instance.pk)
-
-            super().perform_update(serializer)
-            self.check_environment(socket.pk, old_env, socket.environment_id)
+        super().perform_update(serializer)
+        self.check_environment(socket.pk, old_env, socket.environment_id)
 
     def check_environment(self, socket_pk, old_env, new_env_pk):
         # Remove socket environments if they are no longer used.
@@ -165,11 +162,11 @@ class SocketViewSet(ValidateRequestSizeMixin, DetailSerializerMixin, AtomicMixin
             old_env.delete()
 
     def perform_destroy(self, instance):
-        with transaction.atomic():
-            Instance.objects.select_for_update().get(pk=self.request.instance.pk)
+        if instance.is_locked:
+            raise SocketLocked()
 
-            super().perform_destroy(instance)
-            self.check_environment(instance.pk, instance.environment, None)
+        super().perform_destroy(instance)
+        self.check_environment(instance.pk, instance.environment, None)
 
 
 class SocketEndpointViewSet(CacheableObjectMixin,
