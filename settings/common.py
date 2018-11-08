@@ -240,6 +240,7 @@ AWS_QUERYSTRING_AUTH = False  # don't add complex authentication-related query p
 AWS_S3_CUSTOM_DOMAIN = os.environ.get('S3_CUSTOM_DOMAIN', '')  # e.g. d1e3fhjr88e1hl.cloudfront.net
 AWS_DEFAULT_ACL = 'public-read'
 
+S3_GOOGLE_STORAGE = os.environ.get('S3_GOOGLE_STORAGE', 'false') == 'true'
 S3_ACCESS_KEY_ID = os.environ.get('S3_ACCESS_KEY_ID', '')
 S3_HOSTING_BUCKET = os.environ.get('S3_HOSTING_BUCKET', '')
 S3_SECRET_ACCESS_KEY = os.environ.get('S3_SECRET_ACCESS_KEY', '')

@@ -159,7 +159,13 @@ class DeleteFilesTask(TaskLockMixin, app.Task):
 
         for bucket_name in buckets:
             bucket = s3.Bucket(bucket_name)
-            bucket.objects.filter(Prefix=prefix).delete()
+            f = bucket.objects.filter(Prefix=prefix)
+            if settings.S3_GOOGLE_STORAGE:
+                # Temporary workaround for gcloud storage not working properly with mass deletes.
+                for obj in f.all():
+                    obj.delete()
+            else:
+                f.delete()
 
 
 class ObjectProcessorBaseTask(TaskLockMixin, InstanceBasedTask, ABC):
