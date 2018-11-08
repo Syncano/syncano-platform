@@ -238,6 +238,7 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_S3_SECURE_URLS = True  # use https
 AWS_QUERYSTRING_AUTH = False  # don't add complex authentication-related query parameters for requests
 AWS_S3_CUSTOM_DOMAIN = os.environ.get('S3_CUSTOM_DOMAIN', '')  # e.g. d1e3fhjr88e1hl.cloudfront.net
+AWS_DEFAULT_ACL = 'public-read'
 
 S3_ACCESS_KEY_ID = os.environ.get('S3_ACCESS_KEY_ID', '')
 S3_HOSTING_BUCKET = os.environ.get('S3_HOSTING_BUCKET', '')
