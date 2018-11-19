@@ -89,7 +89,9 @@ class RedisPubSubHandler(BasicHandler):
 
         # If subscribe event timed out, reset connection
         if not subscribe_event.wait(timeout):
+            self.channel_data[channel] = Event()
             self.reset()
+            gevent.sleep(0.1)
             return self.subscribe(channel, client_uuid, maxsize, timeout)
         return queue
 
