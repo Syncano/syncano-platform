@@ -13,7 +13,7 @@ from apps.apikeys.permissions import IsApiKeyAccess, IsApiKeyAllowingAnonymousRe
 from apps.async_tasks.exceptions import UwsgiValueError
 from apps.batch.decorators import disallow_batching
 from apps.billing.permissions import OwnerInGoodStanding
-from apps.channels.exceptions import IncorrectLastId, RoomRequired
+from apps.channels.exceptions import RoomRequired
 from apps.channels.helpers import create_author_dict
 from apps.channels.models import Change, Channel
 from apps.channels.permissions import (
@@ -32,7 +32,7 @@ from apps.channels.v1.serializers import (
     ChannelSerializer,
     ChannelSubscribeSerializer
 )
-from apps.core.helpers import get_from_request_query_params, get_tracing_attrs, redis
+from apps.core.helpers import get_from_request_query_params, get_tracing_attrs
 from apps.core.mixins.views import (
     AtomicMixin,
     AutocompleteMixin,
@@ -40,7 +40,6 @@ from apps.core.mixins.views import (
     NestedViewSetMixin,
     ValidateRequestSizeMixin
 )
-from apps.core.response import JSONResponse
 from apps.core.throttling import AnonRateThrottle
 from apps.core.zipkin import propagate_uwsgi_params
 from apps.instances.mixins import InstanceBasedMixin
@@ -126,7 +125,6 @@ class ChannelViewSet(CacheableObjectMixin,
                 uwsgi.add_var('OFFLOAD_HANDLER', 'apps.channels.handlers.ChannelWSHandler')
             uwsgi.add_var('CHANNEL_PK', str(channel.pk))
             uwsgi.add_var('INSTANCE_PK', str(request.instance.pk))
-            uwsgi.add_var('LAST_ID_KEY', channel.get_publish_last_id_key(room))
             uwsgi.add_var('STREAM_CHANNEL', channel.get_stream_channel_name(room))
 
             if room is not None:
@@ -167,27 +165,8 @@ class ChannelViewSet(CacheableObjectMixin,
     def process_poll(self, request, channel, last_id, room):
         # Filter by last id if needed
         if last_id is not None:
-            last_id_key = channel.get_publish_last_id_key(room)
-            current_last_id = redis.get(last_id_key)
-
-            if current_last_id is not None:
-                # Check current last id first if it is set
-                current_last_id = int(current_last_id)
-                # Passed last id cannot be higher than the current one
-                if current_last_id < last_id:
-                    raise IncorrectLastId()
-                if current_last_id == last_id:
-                    # Return an async_tasks handler to subscribe and wait for results
-                    return self.create_uwsgi_response(request, channel, last_id, room)
-
-                # Check if we got message cached
-                cached_history = redis.get(channel.get_last_change_key(room, last_id))
-                if cached_history:
-                    return JSONResponse(cached_history)
-
             # Filter by last_id by id
-            change_list = Change.list(min_pk=last_id + 1, ordering='asc', limit=1,
-                                      channel=channel, room=room)
+            change_list = Change.list(min_pk=last_id + 1, ordering='asc', limit=1, channel=channel, room=room)
             if change_list:
                 return Response(
                     ChangeSerializer(change_list[0], excluded_fields=('links', 'room',)).data)

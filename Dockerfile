@@ -1,8 +1,8 @@
-FROM python:3.6-alpine3.7
+FROM python:3.6-alpine3.8
 
 ARG EMAIL=devops@syncano.com
 ENV PYTHON_EGG_CACHE=/home/syncano/.python-eggs \
-    ACME_VERSION=2.7.8 \
+    ACME_VERSION=2.7.9 \
     LE_WORKING_DIR=/acme/home \
     LE_CONFIG_HOME=/acme/config \
     CERT_HOME=/acme/certs \
@@ -41,9 +41,9 @@ RUN set -ex \
         # envsubst
         gettext \
     \
-    # Install libcrypto from edge for gdal-2.3.0
+    # Install libcrypto from edge for gdal-2.3.2r1
     && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-        libressl2.7-libcrypto \
+        libcrypto1.1 \
     \
     # Install testing packages
     && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \

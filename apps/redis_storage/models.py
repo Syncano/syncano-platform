@@ -150,7 +150,7 @@ class RedisModel(metaclass=RedisModelBase):
 
     @classmethod
     def _format_key(cls, key, **kwargs):
-        if cls.tenant_model:
+        if cls.tenant_model and 'instance' not in kwargs:
             kwargs['instance'] = get_current_instance()
         return key.format(**kwargs)
 

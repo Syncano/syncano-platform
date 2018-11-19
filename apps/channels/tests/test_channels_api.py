@@ -7,8 +7,6 @@ from django_dynamic_fixture import G
 from rest_framework import status
 
 from apps.channels.v1.views import CHANNEL_PAYLOAD_LIMIT
-from apps.core.helpers import redis
-from apps.core.response import JSONResponse
 from apps.core.tests.testcases import SyncanoAPITestBase
 from apps.instances.helpers import set_current_instance
 from apps.users.models import Group, Membership, User
@@ -203,10 +201,9 @@ class TestChannelPublish(UserTestCase):
         self.create_channel(access_as='admin', create_user=False, separate_rooms=False)
         data = {'payload': json.dumps({'key': 'value'})}
 
-        self.assertIsNone(redis.get(self.channel.get_publish_last_id_key(None)))
         self.client.post(self.url, data)
         change_list = Change.list(channel=self.channel)
-        self.assertEqual(int(redis.get(self.channel.get_publish_last_id_key(None))), change_list[0].id)
+        self.assertEqual(len(change_list), 1)
 
 
 class TestChannelPoll(UserTestCase):
@@ -250,8 +247,7 @@ class TestChannelPoll(UserTestCase):
         G(Membership, user=self.user, group=self.group)
         response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIsInstance(response, JSONResponse)
-        self.assertEqual(json.loads(response.content)['id'], change.id)
+        self.assertEqual(response.data['id'], change.id)
 
     def test_poll_denied_without_room(self):
         self.create_channel(access_as='admin', create_user=False)
@@ -267,8 +263,7 @@ class TestChannelPoll(UserTestCase):
         response = self.client.get(self.url, {'last_id': change1.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Expect raw response from cache
-        self.assertIsInstance(response, JSONResponse)
-        self.assertEqual(json.loads(response.content)['id'], change2.id)
+        self.assertEqual(response.data['id'], change2.id)
 
     @mock.patch('apps.channels.v1.views.uwsgi')
     def test_poll_falls_back_to_uwsgi_handler(self, uwsgi_mock):
@@ -300,13 +295,4 @@ class TestChannelPoll(UserTestCase):
         uwsgi_mock.add_var.side_effect = ValueError
         self.create_channel(access_as='admin', create_user=False, separate_rooms=False)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_poll_denied_with_wrong_last_id(self):
-        self.create_channel(access_as='admin', create_user=False, separate_rooms=False)
-        change = self.channel.create_change()
-
-        response = self.client.get(self.url, {'last_id': change.id + 1})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        response = self.client.get(self.url, {'last_id': 'aaa'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
