@@ -134,7 +134,7 @@ class DeleteLiveObjectTask(app.Task):
 
 @register_task
 class DeleteFilesTask(TaskLockMixin, app.Task):
-    buckets = (settings.STORAGE_TYPE, settings.STORAGE_HOSTING_BUCKET)
+    buckets = (settings.STORAGE_BUCKET, settings.STORAGE_HOSTING_BUCKET)
 
     def run(self, prefix, all_buckets=False):
         """

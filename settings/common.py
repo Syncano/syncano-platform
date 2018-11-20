@@ -304,8 +304,6 @@ CELERY_TASK_QUEUES = (
     Queue(ROOT_TASKS_QUEUE, routing_key=ROOT_TASKS_QUEUE),
 )
 
-CELERY_REDBEAT_REDIS_URL = CELERY_RESULT_BACKEND
-CELERY_BEAT_SCHEDULER = 'apps.core.backends.scheduler.RedBeatScheduler'
 CELERY_BEAT_SCHEDULE = {
     'metrics-aggregate-minute-runner': {
         'task': 'apps.metrics.tasks.AggregateMinuteRunnerTask',
