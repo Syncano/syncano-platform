@@ -1,6 +1,5 @@
 #!/bin/bash
-
-set -e
+set -euo pipefail
 
 sysctl -w net.core.somaxconn=1024
 

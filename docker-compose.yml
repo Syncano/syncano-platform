@@ -66,11 +66,11 @@ services:
       - STORAGE_BUCKET
       - CI
       - COLORS_ENABLED=true
+      - DB_INSTANCES_NAME
       - DJANGO_DEBUG=true
       - DOCKER_HOST_DIRECTORY
       - LEGACY_CODEBOX_ENABLED=true
       - PARALLEL_COUNT
-      - DB_INSTANCES_NAME
       - SPACE_DOMAIN=syncano_space.test
       - STRIPE_SECRET_KEY
       - TEST_MIGRATIONS

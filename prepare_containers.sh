@@ -1,6 +1,5 @@
 #!/bin/bash
-
-set -ex
+set -euo pipefail
 
 PLATFORM_IMAGE=quay.io/syncano/syncano-platform:staging
 SANDBOX_IMAGE=quay.io/syncano/script-docker-image:devel
