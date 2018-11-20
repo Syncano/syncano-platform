@@ -14,6 +14,10 @@ jobs:
           command: make pull-cache docker
 
       - run:
+          name: Build docker for tests
+          command: make build
+
+      - run:
           name: Prepare containers
           command: ./prepare_containers.sh
 

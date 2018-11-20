@@ -36,7 +36,7 @@ push-cache: require-docker ## Push platform image for cache
 docker: guard-ACME_EMAIL require-docker ## Build platform image
 	docker build -t $(DOCKERIMAGE) --build-arg EMAIL=$(ACME_EMAIL) .
 
-build: ## Build local platform image (use ./prepare_container.sh to build image for CI)
+build: ## Build platform image for testing (use ./prepare_container.sh to build image for CI)
 	docker-compose build
 
 stop: require-docker-compose ## Stop whole platform
