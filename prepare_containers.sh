@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-PLATFORM_IMAGE=quay.io/syncano/syncano-platform:staging
+PLATFORM_IMAGE=quay.io/syncano/syncano-platform:test
 SANDBOX_IMAGE=quay.io/syncano/script-docker-image:devel
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 

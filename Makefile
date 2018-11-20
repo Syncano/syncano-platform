@@ -5,7 +5,7 @@ endif
 SHELL := /bin/bash
 GITSHA = $(shell git rev-parse --short HEAD)
 
-.PHONY: help run build pull-staging push-staging build-staging pull-production push-production build-production stop clean test test-with-migrations makemigrations deploy-staging deploy-production encrypt decrypt patch fmt fmtcheck lint
+.PHONY: help run build pull-cache push-cache docker build stop clean test test-with-migrations makemigrations deploy-staging deploy-production encrypt decrypt patch fmt fmtcheck lint
 .DEFAULT_GOAL := help
 $(VERBOSE).SILENT:
 
@@ -18,31 +18,28 @@ guard-%:
 		exit 1; \
 	fi
 
-run: build ## Start whole platform locally
+require-%:
+	if ! which ${*} > /dev/null; then \
+		echo "! ${*} not installed"; \
+		exit 1; \
+	fi
+
+run: require-docker-compose ## Start whole platform locally
 	docker-compose up --rm
 
-build: ## Build local platform image (use ./prepare_container.sh to build image for deployment)
+pull-cache: require-docker ## Pull platform image for cache
+	docker pull $(DOCKERIMAGE)|| true
+
+push-cache: require-docker ## Push platform image for cache
+	docker push $(DOCKERIMAGE)
+
+docker: guard-ACME_EMAIL require-docker ## Build platform image
+	docker build -t $(DOCKERIMAGE) --build-arg EMAIL=$(ACME_EMAIL) .
+
+build: ## Build platform image for testing (use ./prepare_container.sh to build image for CI)
 	docker-compose build
 
-pull-staging: ## Pull development (staging) platform image
-	docker pull $(DOCKERIMAGE):staging || true
-
-push-staging: ## Push staging platform image
-	docker push $(DOCKERIMAGE):staging
-
-build-staging: guard-ACME_EMAIL ## Build development (staging) platform image
-	docker build --cache-from $(DOCKERIMAGE):staging -t $(DOCKERIMAGE):staging --build-arg EMAIL=$(ACME_EMAIL) .
-
-pull-production: ## Pull production platform image
-	docker pull $(DOCKERIMAGE):production || true
-
-push-production: ## Push production platform image
-	docker push $(DOCKERIMAGE):production
-
-build-production: guard-ACME_EMAIL ## Build production platform image
-	docker build --cache-from $(DOCKERIMAGE):production -t $(DOCKERIMAGE):production --build-arg EMAIL=$(ACME_EMAIL) --build-arg DEVEL=false .
-
-stop: ## Stop whole platform
+stop: require-docker-compose ## Stop whole platform
 	docker-compose stop
 
 clean: stop ## Cleanup repository
@@ -50,21 +47,21 @@ clean: stop ## Cleanup repository
 	find deploy -name "*.unenc" -delete
 	git clean -f
 
-test: ## Run tests in container
+test: require-docker-compose ## Run tests in container
 	docker-compose run --rm web bash -c "chmod 777 /var/run/docker.sock && su-exec syncano ./test.sh ${ARGS}"
 
-migrate: ## Migrate container database
+migrate: require-docker-compose ## Migrate container database
 	docker-compose run --rm web ./run_care.sh
 
-makemigrations: ## Make django migrations
+makemigrations: require-docker-compose ## Make django migrations
 	docker-compose run --rm --no-deps web ./manage.py makemigrations
 
-deploy-staging: ## Deploy application to staging
+deploy-staging: require-kubectl ## Deploy application to staging
 	echo "=== deploying staging ==="
 	kubectl config use-context k8s.syncano.rocks
 	./deploy.sh staging stg-$(GITSHA) $(ARGS)
 
-deploy-production: ## Deploy application to production
+deploy-production: require-kubectl ## Deploy application to production
 	echo "=== deploying us1 ==="
 	kubectl config use-context k8s.syncano.io
 	./deploy.sh us1 prd-$(GITSHA) $(ARGS)

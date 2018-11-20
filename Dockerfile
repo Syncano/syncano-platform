@@ -78,8 +78,7 @@ killall Xvfb\
     && rm -rf /etc/nginx/conf.d/*
 
 # Install python dependencies
-ARG DEVEL=true
-COPY ./requirements*.txt /home/syncano/app/
+COPY ./requirements.txt /home/syncano/app/
 COPY ./modules /home/syncano/app/modules
 WORKDIR /home/syncano/app
 RUN set -ex \
@@ -94,7 +93,6 @@ RUN set -ex \
         libxml2-dev \
         libxslt-dev \
         git \
-    && if [[ $DEVEL == "true" ]]; then pip3 install -r requirements_development.txt; fi \
     && pip3 install --no-cache-dir -r requirements.txt modules/serializer \
     && apk del .build-deps
 

@@ -11,7 +11,11 @@ jobs:
 
       - run:
           name: Build image
-          command: make pull-staging build-staging
+          command: make pull-cache docker
+
+      - run:
+          name: Build docker for tests
+          command: make build
 
       - run:
           name: Prepare containers
@@ -54,7 +58,7 @@ jobs:
 
             if [ "$CIRCLE_BRANCH" = "devel" ]; then
               kops export kubecfg --name=k8s.syncano.rocks --state=s3://k8s-syncano-rocks-state-store
-              make pull-staging build-staging deploy-staging push-staging
+              make pull-cache docker deploy-staging push-cache
 
             elif [ "$CIRCLE_BRANCH" = "master" ]; then
               kops export kubecfg --name=k8s.syncano.io --state=s3://k8s-syncano-io-state-store
@@ -62,7 +66,7 @@ jobs:
               gcloud auth activate-service-account --key-file=gcloud-service-key.json
               gcloud container clusters get-credentials syncano-eu1 --zone europe-west1 --project pioner-syncano-prod-9cfb
 
-              make pull-production build-production deploy-production push-production
+              make pull-cache docker deploy-production
             fi
 
             make clean
