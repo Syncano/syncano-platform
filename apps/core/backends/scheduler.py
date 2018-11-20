@@ -24,7 +24,7 @@ class RedBeatSchedulerEntry(schedulers.RedBeatSchedulerEntry):
         return self
 
     def _next_instance(self, last_run_at=None, only_update_last_run_at=False):
-        entry = super(RedBeatSchedulerEntry, self)._next_instance(last_run_at=last_run_at)
+        entry = super(schedulers.RedBeatSchedulerEntry, self)._next_instance(last_run_at=last_run_at)
 
         if only_update_last_run_at:
             # rollback the update to total_run_count
