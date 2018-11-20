@@ -1,6 +1,5 @@
 # coding=UTF8
 from django.conf import settings
-from django.db import transaction
 from rest_framework import status, viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
@@ -80,8 +79,7 @@ class ScheduleViewSet(InstanceBasedMixin,
 
     def perform_create(self, serializer):
         # Lock on instance for the duration of transaction to avoid race conditions
-        with transaction.atomic():
-            Instance.objects.select_for_update().get(pk=self.request.instance.pk)
+        with Instance.lock(self.request.instance.pk):
             schedule_limit = AdminLimit.get_for_admin(self.request.instance.owner_id).get_schedules_count()
             if CodeBoxSchedule.objects.count() >= schedule_limit:
                 raise ScheduleCountExceeded(schedule_limit)

@@ -22,6 +22,7 @@ from apps.data.v2.serializers import KlassSerializer
 from apps.hosting.models import Hosting
 from apps.hosting.v2.serializers import HostingSerializer
 from apps.instances.helpers import get_current_instance, get_instance_db
+from apps.instances.models import Instance
 from apps.sockets.exceptions import ObjectProcessingError, SocketLockedClass, SocketNoDeleteClasses
 from apps.sockets.helpers import cleanup_data_klass_ref, unref_data_klass
 from apps.sockets.models import Socket, SocketEndpoint, SocketHandler
@@ -333,7 +334,7 @@ class ClassDependency(SocketDependency):
             'props': field_props,
         }
 
-        return serializer, refs
+        return serializer.save(refs=refs)
 
     def ignored_class_names(self):
         return {dep['name'].lower() for dep in self.dependencies if dep['name'] != self.dependency['name']}
@@ -376,7 +377,7 @@ class ClassDependency(SocketDependency):
         }, partial=True)
         serializer.is_valid(raise_exception=True)
 
-        return serializer, refs
+        return serializer.save(refs=refs)
 
     def merge_class_schema(self, schema, dep_fields, ref_fields, ref_props):
         installed_class = self.socket.installed.get(self.yaml_type, {}).get(self.name, {})
@@ -458,12 +459,12 @@ class ClassDependency(SocketDependency):
                 raise SocketLockedClass(name)
         except Klass.DoesNotExist:
             # Create fresh class
-            klass_serializer, refs = self.create_class()
+            with Instance.lock(get_current_instance().pk):
+                klass = self.create_class()
         else:
-            klass_serializer, refs = self.update_class(klass)
+            klass = self.update_class(klass)
 
         # Save class
-        klass = klass_serializer.save(refs=refs)
         self.add_installed(klass)
         return {name.lower(): {f['name']: f['type'] for f in self.dependency['schema']}}
 
@@ -719,7 +720,8 @@ class ScheduleEventHandlerDependency(ScriptBasedDependency, EventHandlerBasedDep
             schedule = CodeBoxSchedule.objects.filter(socket=self.socket,
                                                       **self.schedule_params).select_related('codebox').get()
         except CodeBoxSchedule.DoesNotExist:
-            schedule = self.create_schedule()
+            with Instance.lock(get_current_instance().pk):
+                schedule = self.create_schedule()
         else:
             schedule = self.update_schedule(schedule)
         schedule.schedule_next()

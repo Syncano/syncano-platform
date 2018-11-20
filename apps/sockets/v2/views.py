@@ -5,7 +5,6 @@ from socket import gaierror, gethostbyname
 
 import rapidjson as json
 from django.conf import settings
-from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.utils.functional import cached_property
 from django.utils.text import get_valid_filename
@@ -133,8 +132,7 @@ class SocketViewSet(ValidateRequestSizeMixin, DetailSerializerMixin, AtomicMixin
 
     def perform_create(self, serializer):
         # Lock on instance for the duration of transaction to avoid race conditions
-        with transaction.atomic():
-            Instance.objects.select_for_update().get(pk=self.request.instance.pk)
+        with Instance.lock(self.request.instance.pk):
             socket_limit = AdminLimit.get_for_admin(self.request.instance.owner_id).get_sockets_count()
             if Socket.objects.count() >= socket_limit:
                 raise SocketCountExceeded(socket_limit)
@@ -406,8 +404,7 @@ class SocketEnvironmentViewSet(ValidateRequestSizeMixin, DetailSerializerMixin, 
 
     def perform_create(self, serializer):
         # Lock on instance for the duration of transaction to avoid race conditions
-        with transaction.atomic():
-            Instance.objects.select_for_update().get(pk=self.request.instance.pk)
+        with Instance.lock(self.request.instance.pk):
             socket_limit = AdminLimit.get_for_admin(self.request.instance.owner_id).get_sockets_count()
             if SocketEnvironment.objects.count() >= socket_limit:
                 raise SocketCountExceeded(socket_limit)

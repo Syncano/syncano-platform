@@ -89,7 +89,7 @@ class TestInstancesDetailAPI(SyncanoAPITestBase):
         response = self.client.delete(self.url, HTTP_X_API_KEY=admin.key)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    @override_settings(LOCAL_MEDIA_STORAGE=False)
+    @override_settings(LOCAL_MEDIA_STORAGE=False, STORAGE_TYPE='s3')
     def test_if_delete_deletes_files(self):
         bucket = mock.Mock()
         connection = mock.Mock()

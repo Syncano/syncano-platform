@@ -108,7 +108,7 @@ class RedisModel(metaclass=RedisModelBase):
             if not self._saved:
                 # Save to list if not added already
                 list_key = self.get_list_key(**kwargs)
-                pipe.zadd(list_key, self.pk, object_key)
+                pipe.zadd(list_key, {object_key: self.pk})
                 if ttl:
                     pipe.expire(list_key, ttl)
                 list_max_size = self.get_list_max_size(**kwargs)

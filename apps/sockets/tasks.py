@@ -16,7 +16,6 @@ from settings.celeryconf import register_task
 from apps.core.helpers import download_file
 from apps.core.tasks import ObjectProcessorBaseTask as _ObjectProcessorBaseTask
 from apps.instances.helpers import get_current_instance, get_instance_db
-from apps.instances.models import Instance
 from apps.sockets.exceptions import ObjectProcessingError
 from apps.sockets.importer import SocketImporter
 from apps.sockets.processor import default_processor
@@ -144,17 +143,13 @@ class SocketProcessorTask(ObjectProcessorBaseTask):
         # Install socket(s) in database
         db = get_instance_db(get_current_instance())
         with transaction.atomic(db):
-            with transaction.atomic():
-                # Lock on instance to make sure we don't have concurrent class creation etc
-                Instance.objects.select_for_update().get(pk=get_current_instance().pk)
-
-                # Process in reverse order so that we process in FIFO
-                for socket, dependencies, is_partial in self.socket_install['data'][::-1]:
-                    socket.zip_file = None
-                    if socket.id is None:
-                        socket.save()
-                    self.install_socket(socket, dependencies, partial=is_partial)
-                    super().save_object(socket)
+            # Process in reverse order so that we process in FIFO
+            for socket, dependencies, is_partial in self.socket_install['data'][::-1]:
+                socket.zip_file = None
+                if socket.id is None:
+                    socket.save()
+                self.install_socket(socket, dependencies, partial=is_partial)
+                super().save_object(socket)
 
 
 @register_task

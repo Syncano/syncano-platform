@@ -44,7 +44,7 @@ class Hosting(LiveAbstractModel, DescriptionAbstractModel,
             'read': {API_PERMISSIONS.READ},
         }
     }
-    UPDATE_LOCK_KEY_TEMPLATE = 'hosting:update:{instance.id}'
+    UPDATE_LOCK_KEY_TEMPLATE = 'lock:hosting:update:{instance.id}'
 
     class SSL_STATUSES(MetaIntEnum):
         CHECKING = -1, 'checking'
@@ -78,7 +78,7 @@ class Hosting(LiveAbstractModel, DescriptionAbstractModel,
     @classmethod
     def get_storage(cls):
         if cls._storage is None:
-            cls._storage = DefaultStorage.create_storage(bucket=settings.S3_HOSTING_BUCKET,
+            cls._storage = DefaultStorage.create_storage(bucket=settings.STORAGE_HOSTING_BUCKET,
                                                          custom_domain=None)
         return cls._storage
 

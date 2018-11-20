@@ -34,7 +34,8 @@ from django.utils.encoding import force_text, smart_text
 from django.utils.functional import Promise
 from django_redis import get_redis_connection
 from munch import Munch
-from redis import StrictRedis
+from redis import Redis
+from redis.lock import Lock
 from requests.exceptions import HTTPError, ReadTimeout
 from rest_framework.fields import BooleanField
 from rest_framework.reverse import reverse
@@ -55,7 +56,7 @@ ALL_CONTROL_CHARACTERS = dict.fromkeys(range(33))
 try:
     redis = get_redis_connection()
 except NotImplementedError:
-    redis = StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
+    redis = Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 
 docker_client = lazy_object_proxy.Proxy(lambda: docker.from_env(version=settings.DOCKER_VERSION))
 
@@ -132,6 +133,12 @@ def add_post_transaction_error_operation(func, *args, **kwargs):
     using = kwargs.pop('using', None)
     if get_connection(using).in_atomic_block:
         get_last_transaction_block_list(using).append((False, func, args, kwargs))
+
+
+def get_lock_registry():
+    if not hasattr(LOCAL_STORAGE, 'lock_registry'):
+        LOCAL_STORAGE.lock_registry = collections.defaultdict(int)
+    return LOCAL_STORAGE.lock_registry
 
 
 class Cached:
@@ -363,89 +370,6 @@ class Command:
             raise TimeoutError()
 
         return self.process.returncode
-
-
-class DictDiffer:
-    """
-    Calculate the difference between two dictionaries as:
-    (1) items added
-    (2) items removed
-    (3) keys same in both but changed values
-    (4) keys same in both and unchanged values
-    """
-
-    def __init__(self, past_dict, current_dict):
-        self.current_dict, self.past_dict = current_dict, past_dict
-        self.set_current, self.set_past = set(current_dict.keys()), set(past_dict.keys())
-        self.intersect = self.set_current.intersection(self.set_past)
-
-    def added(self):
-        return self.set_current - self.intersect
-
-    def removed(self):
-        return self.set_past - self.intersect
-
-    def changed(self):
-        return set(o for o in self.intersect if self.past_dict[o] != self.current_dict[o])
-
-    def unchanged(self):
-        return set(o for o in self.intersect if self.past_dict[o] == self.current_dict[o])
-
-    def _process_added(self, cur_dict, add_dict, replace_dict, delete_set):
-        added = self.added()
-        for key in added:
-            value = cur_dict[key]
-            if key in delete_set:
-                delete_set.remove(key)
-                replace_dict[key] = value
-            else:
-                add_dict[key] = value
-
-    def _process_changed(self, cur_dict, add_dict, replace_dict, delete_set):
-        changed = self.changed()
-        for key in changed:
-            value = cur_dict[key]
-            if key in delete_set:
-                delete_set.remove(key)
-            if key in add_dict:
-                del add_dict[key]
-            replace_dict[key] = value
-
-    def _process_removed(self, add_dict, replace_dict, delete_set):
-        removed = self.removed()
-        for key in removed:
-            if key in add_dict:
-                del add_dict[key]
-            else:
-                delete_set.add(key)
-                if key in replace_dict:
-                    del replace_dict[key]
-
-    def _prepare_changes(self, dict_changes):
-        cur_dict = self.current_dict
-        add_dict = dict_changes.get('add', {})
-        replace_dict = dict_changes.get('replace', {})
-        delete_set = dict_changes.get('delete', set())
-
-        self._process_added(cur_dict, add_dict, replace_dict, delete_set)
-        self._process_changed(cur_dict, add_dict, replace_dict, delete_set)
-        self._process_removed(add_dict, replace_dict, delete_set)
-
-        return add_dict, replace_dict, delete_set
-
-    def changes(self, current_changes=None):
-        dict_changes = current_changes or {}
-
-        add_dict, replace_dict, delete_set = self._prepare_changes(dict_changes)
-
-        dict_changes = dict()
-        if add_dict:
-            dict_changes['add'] = add_dict
-        if replace_dict:
-            dict_changes['replace'] = replace_dict
-        if delete_set:
-            dict_changes['delete'] = delete_set
-        return dict_changes
 
 
 def get_from_dict(dic, *names, **opts):
@@ -743,3 +667,27 @@ def glob(pattern, subj):
         subj = subj[subj.index(part) + len(part):]
 
     return trailing_glob or subj.endswith(parts[-1])
+
+
+class ReentrantLock(Lock):
+    """
+    A reentrant lock implementation.
+    """
+
+    def acquire(self, blocking=None, blocking_timeout=None):
+        registry = get_lock_registry()
+        if registry[self.name] > 0 or super().acquire(blocking, blocking_timeout):
+            registry[self.name] += 1
+            return True
+        return False
+
+    def release(self):
+        registry = get_lock_registry()
+        if registry[self.name] > 1:
+            registry[self.name] -= 1
+            return
+
+        super().release()
+        registry[self.name] -= 1
+        if registry[self.name] <= 0:
+            del registry[self.name]
