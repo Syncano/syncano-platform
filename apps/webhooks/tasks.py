@@ -27,13 +27,14 @@ class ScriptBaseTask(BaseIncentiveTask):
                            socket, expire_at=None, template_name=None):
         run_spec = cls.create_run_spec(instance, script, additional_args, meta, dumps=False,
                                        socket=socket)
-
         spec = {
             'run': run_spec,
-            'result_key': result_key,
             'trace': trace_spec,
             'expire_at': expire_at
         }
+
+        if result_key:
+            spec['result_key'] = result_key
 
         # Prepare custom response as well
         if template_name:
@@ -45,7 +46,6 @@ class ScriptBaseTask(BaseIncentiveTask):
                 spec['template'] = template_spec
             except ResponseTemplate.DoesNotExist:
                 pass
-
         return spec
 
     @classmethod

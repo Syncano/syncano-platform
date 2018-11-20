@@ -11,7 +11,6 @@ from apps.hosting.models import Hosting
 
 @mock.patch('apps.hosting.tasks.HostingAddSecureCustomDomainTask.delay', mock.Mock())
 class TestHostingBase(SyncanoAPITestBase):
-
     def setUp(self):
         super().setUp()
 

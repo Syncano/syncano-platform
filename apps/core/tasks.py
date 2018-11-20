@@ -134,7 +134,7 @@ class DeleteLiveObjectTask(app.Task):
 
 @register_task
 class DeleteFilesTask(TaskLockMixin, app.Task):
-    buckets = (settings.S3_STORAGE_BUCKET, settings.S3_HOSTING_BUCKET)
+    buckets = (settings.STORAGE_TYPE, settings.STORAGE_HOSTING_BUCKET)
 
     def run(self, prefix, all_buckets=False):
         """
@@ -143,13 +143,12 @@ class DeleteFilesTask(TaskLockMixin, app.Task):
 
         storage = default_storage
 
-        if settings.LOCAL_MEDIA_STORAGE:
+        if settings.STORAGE_TYPE == 'local':
             path_to_del = os.path.join(default_storage.location, prefix)
             if os.path.exists(path_to_del):
                 shutil.rmtree(path_to_del)
             return
 
-        s3 = storage.connection
         if not prefix.endswith('/'):
             prefix += '/'
 
@@ -157,15 +156,19 @@ class DeleteFilesTask(TaskLockMixin, app.Task):
         if not all_buckets:
             buckets = buckets[:1]
 
-        for bucket_name in buckets:
-            bucket = s3.Bucket(bucket_name)
-            f = bucket.objects.filter(Prefix=prefix)
-            if settings.S3_GOOGLE_STORAGE:
-                # Temporary workaround for gcloud storage not working properly with mass deletes.
-                for obj in f.all():
-                    obj.delete()
-            else:
-                f.delete()
+        if settings.STORAGE_TYPE == 's3':
+            s3 = storage.connection
+            for bucket_name in buckets:
+                s3.Bucket(bucket_name).objects.filter(Prefix=prefix).delete()
+            return
+
+        if settings.STORAGE_TYPE == 'gcloud':
+            gcloud = storage.client
+            for bucket_name in buckets:
+                bucket = gcloud.get_bucket(bucket_name)
+                for blob in bucket.list_blobs(prefix=prefix):
+                    bucket.delete(blob)
+            return
 
 
 class ObjectProcessorBaseTask(TaskLockMixin, InstanceBasedTask, ABC):

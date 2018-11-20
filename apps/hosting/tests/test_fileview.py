@@ -56,7 +56,7 @@ class TestHostingFileViewRedirect(TestHostingFileViewBase):
         request.META['HTTP_HOST'] = self.client.defaults['HTTP_HOST']
         self.assertEqual(
             response['x-accel-redirect'],
-            HostingView.file_storage_accel(request, self.hosting_file.file_object.url, 'empty', query='')
+            HostingView.get_accel_redirect(request, self.hosting_file.file_object.url, 'empty', query='')
         )
 
     def test_redirect_for_prefix(self):
@@ -100,7 +100,7 @@ class TestHostingFileViewRedirect(TestHostingFileViewBase):
         url = '{}/{}'.format(url_404.rsplit('/', 1)[0], path[1:])
         self.assertEqual(
             response['x-accel-redirect'],
-            HostingView.file_storage_accel(
+            HostingView.get_accel_redirect(
                 request,
                 url,
                 url_404,
@@ -120,7 +120,7 @@ class TestHostingFileViewRedirect(TestHostingFileViewBase):
         request.META['HTTP_HOST'] = self.client.defaults['HTTP_HOST']
         self.assertEqual(
             response['x-accel-redirect'],
-            HostingView.file_storage_accel(
+            HostingView.get_accel_redirect(
                 request,
                 self.hosting_file.file_object.url,
                 'empty',
@@ -134,7 +134,7 @@ class TestHostingFileViewRedirect(TestHostingFileViewBase):
         response = self.client.get('/something/something')
         self.assertEqual(
             response['x-accel-redirect'],
-            HostingView.file_storage_accel(
+            HostingView.get_accel_redirect(
                 request,
                 hosting_file.file_object.url,
                 'empty',

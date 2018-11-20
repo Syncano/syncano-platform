@@ -28,21 +28,19 @@ pull-staging: ## Pull development (staging) platform image
 	docker pull $(DOCKERIMAGE):staging || true
 
 push-staging: ## Push staging platform image
-	docker tag $(DOCKERIMAGE) $(DOCKERIMAGE):staging
 	docker push $(DOCKERIMAGE):staging
 
 build-staging: guard-ACME_EMAIL ## Build development (staging) platform image
-	docker build --cache-from $(DOCKERIMAGE):staging -t $(DOCKERIMAGE) --build-arg EMAIL=$(ACME_EMAIL) .
+	docker build --cache-from $(DOCKERIMAGE):staging -t $(DOCKERIMAGE):staging --build-arg EMAIL=$(ACME_EMAIL) .
 
 pull-production: ## Pull production platform image
 	docker pull $(DOCKERIMAGE):production || true
 
 push-production: ## Push production platform image
-	docker tag $(DOCKERIMAGE) $(DOCKERIMAGE):production
 	docker push $(DOCKERIMAGE):production
 
 build-production: guard-ACME_EMAIL ## Build production platform image
-	docker build --cache-from $(DOCKERIMAGE):production -t $(DOCKERIMAGE) --build-arg EMAIL=$(ACME_EMAIL) --build-arg DEVEL=false .
+	docker build --cache-from $(DOCKERIMAGE):production -t $(DOCKERIMAGE):production --build-arg EMAIL=$(ACME_EMAIL) --build-arg DEVEL=false .
 
 stop: ## Stop whole platform
 	docker-compose stop

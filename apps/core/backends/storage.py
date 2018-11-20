@@ -1,10 +1,9 @@
 # coding=UTF8
-from botocore.handlers import set_list_objects_encoding_type_url
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
+from django.core.files import storage
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.utils.functional import LazyObject
-from storages.backends.s3boto3 import S3Boto3Storage
+from storages.backends import gcloud, s3boto3
 
 from apps.core.helpers import add_post_transaction_error_operation, add_post_transaction_success_operation
 from apps.instances.helpers import get_current_instance, get_instance_db
@@ -40,12 +39,12 @@ class StorageWithTransactionSupportMixin:
                                                using=self._get_current_db())
 
 
-class FileSystemStorageWithTransactionSupport(StorageWithTransactionSupportMixin, FileSystemStorage):
+class FileSystemStorage(StorageWithTransactionSupportMixin, storage.FileSystemStorage):
     def copy(self, src_name, dest_name):
         self.save(dest_name, self.open(src_name))
 
 
-class S3BotoStorageWithTransactionSupport(StorageWithTransactionSupportMixin, S3Boto3Storage):
+class S3BotoStorage(StorageWithTransactionSupportMixin, s3boto3.S3Boto3Storage):
     def copy(self, src_name, dest_name):
         self.bucket.copy(
             {'Bucket': self.bucket_name, 'Key': src_name},
@@ -56,25 +55,33 @@ class S3BotoStorageWithTransactionSupport(StorageWithTransactionSupportMixin, S3
     def _save(self, name, content):
         storage = getattr(content, '_storage', None)
         if storage and storage == self:
-            cleaned_name = self._clean_name(name)
+            cleaned_name = self._normalize_name(name)
             self.copy(content.name, cleaned_name)
             return cleaned_name
         return super()._save(name, content)
 
-    @property
-    def connection(self):
-        connection = getattr(self._connections, 'connection', None)
-        if connection is None:
-            connection = super().connection
-            connection.meta.client.meta.events.unregister('before-parameter-build.s3.ListObjects',
-                                                          set_list_objects_encoding_type_url)
-        return connection
+
+class GoogleCloudStorage(StorageWithTransactionSupportMixin, gcloud.GoogleCloudStorage):
+    def copy(self, src_name, dest_name):
+        bucket = self.bucket
+        bucket.copy_blob(bucket.blob(src_name), bucket, dest_name)
+
+    def _save(self, name, content):
+        storage = getattr(content, '_storage', None)
+        if storage and storage == self:
+            cleaned_name = self._normalize_name(name)
+            self.copy(content.name, cleaned_name)
+            return cleaned_name
+        return super()._save(name, content)
 
 
 class DefaultStorage(LazyObject):
+    # Common settings
+    bucket = settings.STORAGE_BUCKET
+
+    # S3 specific settings
     access_key = settings.S3_ACCESS_KEY_ID
     secret_key = settings.S3_SECRET_ACCESS_KEY
-    bucket = settings.S3_STORAGE_BUCKET
     region = settings.S3_REGION
     endpoint = settings.S3_ENDPOINT
 
@@ -82,20 +89,27 @@ class DefaultStorage(LazyObject):
 
     @classmethod
     def create_storage(cls, **kwargs):
-        if settings.LOCAL_MEDIA_STORAGE:
-            if cls._file_storage is None:
-                cls._file_storage = FileSystemStorageWithTransactionSupport()
-            return cls._file_storage
+        if settings.STORAGE_TYPE == 's3':
+            opts = {
+                'access_key': cls.access_key,
+                'secret_key': cls.secret_key,
+                'bucket_name': cls.bucket,
+                'region_name': cls.region,
+                'endpoint_url': cls.endpoint
+            }
+            opts.update(kwargs)
+            return S3BotoStorage(**opts)
 
-        opts = {
-            'access_key': cls.access_key,
-            'secret_key': cls.secret_key,
-            'bucket_name': cls.bucket,
-            'region_name': cls.region,
-            'endpoint_url': cls.endpoint
-        }
-        opts.update(kwargs)
-        return S3BotoStorageWithTransactionSupport(**opts)
+        if settings.STORAGE_TYPE == 'gcloud':
+            opts = {
+                'bucket_name': cls.bucket,
+            }
+            opts.update(kwargs)
+            return GoogleCloudStorage(**opts)
+
+        if cls._file_storage is None:
+            cls._file_storage = FileSystemStorage()
+        return cls._file_storage
 
     def _setup(self):
         self._wrapped = self.create_storage()

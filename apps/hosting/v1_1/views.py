@@ -15,7 +15,6 @@ from rest_framework_extensions.mixins import DetailSerializerMixin
 from apps.admins.permissions import AdminHasPermissions
 from apps.billing.permissions import OwnerInGoodStanding
 from apps.core.authentication import AUTHORIZATION_HEADER
-from apps.core.backends.storage import FileSystemStorageWithTransactionSupport
 from apps.core.exceptions import ModelNotFound
 from apps.core.helpers import Cached, glob, redis, run_api_view
 from apps.core.mixins.views import AtomicMixin, NestedViewSetMixin
@@ -139,6 +138,34 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
     permission_classes = (permissions.AllowAny,)
     authentication_classes = ()
 
+    @classmethod
+    def get_accel_redirect(cls, request, url, url_404, query):
+        bucket, instance_id, hosting_id, path = cls.split_url(url)
+        _, _, _, path_404 = cls.split_url(url_404)
+        redirect_url = '/internal_redirect/{}/{}/{}/{}/{}/{}'.format(
+            settings.STORAGE_TYPE, bucket, instance_id, hosting_id, path_404, path)
+        if query:
+            redirect_url += '?%s' % query
+
+        return redirect_url
+
+    @classmethod
+    def get_hosting_search_kwargs(cls, domain):
+        if domain == '_default':
+            return {'is_default': True, 'is_active': True}
+        return {'domains__contains': [domain], 'is_active': True}
+
+    @classmethod
+    def split_url(cls, url):
+        if url == 'empty':
+            return None, None, None, 'empty'
+
+        if url.startswith(settings.MEDIA_URL):
+            url == url[len(settings.MEDIA_URL):]
+        else:
+            _, url = url.split('//', 1)
+        return url.split('/', 3)
+
     def create_404_response(self):
         return HttpResponseNotFound(
             self.DEFAULT_CONTENT_TMPL.substitute(iframe=self.EMPTY_404_IFRAME),
@@ -214,7 +241,6 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
         try:
             hosting_file = HostingFile.get_file(hosting=hosting, path=path)
             return self.get_accel_response(request,
-                                           hosting_file.file_object.storage,
                                            hosting_file.file_object.url,
                                            self.EMPTY_404_KEY,
                                            query)
@@ -237,7 +263,6 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
                 pass
             else:
                 return self.get_accel_response(request,
-                                               hosting_file.file_object.storage,
                                                url=hosting_file.file_object.url,
                                                url_404=self.EMPTY_404_KEY,
                                                query=query)
@@ -250,55 +275,14 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
 
         url_404 = hosting_file.file_object.url
         return self.get_accel_response(request,
-                                       hosting_file.file_object.storage,
                                        url='{}/{}'.format(url_404.rsplit('/', 1)[0], path),
                                        url_404=url_404,
                                        query=query)
 
-    def get_accel_redirect(self, request, storage, url, url_404, query):
-        if isinstance(storage, FileSystemStorageWithTransactionSupport):
-            accel_redirect = self.file_storage_accel(request, url, url_404, query)
-        else:
-            accel_redirect = self.boto_s3_storage_accel(url, url_404, query)
-        return accel_redirect
-
-    def get_accel_response(self, request, storage, url, url_404, query):
+    def get_accel_response(self, request, url, url_404, query):
         response = HttpResponse()
-        response['X-Accel-Redirect'] = self.get_accel_redirect(request, storage, url, url_404, query)
+        response['X-Accel-Redirect'] = self.get_accel_redirect(request, url, url_404, query)
         return response
-
-    @classmethod
-    def get_hosting_search_kwargs(cls, domain):
-        if domain == '_default':
-            return {'is_default': True, 'is_active': True}
-        return {'domains__contains': [domain], 'is_active': True}
-
-    @staticmethod
-    def split_url(url):
-        if url == 'empty':
-            return None, None, None, 'empty'
-        _, url = url.split('//', 1)
-        return url.split('/', 3)
-
-    @classmethod
-    def file_storage_accel(cls, request, url, url_404, query):
-        if url_404 == 'empty':
-            url_404 = '/empty'
-        redirect_url = '/internal_redirect/{}{}{}'.format(request.META.get('HTTP_HOST'),
-                                                          url_404,
-                                                          url)
-        if query:
-            redirect_url += '?%s' % query
-        return redirect_url
-
-    @classmethod
-    def boto_s3_storage_accel(cls, url, url_404, query):
-        bucket, instance_id, hosting_id, path = cls.split_url(url)
-        _, _, _, path_404 = cls.split_url(url_404)
-        redirect_url = '/internal_redirect/{}/{}/{}/{}/{}'.format(bucket, instance_id, hosting_id, path_404, path)
-        if query:
-            redirect_url += '?%s' % query
-        return redirect_url
 
     def finalize_response(self, request, response, *args, **kwargs):
         response = super().finalize_response(request, response, *args, **kwargs)

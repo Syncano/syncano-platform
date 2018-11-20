@@ -33,8 +33,8 @@ class Channel(AclAbstractModel, DescriptionAbstractModel, CacheableAbstractModel
     DEFAULT_NAME = 'default'
     EVENTLOG_NAME = 'eventlog'
 
-    PUBLISH_LOCK_KEY_TEMPLATE = 'channel:publish_lock:{instance_pk}:{channel_id}'
-    STREAM_CHANNEL_TEMPLATE = 'channel:stream:{instance_pk}:{channel_id}'
+    PUBLISH_LOCK_KEY_TEMPLATE = 'lock:channel:publish:{instance_pk}:{channel_id}'
+    STREAM_CHANNEL_TEMPLATE = 'stream:channel:{instance_pk}:{channel_id}'
 
     # v1 permission config
     PERMISSION_CONFIG = {
@@ -109,18 +109,13 @@ class Channel(AclAbstractModel, DescriptionAbstractModel, CacheableAbstractModel
         from apps.channels.v1.serializers import ChangeSerializer
 
         lock_key = self.get_publish_lock_key(room)
-        lock = redis.lock(lock_key, timeout=settings.LOCK_TIMEOUT, sleep=0.01)
-        lock.acquire()
-
-        try:
+        with redis.lock(lock_key, timeout=settings.LOCK_TIMEOUT, sleep=0.01):
             change = Change.create(channel=self, room=room, **kwargs)
 
             message = ChangeSerializer(change, excluded_fields=('links',)).data
             message = json.dumps(message)
             redis.publish(self.get_stream_channel_name(room), message)
             return change
-        finally:
-            lock.release()
 
     @classmethod
     def get_default(cls):

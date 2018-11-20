@@ -2,6 +2,7 @@
 from hashlib import md5
 
 from django.conf import settings
+from redis.exceptions import LockError
 
 from apps.core.helpers import redis
 
@@ -13,26 +14,17 @@ class TaskLockMixin:
 
     def __call__(self, *args, **kwargs):
         logger = self.get_logger()
-        self.lock = None
-        self.lock_acquired = False
 
-        logger.debug('Acquiring lock...')
-        if not self.acquire_lock(*args, **kwargs):
+        lock_key = self.get_lock_key(*args, **kwargs)
+        lock_expire = self.get_lock_expire(*args, **kwargs)
+        try:
+            with redis.lock(lock_key, timeout=lock_expire, blocking_timeout=self.lock_blocking_timeout):
+                ret = super().__call__(*args, **kwargs)
+            self.after_lock_released(args, kwargs)
+            return ret
+        except LockError:
             logger.debug('Already locked.')
             return False
-
-        self.lock_acquired = True
-        logger.debug('Lock aquired.')
-        return super().__call__(*args, **kwargs)
-
-    def acquire_lock(self, *args, **kwargs):
-        if not self.lock:
-            lock_key = self.get_lock_key(*args, **kwargs)
-            lock_expire = self.get_lock_expire(*args, **kwargs)
-            self.lock = redis.lock(lock_key, timeout=lock_expire, blocking_timeout=self.lock_blocking_timeout)
-        if not self.lock_acquired:
-            self.lock_acquired = self.lock.acquire()
-        return self.lock_acquired
 
     def after_lock_released(self, args, kwargs):
         # Override to add a custom handling when lock gets released
@@ -51,15 +43,6 @@ class TaskLockMixin:
 
     def get_lock_expire(self, *args, **kwargs):
         return self.lock_expire
-
-    def after_return(self, status, retval, task_id, args, kwargs, einfo):
-        if self.lock_acquired:
-            try:
-                self.lock.release()
-                self.after_lock_released(args, kwargs)
-            except Exception:
-                self.get_logger().exception('Unexpected exception during releasing lock.')
-        super().after_return(status, retval, task_id, args, kwargs, einfo)
 
 
 class AllowStaffRateThrottleMixin:
