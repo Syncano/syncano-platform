@@ -54,6 +54,7 @@ SHARED_APPS = (
     'rest_framework',
     'corsheaders',
     'django_atomic_signals',
+    'django_extensions',
 
     'apps.core',
     'apps.apikeys',

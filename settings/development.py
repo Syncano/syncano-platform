@@ -7,7 +7,6 @@ ZIPKIN_RAISE = True
 
 MIDDLEWARE = ('apps.core.middleware.InstrumentMiddleware',) + MIDDLEWARE
 
-INSTALLED_APPS += ('django_extensions',)
 REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += ('rest_framework.renderers.BrowsableAPIRenderer',)
 
 # Cache

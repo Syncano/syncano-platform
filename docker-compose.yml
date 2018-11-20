@@ -44,8 +44,10 @@ services:
       - ./conf/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
 
   web:
-    image: quay.io/syncano/syncano-platform:staging
-    build: .
+    image: quay.io/syncano/syncano-platform:test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
     privileged: true
     ports:
       - "8100"
@@ -77,8 +79,10 @@ services:
       - TRACING_ENABLED
 
   worker:
-    image: quay.io/syncano/syncano-platform:staging
-    build: .
+    image: quay.io/syncano/syncano-platform:test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
     privileged: true
     depends_on:
       - postgresql
@@ -99,8 +103,10 @@ services:
       - TRACING_ENABLED
 
   codebox:
-    image: quay.io/syncano/syncano-platform:staging
-    build: .
+    image: quay.io/syncano/syncano-platform:test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
     privileged: true
     depends_on:
       - redis

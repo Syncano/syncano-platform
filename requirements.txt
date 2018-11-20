@@ -8,6 +8,7 @@ django-atomic-signals==1.1.0
 django-cors-headers==2.4.0
 django-filter==1.1.0
 git+https://github.com/djangonauts/django-hstore.git@aac755f587ff8ea95c1f43e7f3df8e339b848b6b
+django_extensions==2.1.3
 django-livefield==3.1.0
 django-redis==4.10.0
 django-storages==1.7.1
