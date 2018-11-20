@@ -34,7 +34,7 @@ push-cache: require-docker ## Push platform image for cache
 	docker push $(DOCKERIMAGE)
 
 docker: guard-ACME_EMAIL require-docker ## Build platform image
-	docker build -t --cache-from $(DOCKERIMAGE):latest $(DOCKERIMAGE) --build-arg EMAIL=$(ACME_EMAIL) .
+	docker build --cache-from $(DOCKERIMAGE):latest -t $(DOCKERIMAGE) --build-arg EMAIL=$(ACME_EMAIL) .
 
 build: ## Build platform image for testing (use ./prepare_container.sh to build image for CI)
 	docker-compose build
