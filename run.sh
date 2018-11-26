@@ -1,6 +1,5 @@
 #!/bin/bash
-
-set -e
+set -eo pipefail
 
 sysctl -w net.core.somaxconn=1024
 
@@ -50,4 +49,4 @@ elif [ "$INSTANCE_TYPE" = "codebox" ]; then
     chmod 777 /var/run/docker.sock
 fi
 
-exec supervisord
+exec supervisord -c /etc/supervisord.conf

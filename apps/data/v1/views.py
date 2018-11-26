@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.db import transaction
 from rest_condition import And, Or
 from rest_framework import permissions, viewsets
 from rest_framework.response import Response
@@ -88,8 +87,7 @@ class KlassViewSet(AutocompleteMixin,
 
     def perform_create(self, serializer):
         # Lock on instance for the duration of transaction to avoid race conditions
-        with transaction.atomic():
-            Instance.objects.select_for_update().get(pk=self.request.instance.pk)
+        with Instance.lock(self.request.instance.pk):
             klass_limit = AdminLimit.get_for_admin(self.request.instance.owner_id).get_classes_count()
             if Klass.objects.count() >= klass_limit:
                 raise KlassCountExceeded(klass_limit)

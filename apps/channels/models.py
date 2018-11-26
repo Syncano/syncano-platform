@@ -33,10 +33,8 @@ class Channel(AclAbstractModel, DescriptionAbstractModel, CacheableAbstractModel
     DEFAULT_NAME = 'default'
     EVENTLOG_NAME = 'eventlog'
 
-    PUBLISH_LOCK_KEY_TEMPLATE = 'channel:publish_lock:{instance_pk}:{channel_id}'
-    STREAM_CHANNEL_TEMPLATE = 'channel:stream:{instance_pk}:{channel_id}'
-    PUBLISH_LAST_ID_KEY_TEMPLATE = 'channel:last_id:{instance_pk}:{channel_id}'
-    LAST_CHANGE_KEY_TEMPLATE = 'channel:change:{instance_pk}:{channel_id}:{change_id}'
+    PUBLISH_LOCK_KEY_TEMPLATE = 'lock:channel:publish:{instance_pk}:{channel_id}'
+    STREAM_CHANNEL_TEMPLATE = 'stream:channel:{instance_pk}:{channel_id}'
 
     # v1 permission config
     PERMISSION_CONFIG = {
@@ -107,43 +105,17 @@ class Channel(AclAbstractModel, DescriptionAbstractModel, CacheableAbstractModel
     def get_stream_channel_name(self, room):
         return create_room_key(template=Channel.STREAM_CHANNEL_TEMPLATE, channel_id=self.id, channel_room=room)
 
-    def get_publish_last_id_key(self, room):
-        return create_room_key(template=Channel.PUBLISH_LAST_ID_KEY_TEMPLATE, channel_id=self.id, channel_room=room)
-
-    def get_last_change_key(self, room, change_id):
-        return create_room_key(template=Channel.LAST_CHANGE_KEY_TEMPLATE, channel_id=self.id, channel_room=room,
-                               change_id=change_id)
-
     def create_change(self, room=None, **kwargs):
         from apps.channels.v1.serializers import ChangeSerializer
 
         lock_key = self.get_publish_lock_key(room)
-        lock = redis.lock(lock_key, timeout=settings.LOCK_TIMEOUT, sleep=0.01)
-        lock.acquire()
-
-        try:
+        with redis.lock(lock_key, timeout=settings.LOCK_TIMEOUT, sleep=0.01):
             change = Change.create(channel=self, room=room, **kwargs)
 
             message = ChangeSerializer(change, excluded_fields=('links',)).data
             message = json.dumps(message)
-
-            current_last_id = redis.get(self.get_publish_last_id_key(room))
-
-            with redis.pipeline() as pipe:
-                if current_last_id is not None:
-                    pipe.set(self.get_last_change_key(room, int(current_last_id)),
-                             message, ex=settings.CHANNEL_LAST_ID_TIMEOUT)
-
-                # Set last ID
-                pipe.set(self.get_publish_last_id_key(room), change.id, ex=settings.CHANNEL_LAST_ID_TIMEOUT)
-                # Publish changeset
-                pipe.publish(self.get_stream_channel_name(room), message)
-
-                pipe.execute()
-
+            redis.publish(self.get_stream_channel_name(room), message)
             return change
-        finally:
-            lock.release()
 
     @classmethod
     def get_default(cls):

@@ -16,7 +16,7 @@ from apps.core.abstract_models import (
     TrackChangesAbstractModel
 )
 from apps.core.fields import NullableJSONField, StrippedSlugField
-from apps.core.helpers import MetaIntEnum
+from apps.core.helpers import MetaIntEnum, ReentrantLock, redis
 from apps.core.permissions import API_PERMISSIONS
 from apps.core.validators import NotInValidator
 from apps.instances.contextmanagers import instance_context
@@ -34,6 +34,9 @@ class Instance(DescriptionAbstractModel, MetadataAbstractModel, CacheableAbstrac
                LiveAbstractModel):
 
     PERMISSION_CONFIG = {'api_key': {API_PERMISSIONS.READ}}
+
+    LOCK_KEY_TEMPLATE = 'lock:instance:{instance_pk}'
+    LOCK_TIMEOUT = 120
 
     name = StrippedSlugField(max_length=64,
                              validators=[NotInValidator(values=INSTANCE_PROTECTED_NAMES),
@@ -100,6 +103,12 @@ class Instance(DescriptionAbstractModel, MetadataAbstractModel, CacheableAbstrac
 
     def get_storage_prefix(self):
         return self.storage_prefix or str(self.id)
+
+    @classmethod
+    def lock(cls, instance_pk):
+        return redis.lock(cls.LOCK_KEY_TEMPLATE.format(instance_pk=instance_pk),
+                          lock_class=ReentrantLock,
+                          timeout=cls.LOCK_TIMEOUT, sleep=0.01)
 
 
 class InstanceIndicator(TrackChangesAbstractModel):

@@ -3,14 +3,15 @@ import logging
 import re
 import time
 
+import rapidjson as json
 from django.conf import settings
 from gevent.queue import Empty
+from munch import Munch
 from rest_framework import exceptions, status
 
 from apps.async_tasks.handlers import RedisPubSubHandler, WebSocketHandler
-from apps.channels.exceptions import IncorrectLastId
-from apps.channels.tasks import GetChangeTask
-from apps.core.exceptions import RequestTimeout
+from apps.channels.models import Change
+from apps.channels.v1.serializers import ChangeSerializer
 from apps.core.helpers import generate_key
 from apps.core.response import JSONResponse
 
@@ -20,7 +21,6 @@ try:
 except ImportError:
     uwsgi = None
 
-TASK_RESULT_KEY_TEMPLATE = 'change:result:{key}'
 CHANGE_ID_REGEX = re.compile(r'"id":\s*(\d+)')
 
 logger = logging.getLogger(__name__)
@@ -40,8 +40,6 @@ class ChannelHandler(RedisPubSubHandler):
         last_id = environ.get('LAST_ID')
         if last_id is not None:
             last_id = int(last_id)
-        current_last_id = None
-        last_id_key = environ['LAST_ID_KEY']
         stream_channel = environ['STREAM_CHANNEL']
 
         queue = self.subscribe(stream_channel, client_uuid=client_id, maxsize=maxsize)
@@ -49,25 +47,19 @@ class ChannelHandler(RedisPubSubHandler):
             start_time = time.time()
             data_counter = maxsize
 
-            if last_id is not None:
-                current_last_id = self.redis_client.get(last_id_key)
-                if current_last_id is not None:
-                    current_last_id = int(current_last_id)
-                    if current_last_id < last_id:
-                        raise IncorrectLastId()
-                    if current_last_id > last_id:
-                        # Seems like change arrived in the mean time. Fallback to getting results from database
-                        # as it may have arrived before we subscribed yet after first check.
-                        for data in self.get_change_from_database(environ, last_id, current_last_id, limit=maxsize):
-                            data_counter -= 1
-                            yield data
+            for change in self.get_change_from_database(environ, last_id, limit=maxsize):
+                data_counter -= 1
+                last_id = change.id
+                data = ChangeSerializer(change, excluded_fields=('links', 'room',)).data
+                data = json.dumps(data)
+                yield data
 
-            for ret in self.process_queue(queue, start_time, current_last_id, data_counter):
+            for ret in self.process_queue(queue, start_time, last_id, data_counter):
                 yield ret
         finally:
             self.unsubscribe(stream_channel, client_uuid=client_id)
 
-    def process_queue(self, queue, start_time, current_last_id, data_counter):
+    def process_queue(self, queue, start_time, last_id, data_counter):
         try:
             while True:
                 # Process queue until remaining time elapses
@@ -76,8 +68,8 @@ class ChannelHandler(RedisPubSubHandler):
                     return
                 data = queue.get(timeout=remaining_time)
 
-                # Yield if we got no current last id or change.id > current last id
-                if current_last_id is None or self.extract_change_id(data) > current_last_id:
+                # Yield if we got no current last id or change.id > last id
+                if last_id is None or self.extract_change_id(data) > last_id:
                     data_counter -= 1
                     yield data
         except Empty:
@@ -85,41 +77,21 @@ class ChannelHandler(RedisPubSubHandler):
             yield ''
             return
 
-    def get_change_from_database(self, environ, last_id, current_last_id=None, limit=1):
+    def get_change_from_database(self, environ, last_id, limit=1):
         """
         Process change from database.
         """
+        if last_id is None:
+            return
+
         channel_pk = int(environ['CHANNEL_PK'])
         instance_pk = int(environ['INSTANCE_PK'])
         channel_room = environ.get('CHANNEL_ROOM')
 
-        result_channel = TASK_RESULT_KEY_TEMPLATE.format(key=generate_key())
-        queue = self.subscribe(result_channel, maxsize=limit)
-        try:
-            # Now queue the task
-            GetChangeTask.delay(
-                result_key=result_channel,
-                instance_pk=instance_pk,
-                channel_pk=channel_pk,
-                channel_room=channel_room,
-                last_id=last_id,
-                limit=limit,
-                current_last_id=current_last_id
-            )
-
-            try:
-                # Now wait for task to finish
-                while True:
-                    data = queue.get(timeout=settings.CHANNEL_TASK_TIMEOUT)
-                    if data:
-                        yield data
-                    else:
-                        return
-            except Empty:
-                logger.warning('Failed to get back the result of GetChangeTask.')
-                raise RequestTimeout('Channel workers are busy.')
-        finally:
-            self.unsubscribe(result_channel)
+        change_list = Change.list(min_pk=last_id + 1, ordering='asc', limit=limit,
+                                  channel=Munch(id=channel_pk), instance=Munch(id=instance_pk), room=channel_room)
+        for change in change_list:
+            yield change
 
 
 class ChannelPollHandler(ChannelHandler):

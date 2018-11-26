@@ -3,13 +3,13 @@ analytics-python==1.2.9
 billiard==3.5.0.4
 boto3==1.9.38
 celery==4.2.1
-celery-redbeat==0.11.1
 django-atomic-signals==1.1.0
 django-cors-headers==2.4.0
 django-filter==1.1.0
 git+https://github.com/djangonauts/django-hstore.git@aac755f587ff8ea95c1f43e7f3df8e339b848b6b
+django_extensions==2.1.3
 django-livefield==3.1.0
-django-redis==4.9.0
+django-redis==4.10.0
 django-storages==1.7.1
 django-timezone-utils==0.13
 Django==2.0.9
@@ -19,6 +19,7 @@ dnspython==1.15.0
 docker==3.5.1
 drf-extensions==0.4.0
 gevent==1.3.7
+google-cloud-storage==1.13.0
 greenlet==0.4.15
 grpcio==1.16.0
 hiredis==0.2.0
@@ -42,11 +43,12 @@ pytz==2018.7
 PyYAML==3.13
 py_zipkin==0.15.1
 raven==6.9.0
-redis==2.10.6
+redis==3.0.1
 requests==2.20.0
 requests-oauthlib==1.0.0
 rest_condition==1.0.3
 retrying==1.3.3
+single-beat==0.3.1
 stripe==1.84.2
 URLObject==2.4.3
 uWSGI==2.0.17.1

@@ -1,11 +1,12 @@
 #!/bin/bash
+set -eo pipefail
 
 CELERY_TYPE="$1"
 
 # Worker environment
 if [ "$CELERY_TYPE" = "beat" ]
 then
-    exec su-exec syncano celery beat -A settings.celeryconf -s /tmp/celerybeat-schedule ${@:2}
+    exec su-exec syncano single-beat celery beat -A settings.celeryconf -s /tmp/celerybeat-schedule ${@:2}
 elif [ "$CELERY_TYPE" = "root_tasks" ]
 then
     exec newrelic-admin run-program celery worker -A settings.celeryconf -c 1 -Q ${CELERY_TYPE} \

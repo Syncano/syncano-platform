@@ -54,6 +54,7 @@ SHARED_APPS = (
     'rest_framework',
     'corsheaders',
     'django_atomic_signals',
+    'django_extensions',
 
     'apps.core',
     'apps.apikeys',
@@ -233,6 +234,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # S3 - django-storages settings
+STORAGE_TYPE = os.environ.get('STORAGE_TYPE', 'local')
 AWS_IS_GZIPPED = False
 AWS_S3_FILE_OVERWRITE = False
 AWS_S3_SECURE_URLS = True  # use https
@@ -240,18 +242,15 @@ AWS_QUERYSTRING_AUTH = False  # don't add complex authentication-related query p
 AWS_S3_CUSTOM_DOMAIN = os.environ.get('S3_CUSTOM_DOMAIN', '')  # e.g. d1e3fhjr88e1hl.cloudfront.net
 AWS_DEFAULT_ACL = 'public-read'
 
-S3_GOOGLE_STORAGE = os.environ.get('S3_GOOGLE_STORAGE', 'false') == 'true'
 S3_ACCESS_KEY_ID = os.environ.get('S3_ACCESS_KEY_ID', '')
-S3_HOSTING_BUCKET = os.environ.get('S3_HOSTING_BUCKET', '')
 S3_SECRET_ACCESS_KEY = os.environ.get('S3_SECRET_ACCESS_KEY', '')
-S3_STORAGE_BUCKET = os.environ.get('S3_STORAGE_BUCKET', '')
 S3_REGION = os.environ.get('S3_REGION')
 S3_ENDPOINT = os.environ.get('S3_ENDPOINT')
 
-if S3_STORAGE_BUCKET:
-    LOCAL_MEDIA_STORAGE = False
-else:
-    LOCAL_MEDIA_STORAGE = True
+STORAGE_HOSTING_BUCKET = os.environ.get('STORAGE_HOSTING_BUCKET', '')
+STORAGE_BUCKET = os.environ.get('STORAGE_BUCKET', '')
+
+LOCAL_MEDIA_STORAGE = STORAGE_TYPE == 'local'
 
 DEFAULT_FILE_STORAGE = 'apps.core.backends.storage.DefaultStorage'
 
@@ -305,8 +304,6 @@ CELERY_TASK_QUEUES = (
     Queue(ROOT_TASKS_QUEUE, routing_key=ROOT_TASKS_QUEUE),
 )
 
-CELERY_REDBEAT_REDIS_URL = CELERY_RESULT_BACKEND
-CELERY_BEAT_SCHEDULER = 'redbeat.RedBeatScheduler'
 CELERY_BEAT_SCHEDULE = {
     'metrics-aggregate-minute-runner': {
         'task': 'apps.metrics.tasks.AggregateMinuteRunnerTask',

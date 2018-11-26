@@ -44,8 +44,10 @@ services:
       - ./conf/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
 
   web:
-    image: quay.io/syncano/syncano-platform:staging
-    build: .
+    image: quay.io/syncano/syncano-platform:test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
     privileged: true
     ports:
       - "8100"
@@ -63,22 +65,24 @@ services:
       - ANALYTICS_WRITE_KEY
       - S3_ACCESS_KEY_ID
       - S3_SECRET_ACCESS_KEY
-      - S3_STORAGE_BUCKET
+      - STORAGE_BUCKET
       - CI
       - COLORS_ENABLED=true
+      - DB_INSTANCES_NAME
       - DJANGO_DEBUG=true
       - DOCKER_HOST_DIRECTORY
       - LEGACY_CODEBOX_ENABLED=true
       - PARALLEL_COUNT
-      - DB_INSTANCES_NAME
       - SPACE_DOMAIN=syncano_space.test
       - STRIPE_SECRET_KEY
       - TEST_MIGRATIONS
       - TRACING_ENABLED
 
   worker:
-    image: quay.io/syncano/syncano-platform:staging
-    build: .
+    image: quay.io/syncano/syncano-platform:test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
     privileged: true
     depends_on:
       - postgresql
@@ -91,7 +95,7 @@ services:
       - ANALYTICS_WRITE_KEY
       - S3_ACCESS_KEY_ID
       - S3_SECRET_ACCESS_KEY
-      - S3_STORAGE_BUCKET
+      - STORAGE_BUCKET
       - COLORS_ENABLED=true
       - DJANGO_DEBUG=true
       - LEGACY_CODEBOX_ENABLED=true
@@ -99,8 +103,10 @@ services:
       - TRACING_ENABLED
 
   codebox:
-    image: quay.io/syncano/syncano-platform:staging
-    build: .
+    image: quay.io/syncano/syncano-platform:test
+    build:
+      context: .
+      dockerfile: Dockerfile.test
     privileged: true
     depends_on:
       - redis
