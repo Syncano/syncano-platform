@@ -49,8 +49,18 @@ for PARAM in ${@:3}; do
     esac
 done
 
+envsubst() {
+    for var in $(compgen -e); do
+        echo "$var: \"${!var}\""
+    done | jinja2 $1
+}
+
 
 echo "* Starting deployment for $TARGET at $VERSION for $DOCKERIMAGE."
+
+# Setup environment variables.
+export $(cat deploy/env/${TARGET}.env | xargs)
+export BUILDTIME=$(date +%Y-%m-%dT%H%M)
 
 
 # Push docker image.
@@ -82,17 +92,13 @@ do
 done < deploy/env/${TARGET}.secrets.unenc
 echo -e $SECRETS | kubectl apply -f -
 
-# Setup environment variables.
-export $(cat deploy/env/${TARGET}.env | xargs)
-export BUILDTIME=$(date +%Y-%m-%dT%H%M)
-
 
 # Migrate database.
 if $MIGRATIONS; then
     echo "* Starting migration job."
     export CARE_ARGUMENTS=${CARE_ARGUMENTS:-$DEFAULT_CARE_ARGUMENTS}
     kubectl delete job/platform-migration 2>/dev/null || true
-    envsubst < deploy/yaml/migration-job.yml | kubectl apply -f -
+    envsubst deploy/yaml/migration-job.yml.j2 | kubectl apply -f -
     for i in {1..300}; do
         echo ". Waiting for migration job."
         sleep 1
@@ -114,16 +120,16 @@ fi
 # Start with deployment (web + worker).
 echo "* Deploying Web."
 export REPLICAS=$(kubectl get deployment/platform-web -o jsonpath='{.spec.replicas}' 2>/dev/null || echo ${WEB_MIN})
-envsubst < deploy/yaml/web-deployment.yml | kubectl apply -f -
-envsubst < deploy/yaml/web-hpa.yml | kubectl apply -f -
+envsubst deploy/yaml/web-deployment.yml.j2 | kubectl apply -f -
+envsubst deploy/yaml/web-hpa.yml.j2 | kubectl apply -f -
 
 echo "* Deploying Service for Web."
-envsubst < deploy/yaml/web-service.yml | kubectl apply -f -
+envsubst deploy/yaml/web-service.yml.j2 | kubectl apply -f -
 
 export REPLICAS=$(kubectl get deployment/platform-worker -o jsonpath='{.spec.replicas}' 2>/dev/null || echo ${WORKER_MIN})
 echo "* Deploying Worker."
-envsubst < deploy/yaml/worker-deployment.yml | kubectl apply -f -
-envsubst < deploy/yaml/worker-hpa.yml | kubectl apply -f -
+envsubst deploy/yaml/worker-deployment.yml.j2 | kubectl apply -f -
+envsubst deploy/yaml/worker-hpa.yml.j2 | kubectl apply -f -
 
 
 # Wait for web and worker deployments to finish.

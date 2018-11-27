@@ -6,7 +6,7 @@ metadata:
     app: platform
     type: web
 spec:
-  replicas: ${REPLICAS}
+  replicas: {{ REPLICAS }}
   selector:
     matchLabels:
       app: platform
@@ -21,7 +21,7 @@ spec:
   template:
     metadata:
       labels:
-        buildtime: ${BUILDTIME}
+        buildtime: {{ BUILDTIME }}
         app: platform
         type: web
     spec:
@@ -30,7 +30,7 @@ spec:
         - name: syncano-k8s-pull-secret
       containers:
         - name: web
-          image: ${DOCKERIMAGE}:${VERSION}
+          image: {{ DOCKERIMAGE }}:{{ VERSION }}
           securityContext:
             privileged: true
           resources:
@@ -60,3 +60,13 @@ spec:
               path: /healthz
               port: 80
             initialDelaySeconds: 5
+{%- if STORAGE_TYPE == "gcloud" %}
+          volumeMounts:
+            - name: storage-credentials
+              mountPath: /secrets/storage
+              readOnly: true
+      volumes:
+        - name: storage-credentials
+          secret:
+            secretName: storage-credentials
+{%- endif %}
