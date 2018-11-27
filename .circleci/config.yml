@@ -37,6 +37,15 @@ jobs:
             pip install ebs-deploy==2.0.1
 
       - run:
+          name: Build target Docker image
+          command: |
+            make pull-cache docker
+
+      - run:
+          name: Install jinja2-cli
+          command: |
+            pip install jinja2-cli[yaml]
+      - run:
           name: Install kops
           command: |
             sudo curl -L -o /usr/local/bin/kops https://github.com/kubernetes/kops/releases/download/1.10.0/kops-linux-amd64
@@ -58,7 +67,7 @@ jobs:
 
             if [ "$CIRCLE_BRANCH" = "devel" ]; then
               kops export kubecfg --name=k8s.syncano.rocks --state=s3://k8s-syncano-rocks-state-store
-              make pull-cache docker deploy-staging push-cache
+              make deploy-staging push-cache
 
             elif [ "$CIRCLE_BRANCH" = "master" ]; then
               kops export kubecfg --name=k8s.syncano.io --state=s3://k8s-syncano-io-state-store
@@ -66,7 +75,7 @@ jobs:
               gcloud auth activate-service-account --key-file=gcloud-service-key.json
               gcloud container clusters get-credentials syncano-eu1 --zone europe-west1 --project pioner-syncano-prod-9cfb
 
-              make pull-cache docker deploy-production
+              make deploy-production
             fi
 
             make clean

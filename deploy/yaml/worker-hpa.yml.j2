@@ -3,8 +3,8 @@ apiVersion: autoscaling/v1
 metadata:
   name: platform-worker
 spec:
-  minReplicas: ${WORKER_MIN}
-  maxReplicas: ${WORKER_MAX}
+  minReplicas: {{ WORKER_MIN }}
+  maxReplicas: {{ WORKER_MAX }}
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment

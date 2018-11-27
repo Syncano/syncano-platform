@@ -18,5 +18,5 @@
 ## Deployment
 
 - Run `build-staging` or `make build-production` to build a staging or production image respectively.
-- Make sure you have a working `kubectl` installed and configured. During deployment you may also require `gpg` (gnupg) and `envsubst` (gettext).
+- Make sure you have a working `kubectl` installed and configured. During deployment you may also require `gpg` (gnupg) and `jinja2-cli` (`pip install jinja2-cli[yaml]`).
 - Run `make deploy-staging` or `make deploy-production` to deploy relevant image.

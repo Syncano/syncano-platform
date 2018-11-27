@@ -12,10 +12,10 @@ spec:
       restartPolicy: Never
       containers:
         - name: platform-web
-          image: ${DOCKERIMAGE}:${VERSION}
+          image: {{ DOCKERIMAGE }}:{{ VERSION }}
           command:
             - "./run_care.sh"
-            - "${CARE_ARGUMENTS}"
+            - "{{ CARE_ARGUMENTS }}"
           securityContext:
             privileged: true
           resources:
@@ -27,3 +27,13 @@ spec:
                 name: platform
             - secretRef:
                 name: platform
+{%- if STORAGE_TYPE == "gcloud" %}
+          volumeMounts:
+            - name: storage-credentials
+              mountPath: /secrets/storage
+              readOnly: true
+      volumes:
+        - name: storage-credentials
+          secret:
+            secretName: storage-credentials
+{%- endif %}
