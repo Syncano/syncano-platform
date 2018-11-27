@@ -6,7 +6,7 @@ metadata:
     app: platform
     type: worker
 spec:
-  replicas: ${REPLICAS}
+  replicas: {{ REPLICAS }}
   selector:
     matchLabels:
       app: platform
@@ -21,26 +21,31 @@ spec:
   template:
     metadata:
       labels:
-        buildtime: ${BUILDTIME}
+        buildtime: {{ BUILDTIME }}
         app: platform
         type: worker
     spec:
       volumes:
         - name: cert-data
           nfs:
-            server: ${CERTS_NFS}
+            server: {{ CERTS_NFS }}
             path: /
             readOnly: false
         - name: acme
           secret:
             secretName: platform-acme
+{%- if STORAGE_TYPE == "gcloud" %}
+        - name: storage-credentials
+          secret:
+            secretName: storage-credentials
+{%- endif %}
 
       terminationGracePeriodSeconds: 360
       imagePullSecrets:
         - name: syncano-k8s-pull-secret
       containers:
         - name: worker
-          image: ${DOCKERIMAGE}:${VERSION}
+          image: {{ DOCKERIMAGE }}:{{ VERSION }}
           securityContext:
             privileged: true
           volumeMounts:
@@ -55,6 +60,11 @@ spec:
               mountPath: "/acme/config/account.thumb"
               readOnly: true
               subPath: account.thumb
+{%- if STORAGE_TYPE == "gcloud" %}
+            - name: storage-credentials
+              mountPath: /secrets/storage
+              readOnly: true
+{%- endif %}
           resources:
             requests:
               memory: "1500Mi"
