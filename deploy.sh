@@ -51,7 +51,7 @@ done
 
 envsubst() {
     for var in $(compgen -e); do
-        echo "$var: \"${!var}\""
+        echo "$var: \"${!var//\"/\\\"}\""
     done | jinja2 $1
 }
 
