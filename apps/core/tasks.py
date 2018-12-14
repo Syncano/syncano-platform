@@ -167,7 +167,7 @@ class DeleteFilesTask(TaskLockMixin, app.Task):
             for bucket_name in buckets:
                 bucket = gcloud.get_bucket(bucket_name)
                 for blob in bucket.list_blobs(prefix=prefix):
-                    bucket.delete(blob)
+                    blob.delete()
             return
 
 
