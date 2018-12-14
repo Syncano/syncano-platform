@@ -78,7 +78,7 @@ class Hosting(LiveAbstractModel, DescriptionAbstractModel,
     @classmethod
     def get_storage(cls):
         if cls._storage is None:
-            cls._storage = DefaultStorage.create_storage(bucket=settings.STORAGE_HOSTING_BUCKET,
+            cls._storage = DefaultStorage.create_storage(bucket_name=settings.STORAGE_HOSTING_BUCKET,
                                                          custom_domain=None)
         return cls._storage
 

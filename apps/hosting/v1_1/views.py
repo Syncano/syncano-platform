@@ -144,6 +144,7 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
         _, _, _, path_404 = cls.split_url(url_404)
         redirect_url = '/internal_redirect/{}/{}/{}/{}/{}/{}'.format(
             settings.STORAGE_TYPE, bucket, instance_id, hosting_id, path_404, path)
+
         if query:
             redirect_url += '?%s' % query
 
@@ -164,6 +165,8 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
             url == url[len(settings.MEDIA_URL):]
         else:
             _, url = url.split('//', 1)
+        if settings.STORAGE_TYPE == 'gcloud':
+            _, url = url.split('/', 1)
         return url.split('/', 3)
 
     def create_404_response(self):
