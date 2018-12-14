@@ -81,11 +81,11 @@ class WorkLogEntry(models.Model):
     @classmethod
     def is_covered(cls, left_boundary, right_boundary, step):
         full_coverage = int((right_boundary - left_boundary).total_seconds() / step.total_seconds())
-        actual_coverage = WorkLogEntry.objects.filter(left_boundary__gte=left_boundary,
-                                                      right_boundary__lte=right_boundary,
-                                                      seconds=step.total_seconds(),
-                                                      status=WorkLogEntry.STATUS_CHOICES.DONE,
-                                                      location=settings.LOCATION).count()
+        actual_coverage = cls.objects.filter(left_boundary__gte=left_boundary,
+                                             right_boundary__lte=right_boundary,
+                                             seconds=step.total_seconds(),
+                                             status=WorkLogEntry.STATUS_CHOICES.DONE,
+                                             location=settings.LOCATION).count()
 
         return actual_coverage == full_coverage
 
@@ -96,12 +96,13 @@ class WorkLogEntry(models.Model):
         """
 
         try:
-            last_entry = cls.objects.filter(seconds=step.total_seconds()).latest('right_boundary')
+            last_entry = cls.objects.filter(seconds=step.total_seconds(),
+                                            location=settings.LOCATION).latest('right_boundary')
             cursor = last_entry.right_boundary + step
         except WorkLogEntry.DoesNotExist:
             # If we got no worklogs yet for this step, fallback to the earliest worklog in general
             try:
-                last_entry = cls.objects.earliest('right_boundary')
+                last_entry = cls.objects.filter(location=settings.LOCATION).earliest('right_boundary')
                 cursor = last_entry.right_boundary + step
             except WorkLogEntry.DoesNotExist:
                 # Otherwise just use until datetime
