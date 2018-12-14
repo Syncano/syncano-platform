@@ -6,7 +6,6 @@ from datetime import datetime
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.utils.encoding import force_bytes
 from py_zipkin.zipkin import zipkin_span
 
 from apps.core import zipkin
