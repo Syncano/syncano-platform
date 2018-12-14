@@ -66,6 +66,10 @@ class GoogleCloudStorage(StorageWithTransactionSupportMixin, gcloud.GoogleCloudS
         bucket = self.bucket
         bucket.copy_blob(bucket.blob(src_name), bucket, dest_name)
 
+    def delete(self, name):
+        name = self._normalize_name(gcloud.clean_name(name))
+        self.bucket.delete_blobs([self._encode_name(name)], on_error=lambda blob: None)
+
     def _save(self, name, content):
         storage = getattr(content, '_storage', None)
         if storage and storage == self:

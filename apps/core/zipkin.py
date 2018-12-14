@@ -4,7 +4,6 @@ import struct
 
 import requests
 from django.conf import settings
-from django.utils.encoding import force_bytes
 from py_zipkin.util import generate_random_64bit_string
 from py_zipkin.zipkin import ZipkinAttrs
 
