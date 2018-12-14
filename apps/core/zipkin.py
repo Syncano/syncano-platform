@@ -4,7 +4,6 @@ import struct
 
 import requests
 from django.conf import settings
-from django.utils.encoding import force_bytes
 from py_zipkin.util import generate_random_64bit_string
 from py_zipkin.zipkin import ZipkinAttrs
 
@@ -164,7 +163,8 @@ def get_binary_annotations(request, response):
     Helper method for getting all binary annotations from the request.
     """
     annotations = {
-        'http.uri': force_bytes(request.path),
-        'response_status_code': str(getattr(response, 'status_code', '0')),
+        'http.method': request.method,
+        'http.url': request.path,
+        'http.status_code': str(getattr(response, 'status_code', '0')),
     }
     return annotations

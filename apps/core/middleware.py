@@ -6,7 +6,6 @@ from datetime import datetime
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.utils.encoding import force_bytes
 from py_zipkin.zipkin import zipkin_span
 
 from apps.core import zipkin
@@ -76,11 +75,9 @@ class ZipkinMiddleware:
         if self.zipkin_attrs.is_sampled:
             self.zipkin_context = zipkin_span(
                 service_name=settings.TRACING_SERVICE_NAME,
-                span_name='{0} {1}'.format(request.method, force_bytes(request.path)),
+                span_name='{0} {1}'.format(request.method, request.path),
                 zipkin_attrs=self.zipkin_attrs,
                 transport_handler=zipkin.transport_handler,
-                host='127.0.0.1',
-                port=443,
             )
             self.zipkin_context.start()
 
