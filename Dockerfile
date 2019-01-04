@@ -23,6 +23,7 @@ RUN set -ex \
         openssl \
         # nginx
         nginx \
+        libxml2 \
         # unzip and mksquashfs for env zip processing
         squashfs-tools \
         unzip \
