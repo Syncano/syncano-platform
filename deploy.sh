@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -e
-
 export DOCKERIMAGE=${DOCKERIMAGE:-quay.io/syncano/syncano-platform}
 export VERSION="$2"
 
@@ -13,6 +11,8 @@ DEFAULT_CARE_ARGUMENTS=""
 usage() { echo "* Usage: $0 <environment> <version> [--skip-gitlog][--codebox][--skip-push][--migration]" >&2; exit 1; }
 [[ ! -z $TARGET ]] || usage
 [[ ! -z $VERSION ]] || usage
+
+set -euo pipefail
 
 if ! which kubectl > /dev/null; then
     echo "! kubectl not installed" >&2; exit 1

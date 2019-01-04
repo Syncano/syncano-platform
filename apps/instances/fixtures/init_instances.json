@@ -26,15 +26,6 @@
         }
     },
     {
-        "pk": 2,
-        "model": "admins.admininstancerole",
-        "fields": {
-            "admin": 2,
-            "role": 1,
-            "instance": 1
-        }
-    },
-    {
         "pk": 1,
         "model": "instances.Instance",
         "fields": {
