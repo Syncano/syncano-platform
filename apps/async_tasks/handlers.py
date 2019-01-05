@@ -138,11 +138,11 @@ class RedisPubSubHandler(BasicHandler):
                             self.pubsub.unsubscribe(channel, client_uuid=client_uuid)
 
     def reset(self):
-        self.pubsub.close()
         redis.connection_pool.disconnect()
         redis.connection_pool.reset()
         self.client_data.clear()
         self.channel_data.clear()
+        self._pubsub = self.redis_client.pubsub()
 
 
 class WebSocketHandler(BasicHandler):
