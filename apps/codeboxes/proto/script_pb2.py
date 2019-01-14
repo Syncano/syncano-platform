@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -19,7 +18,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     name='pkg/script/proto/script.proto',
     package='script',
     syntax='proto3',
-    serialized_pb=_b('\n\x1dpkg/script/proto/script.proto\x12\x06script\"\xb5\x03\n\nRunRequest\x12.\n\x04meta\x18\x01 \x01(\x0b\x32\x1e.script.RunRequest.MetaMessageH\x00\x12\x30\n\x05\x63hunk\x18\x02 \x01(\x0b\x32\x1f.script.RunRequest.ChunkMessageH\x00\x1a\x8f\x02\n\x0bMetaMessage\x12\x0f\n\x07runtime\x18\x01 \x01(\t\x12\x12\n\nsourceHash\x18\x02 \x01(\t\x12\x0e\n\x06userID\x18\x03 \x01(\t\x12>\n\x07options\x18\x05 \x01(\x0b\x32-.script.RunRequest.MetaMessage.OptionsMessage\x12\x13\n\x0b\x65nvironment\x18\x06 \x01(\t\x1av\n\x0eOptionsMessage\x12\x12\n\nentryPoint\x18\x01 \x01(\t\x12\x13\n\x0boutputLimit\x18\x02 \x01(\r\x12\x0f\n\x07timeout\x18\x03 \x01(\x03\x12\x0c\n\x04\x61rgs\x18\x04 \x01(\x0c\x12\x0e\n\x06\x63onfig\x18\x05 \x01(\x0c\x12\x0c\n\x04meta\x18\x06 \x01(\x0c\x1a*\n\x0c\x43hunkMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\x42\x07\n\x05value\"\xba\x01\n\x13HTTPResponseMessage\x12\x12\n\nstatusCode\x18\x01 \x01(\x05\x12\x13\n\x0b\x63ontentType\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\x0c\x12\x39\n\x07headers\x18\x04 \x03(\x0b\x32(.script.HTTPResponseMessage.HeadersEntry\x1a.\n\x0cHeadersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\x88\x01\n\x0bRunResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x0e\n\x06stdout\x18\x02 \x01(\x0c\x12\x0e\n\x06stderr\x18\x03 \x01(\x0c\x12-\n\x08response\x18\x04 \x01(\x0b\x32\x1b.script.HTTPResponseMessage\x12\x0c\n\x04time\x18\x05 \x01(\x03\x12\x0e\n\x06\x63\x61\x63hed\x18\x06 \x01(\x08\x32\x42\n\x0cScriptRunner\x12\x32\n\x03Run\x12\x12.script.RunRequest\x1a\x13.script.RunResponse(\x01\x30\x01\x42-Z+github.com/Syncano/codebox/pkg/script/protob\x06proto3')
+    serialized_options=_b('Z+github.com/Syncano/codebox/pkg/script/proto'),
+    serialized_pb=_b('\n\x1dpkg/script/proto/script.proto\x12\x06script\"\xeb\x03\n\nRunRequest\x12.\n\x04meta\x18\x01 \x01(\x0b\x32\x1e.script.RunRequest.MetaMessageH\x00\x12\x30\n\x05\x63hunk\x18\x02 \x01(\x0b\x32\x1f.script.RunRequest.ChunkMessageH\x00\x1a\x9e\x02\n\x0bMetaMessage\x12\x0f\n\x07runtime\x18\x01 \x01(\t\x12\x12\n\nsourceHash\x18\x02 \x01(\t\x12\x0e\n\x06userID\x18\x03 \x01(\t\x12>\n\x07options\x18\x05 \x01(\x0b\x32-.script.RunRequest.MetaMessage.OptionsMessage\x12\x13\n\x0b\x65nvironment\x18\x06 \x01(\t\x1a\x84\x01\n\x0eOptionsMessage\x12\x12\n\nentryPoint\x18\x01 \x01(\t\x12\x13\n\x0boutputLimit\x18\x02 \x01(\r\x12\x0f\n\x07timeout\x18\x03 \x01(\x03\x12\x0c\n\x04mCPU\x18\x07 \x01(\r\x12\x0c\n\x04\x61rgs\x18\x04 \x01(\x0c\x12\x0e\n\x06\x63onfig\x18\x05 \x01(\x0c\x12\x0c\n\x04meta\x18\x06 \x01(\x0c\x1aQ\n\x0c\x43hunkMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08\x66ilename\x18\x02 \x01(\t\x12\x13\n\x0b\x63ontentType\x18\x03 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x04 \x01(\x0c\x42\x07\n\x05value\"\xba\x01\n\x13HTTPResponseMessage\x12\x12\n\nstatusCode\x18\x01 \x01(\x05\x12\x13\n\x0b\x63ontentType\x18\x02 \x01(\t\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\x0c\x12\x39\n\x07headers\x18\x04 \x03(\x0b\x32(.script.HTTPResponseMessage.HeadersEntry\x1a.\n\x0cHeadersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\xa6\x01\n\x0bRunResponse\x12\x0c\n\x04\x63ode\x18\x01 \x01(\x05\x12\x0e\n\x06stdout\x18\x02 \x01(\x0c\x12\x0e\n\x06stderr\x18\x03 \x01(\x0c\x12-\n\x08response\x18\x04 \x01(\x0b\x32\x1b.script.HTTPResponseMessage\x12\x0c\n\x04took\x18\x05 \x01(\x03\x12\x0e\n\x06\x63\x61\x63hed\x18\x06 \x01(\x08\x12\x0c\n\x04time\x18\x07 \x01(\x03\x12\x0e\n\x06weight\x18\x08 \x01(\r2B\n\x0cScriptRunner\x12\x32\n\x03Run\x12\x12.script.RunRequest\x1a\x13.script.RunResponse(\x01\x30\x01\x42-Z+github.com/Syncano/codebox/pkg/script/protob\x06proto3')
 )
 
 
@@ -38,56 +38,63 @@ _RUNREQUEST_METAMESSAGE_OPTIONSMESSAGE = _descriptor.Descriptor(
             has_default_value=False, default_value=_b("").decode('utf-8'),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='outputLimit', full_name='script.RunRequest.MetaMessage.OptionsMessage.outputLimit', index=1,
             number=2, type=13, cpp_type=3, label=1,
             has_default_value=False, default_value=0,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='timeout', full_name='script.RunRequest.MetaMessage.OptionsMessage.timeout', index=2,
             number=3, type=3, cpp_type=2, label=1,
             has_default_value=False, default_value=0,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
-            name='args', full_name='script.RunRequest.MetaMessage.OptionsMessage.args', index=3,
+            name='mCPU', full_name='script.RunRequest.MetaMessage.OptionsMessage.mCPU', index=3,
+            number=7, type=13, cpp_type=3, label=1,
+            has_default_value=False, default_value=0,
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='args', full_name='script.RunRequest.MetaMessage.OptionsMessage.args', index=4,
             number=4, type=12, cpp_type=9, label=1,
             has_default_value=False, default_value=_b(""),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
-            name='config', full_name='script.RunRequest.MetaMessage.OptionsMessage.config', index=4,
+            name='config', full_name='script.RunRequest.MetaMessage.OptionsMessage.config', index=5,
             number=5, type=12, cpp_type=9, label=1,
             has_default_value=False, default_value=_b(""),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
-            name='meta', full_name='script.RunRequest.MetaMessage.OptionsMessage.meta', index=5,
+            name='meta', full_name='script.RunRequest.MetaMessage.OptionsMessage.meta', index=6,
             number=6, type=12, cpp_type=9, label=1,
             has_default_value=False, default_value=_b(""),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
     ],
     extensions=[
     ],
     nested_types=[],
     enum_types=[
     ],
-    options=None,
+    serialized_options=None,
     is_extendable=False,
     syntax='proto3',
     extension_ranges=[],
     oneofs=[
     ],
-    serialized_start=308,
-    serialized_end=426,
+    serialized_start=309,
+    serialized_end=441,
 )
 
 _RUNREQUEST_METAMESSAGE = _descriptor.Descriptor(
@@ -103,49 +110,49 @@ _RUNREQUEST_METAMESSAGE = _descriptor.Descriptor(
             has_default_value=False, default_value=_b("").decode('utf-8'),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='sourceHash', full_name='script.RunRequest.MetaMessage.sourceHash', index=1,
             number=2, type=9, cpp_type=9, label=1,
             has_default_value=False, default_value=_b("").decode('utf-8'),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='userID', full_name='script.RunRequest.MetaMessage.userID', index=2,
             number=3, type=9, cpp_type=9, label=1,
             has_default_value=False, default_value=_b("").decode('utf-8'),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='options', full_name='script.RunRequest.MetaMessage.options', index=3,
             number=5, type=11, cpp_type=10, label=1,
             has_default_value=False, default_value=None,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='environment', full_name='script.RunRequest.MetaMessage.environment', index=4,
             number=6, type=9, cpp_type=9, label=1,
             has_default_value=False, default_value=_b("").decode('utf-8'),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
     ],
     extensions=[
     ],
     nested_types=[_RUNREQUEST_METAMESSAGE_OPTIONSMESSAGE, ],
     enum_types=[
     ],
-    options=None,
+    serialized_options=None,
     is_extendable=False,
     syntax='proto3',
     extension_ranges=[],
     oneofs=[
     ],
     serialized_start=155,
-    serialized_end=426,
+    serialized_end=441,
 )
 
 _RUNREQUEST_CHUNKMESSAGE = _descriptor.Descriptor(
@@ -161,28 +168,42 @@ _RUNREQUEST_CHUNKMESSAGE = _descriptor.Descriptor(
             has_default_value=False, default_value=_b("").decode('utf-8'),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
-            name='data', full_name='script.RunRequest.ChunkMessage.data', index=1,
-            number=2, type=12, cpp_type=9, label=1,
+            name='filename', full_name='script.RunRequest.ChunkMessage.filename', index=1,
+            number=2, type=9, cpp_type=9, label=1,
+            has_default_value=False, default_value=_b("").decode('utf-8'),
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='contentType', full_name='script.RunRequest.ChunkMessage.contentType', index=2,
+            number=3, type=9, cpp_type=9, label=1,
+            has_default_value=False, default_value=_b("").decode('utf-8'),
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='data', full_name='script.RunRequest.ChunkMessage.data', index=3,
+            number=4, type=12, cpp_type=9, label=1,
             has_default_value=False, default_value=_b(""),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
     ],
     extensions=[
     ],
     nested_types=[],
     enum_types=[
     ],
-    options=None,
+    serialized_options=None,
     is_extendable=False,
     syntax='proto3',
     extension_ranges=[],
     oneofs=[
     ],
-    serialized_start=428,
-    serialized_end=470,
+    serialized_start=443,
+    serialized_end=524,
 )
 
 _RUNREQUEST = _descriptor.Descriptor(
@@ -198,21 +219,21 @@ _RUNREQUEST = _descriptor.Descriptor(
             has_default_value=False, default_value=None,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='chunk', full_name='script.RunRequest.chunk', index=1,
             number=2, type=11, cpp_type=10, label=1,
             has_default_value=False, default_value=None,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
     ],
     extensions=[
     ],
     nested_types=[_RUNREQUEST_METAMESSAGE, _RUNREQUEST_CHUNKMESSAGE, ],
     enum_types=[
     ],
-    options=None,
+    serialized_options=None,
     is_extendable=False,
     syntax='proto3',
     extension_ranges=[],
@@ -222,7 +243,7 @@ _RUNREQUEST = _descriptor.Descriptor(
             index=0, containing_type=None, fields=[]),
     ],
     serialized_start=42,
-    serialized_end=479,
+    serialized_end=533,
 )
 
 
@@ -239,28 +260,28 @@ _HTTPRESPONSEMESSAGE_HEADERSENTRY = _descriptor.Descriptor(
             has_default_value=False, default_value=_b("").decode('utf-8'),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='value', full_name='script.HTTPResponseMessage.HeadersEntry.value', index=1,
             number=2, type=9, cpp_type=9, label=1,
             has_default_value=False, default_value=_b("").decode('utf-8'),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
     ],
     extensions=[
     ],
     nested_types=[],
     enum_types=[
     ],
-    options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+    serialized_options=_b('8\001'),
     is_extendable=False,
     syntax='proto3',
     extension_ranges=[],
     oneofs=[
     ],
-    serialized_start=622,
-    serialized_end=668,
+    serialized_start=676,
+    serialized_end=722,
 )
 
 _HTTPRESPONSEMESSAGE = _descriptor.Descriptor(
@@ -276,42 +297,42 @@ _HTTPRESPONSEMESSAGE = _descriptor.Descriptor(
             has_default_value=False, default_value=0,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='contentType', full_name='script.HTTPResponseMessage.contentType', index=1,
             number=2, type=9, cpp_type=9, label=1,
             has_default_value=False, default_value=_b("").decode('utf-8'),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='content', full_name='script.HTTPResponseMessage.content', index=2,
             number=3, type=12, cpp_type=9, label=1,
             has_default_value=False, default_value=_b(""),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='headers', full_name='script.HTTPResponseMessage.headers', index=3,
             number=4, type=11, cpp_type=10, label=3,
             has_default_value=False, default_value=[],
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
     ],
     extensions=[
     ],
     nested_types=[_HTTPRESPONSEMESSAGE_HEADERSENTRY, ],
     enum_types=[
     ],
-    options=None,
+    serialized_options=None,
     is_extendable=False,
     syntax='proto3',
     extension_ranges=[],
     oneofs=[
     ],
-    serialized_start=482,
-    serialized_end=668,
+    serialized_start=536,
+    serialized_end=722,
 )
 
 
@@ -328,56 +349,70 @@ _RUNRESPONSE = _descriptor.Descriptor(
             has_default_value=False, default_value=0,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='stdout', full_name='script.RunResponse.stdout', index=1,
             number=2, type=12, cpp_type=9, label=1,
             has_default_value=False, default_value=_b(""),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='stderr', full_name='script.RunResponse.stderr', index=2,
             number=3, type=12, cpp_type=9, label=1,
             has_default_value=False, default_value=_b(""),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='response', full_name='script.RunResponse.response', index=3,
             number=4, type=11, cpp_type=10, label=1,
             has_default_value=False, default_value=None,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
-            name='time', full_name='script.RunResponse.time', index=4,
+            name='took', full_name='script.RunResponse.took', index=4,
             number=5, type=3, cpp_type=2, label=1,
             has_default_value=False, default_value=0,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
         _descriptor.FieldDescriptor(
             name='cached', full_name='script.RunResponse.cached', index=5,
             number=6, type=8, cpp_type=7, label=1,
             has_default_value=False, default_value=False,
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
-            options=None, file=DESCRIPTOR),
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='time', full_name='script.RunResponse.time', index=6,
+            number=7, type=3, cpp_type=2, label=1,
+            has_default_value=False, default_value=0,
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='weight', full_name='script.RunResponse.weight', index=7,
+            number=8, type=13, cpp_type=3, label=1,
+            has_default_value=False, default_value=0,
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
     ],
     extensions=[
     ],
     nested_types=[],
     enum_types=[
     ],
-    options=None,
+    serialized_options=None,
     is_extendable=False,
     syntax='proto3',
     extension_ranges=[],
     oneofs=[
     ],
-    serialized_start=671,
-    serialized_end=807,
+    serialized_start=725,
+    serialized_end=891,
 )
 
 _RUNREQUEST_METAMESSAGE_OPTIONSMESSAGE.containing_type = _RUNREQUEST_METAMESSAGE
@@ -454,19 +489,17 @@ RunResponse = _reflection.GeneratedProtocolMessageType('RunResponse', (_message.
 _sym_db.RegisterMessage(RunResponse)
 
 
-DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('Z+github.com/Syncano/codebox/pkg/script/proto'))
-_HTTPRESPONSEMESSAGE_HEADERSENTRY.has_options = True
-_HTTPRESPONSEMESSAGE_HEADERSENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
+DESCRIPTOR._options = None
+_HTTPRESPONSEMESSAGE_HEADERSENTRY._options = None
 
 _SCRIPTRUNNER = _descriptor.ServiceDescriptor(
     name='ScriptRunner',
     full_name='script.ScriptRunner',
     file=DESCRIPTOR,
     index=0,
-    options=None,
-    serialized_start=809,
-    serialized_end=875,
+    serialized_options=None,
+    serialized_start=893,
+    serialized_end=959,
     methods=[
         _descriptor.MethodDescriptor(
             name='Run',
@@ -475,7 +508,7 @@ _SCRIPTRUNNER = _descriptor.ServiceDescriptor(
             containing_service=None,
             input_type=_RUNREQUEST,
             output_type=_RUNRESPONSE,
-            options=None,
+            serialized_options=None,
         ),
     ])
 _sym_db.RegisterServiceDescriptor(_SCRIPTRUNNER)

@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -21,7 +20,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     name='pkg/broker/proto/broker.proto',
     package='broker',
     syntax='proto3',
-    serialized_pb=_b('\n\x1dpkg/broker/proto/broker.proto\x12\x06\x62roker\x1a\x19pkg/lb/proto/runner.proto\x1a\x1dpkg/script/proto/script.proto\"\xbb\x02\n\nRunRequest\x12,\n\x04meta\x18\x01 \x01(\x0b\x32\x1e.broker.RunRequest.MetaMessage\x12*\n\x06lbMeta\x18\x02 \x01(\x0b\x32\x1a.lb.RunRequest.MetaMessage\x12#\n\x07request\x18\x03 \x03(\x0b\x32\x12.script.RunRequest\x1a\xad\x01\n\x0bMetaMessage\x12\x38\n\x05\x66iles\x18\x01 \x03(\x0b\x32).broker.RunRequest.MetaMessage.FilesEntry\x12\x16\n\x0e\x65nvironmentURL\x18\x02 \x01(\t\x12\r\n\x05trace\x18\x03 \x01(\x0c\x12\x0f\n\x07traceID\x18\x04 \x01(\x04\x1a,\n\nFilesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"\r\n\x0bRunResponse2>\n\x0cScriptRunner\x12.\n\x03Run\x12\x12.broker.RunRequest\x1a\x13.broker.RunResponseB-Z+github.com/Syncano/codebox/pkg/broker/protob\x06proto3')
+    serialized_options=_b('Z+github.com/Syncano/codebox/pkg/broker/proto'),
+    serialized_pb=_b('\n\x1dpkg/broker/proto/broker.proto\x12\x06\x62roker\x1a\x19pkg/lb/proto/runner.proto\x1a\x1dpkg/script/proto/script.proto\"\xc9\x02\n\nRunRequest\x12,\n\x04meta\x18\x01 \x01(\x0b\x32\x1e.broker.RunRequest.MetaMessage\x12*\n\x06lbMeta\x18\x02 \x01(\x0b\x32\x1a.lb.RunRequest.MetaMessage\x12#\n\x07request\x18\x03 \x03(\x0b\x32\x12.script.RunRequest\x1a\xbb\x01\n\x0bMetaMessage\x12\x38\n\x05\x66iles\x18\x01 \x03(\x0b\x32).broker.RunRequest.MetaMessage.FilesEntry\x12\x16\n\x0e\x65nvironmentURL\x18\x02 \x01(\t\x12\r\n\x05trace\x18\x03 \x01(\x0c\x12\x0f\n\x07traceID\x18\x04 \x01(\x04\x12\x0c\n\x04sync\x18\x05 \x01(\x08\x1a,\n\nFilesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x32@\n\x0cScriptRunner\x12\x30\n\x03Run\x12\x12.broker.RunRequest\x1a\x13.script.RunResponse0\x01\x42-Z+github.com/Syncano/codebox/pkg/broker/protob\x06proto3')
     ,
     dependencies=[pkg_dot_lb_dot_proto_dot_runner__pb2.DESCRIPTOR,pkg_dot_script_dot_proto_dot_script__pb2.DESCRIPTOR,])
 
@@ -35,34 +35,34 @@ _RUNREQUEST_METAMESSAGE_FILESENTRY = _descriptor.Descriptor(
     file=DESCRIPTOR,
     containing_type=None,
     fields=[
-      _descriptor.FieldDescriptor(
-          name='key', full_name='broker.RunRequest.MetaMessage.FilesEntry.key', index=0,
-          number=1, type=9, cpp_type=9, label=1,
-          has_default_value=False, default_value=_b("").decode('utf-8'),
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
-      _descriptor.FieldDescriptor(
-          name='value', full_name='broker.RunRequest.MetaMessage.FilesEntry.value', index=1,
-          number=2, type=9, cpp_type=9, label=1,
-          has_default_value=False, default_value=_b("").decode('utf-8'),
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='key', full_name='broker.RunRequest.MetaMessage.FilesEntry.key', index=0,
+            number=1, type=9, cpp_type=9, label=1,
+            has_default_value=False, default_value=_b("").decode('utf-8'),
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='value', full_name='broker.RunRequest.MetaMessage.FilesEntry.value', index=1,
+            number=2, type=9, cpp_type=9, label=1,
+            has_default_value=False, default_value=_b("").decode('utf-8'),
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
     ],
     extensions=[
     ],
     nested_types=[],
     enum_types=[
     ],
-    options=_descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001')),
+    serialized_options=_b('8\001'),
     is_extendable=False,
     syntax='proto3',
     extension_ranges=[],
     oneofs=[
     ],
-    serialized_start=371,
-    serialized_end=415,
+    serialized_start=385,
+    serialized_end=429,
 )
 
 _RUNREQUEST_METAMESSAGE = _descriptor.Descriptor(
@@ -72,48 +72,55 @@ _RUNREQUEST_METAMESSAGE = _descriptor.Descriptor(
     file=DESCRIPTOR,
     containing_type=None,
     fields=[
-      _descriptor.FieldDescriptor(
-          name='files', full_name='broker.RunRequest.MetaMessage.files', index=0,
-          number=1, type=11, cpp_type=10, label=3,
-          has_default_value=False, default_value=[],
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
-      _descriptor.FieldDescriptor(
-          name='environmentURL', full_name='broker.RunRequest.MetaMessage.environmentURL', index=1,
-          number=2, type=9, cpp_type=9, label=1,
-          has_default_value=False, default_value=_b("").decode('utf-8'),
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
-      _descriptor.FieldDescriptor(
-          name='trace', full_name='broker.RunRequest.MetaMessage.trace', index=2,
-          number=3, type=12, cpp_type=9, label=1,
-          has_default_value=False, default_value=_b(""),
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
-      _descriptor.FieldDescriptor(
-          name='traceID', full_name='broker.RunRequest.MetaMessage.traceID', index=3,
-          number=4, type=4, cpp_type=4, label=1,
-          has_default_value=False, default_value=0,
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='files', full_name='broker.RunRequest.MetaMessage.files', index=0,
+            number=1, type=11, cpp_type=10, label=3,
+            has_default_value=False, default_value=[],
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='environmentURL', full_name='broker.RunRequest.MetaMessage.environmentURL', index=1,
+            number=2, type=9, cpp_type=9, label=1,
+            has_default_value=False, default_value=_b("").decode('utf-8'),
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='trace', full_name='broker.RunRequest.MetaMessage.trace', index=2,
+            number=3, type=12, cpp_type=9, label=1,
+            has_default_value=False, default_value=_b(""),
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='traceID', full_name='broker.RunRequest.MetaMessage.traceID', index=3,
+            number=4, type=4, cpp_type=4, label=1,
+            has_default_value=False, default_value=0,
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='sync', full_name='broker.RunRequest.MetaMessage.sync', index=4,
+            number=5, type=8, cpp_type=7, label=1,
+            has_default_value=False, default_value=False,
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
     ],
     extensions=[
     ],
     nested_types=[_RUNREQUEST_METAMESSAGE_FILESENTRY, ],
     enum_types=[
     ],
-    options=None,
+    serialized_options=None,
     is_extendable=False,
     syntax='proto3',
     extension_ranges=[],
     oneofs=[
     ],
     serialized_start=242,
-    serialized_end=415,
+    serialized_end=429,
 )
 
 _RUNREQUEST = _descriptor.Descriptor(
@@ -123,65 +130,41 @@ _RUNREQUEST = _descriptor.Descriptor(
     file=DESCRIPTOR,
     containing_type=None,
     fields=[
-      _descriptor.FieldDescriptor(
-          name='meta', full_name='broker.RunRequest.meta', index=0,
-          number=1, type=11, cpp_type=10, label=1,
-          has_default_value=False, default_value=None,
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
-      _descriptor.FieldDescriptor(
-          name='lbMeta', full_name='broker.RunRequest.lbMeta', index=1,
-          number=2, type=11, cpp_type=10, label=1,
-          has_default_value=False, default_value=None,
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
-      _descriptor.FieldDescriptor(
-          name='request', full_name='broker.RunRequest.request', index=2,
-          number=3, type=11, cpp_type=10, label=3,
-          has_default_value=False, default_value=[],
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='meta', full_name='broker.RunRequest.meta', index=0,
+            number=1, type=11, cpp_type=10, label=1,
+            has_default_value=False, default_value=None,
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='lbMeta', full_name='broker.RunRequest.lbMeta', index=1,
+            number=2, type=11, cpp_type=10, label=1,
+            has_default_value=False, default_value=None,
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='request', full_name='broker.RunRequest.request', index=2,
+            number=3, type=11, cpp_type=10, label=3,
+            has_default_value=False, default_value=[],
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
     ],
     extensions=[
     ],
     nested_types=[_RUNREQUEST_METAMESSAGE, ],
     enum_types=[
     ],
-    options=None,
+    serialized_options=None,
     is_extendable=False,
     syntax='proto3',
     extension_ranges=[],
     oneofs=[
     ],
     serialized_start=100,
-    serialized_end=415,
-)
-
-
-_RUNRESPONSE = _descriptor.Descriptor(
-    name='RunResponse',
-    full_name='broker.RunResponse',
-    filename=None,
-    file=DESCRIPTOR,
-    containing_type=None,
-    fields=[
-    ],
-    extensions=[
-    ],
-    nested_types=[],
-    enum_types=[
-    ],
-    options=None,
-    is_extendable=False,
-    syntax='proto3',
-    extension_ranges=[],
-    oneofs=[
-    ],
-    serialized_start=417,
-    serialized_end=430,
+    serialized_end=429,
 )
 
 _RUNREQUEST_METAMESSAGE_FILESENTRY.containing_type = _RUNREQUEST_METAMESSAGE
@@ -191,7 +174,6 @@ _RUNREQUEST.fields_by_name['meta'].message_type = _RUNREQUEST_METAMESSAGE
 _RUNREQUEST.fields_by_name['lbMeta'].message_type = pkg_dot_lb_dot_proto_dot_runner__pb2._RUNREQUEST_METAMESSAGE
 _RUNREQUEST.fields_by_name['request'].message_type = pkg_dot_script_dot_proto_dot_script__pb2._RUNREQUEST
 DESCRIPTOR.message_types_by_name['RunRequest'] = _RUNREQUEST
-DESCRIPTOR.message_types_by_name['RunResponse'] = _RUNRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 RunRequest = _reflection.GeneratedProtocolMessageType('RunRequest', (_message.Message,), dict(
@@ -217,37 +199,28 @@ _sym_db.RegisterMessage(RunRequest)
 _sym_db.RegisterMessage(RunRequest.MetaMessage)
 _sym_db.RegisterMessage(RunRequest.MetaMessage.FilesEntry)
 
-RunResponse = _reflection.GeneratedProtocolMessageType('RunResponse', (_message.Message,), dict(
-    DESCRIPTOR = _RUNRESPONSE,
-    __module__ = 'pkg.broker.proto.broker_pb2'
-    # @@protoc_insertion_point(class_scope:broker.RunResponse)
-))
-_sym_db.RegisterMessage(RunResponse)
 
-
-DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('Z+github.com/Syncano/codebox/pkg/broker/proto'))
-_RUNREQUEST_METAMESSAGE_FILESENTRY.has_options = True
-_RUNREQUEST_METAMESSAGE_FILESENTRY._options = _descriptor._ParseOptions(descriptor_pb2.MessageOptions(), _b('8\001'))
+DESCRIPTOR._options = None
+_RUNREQUEST_METAMESSAGE_FILESENTRY._options = None
 
 _SCRIPTRUNNER = _descriptor.ServiceDescriptor(
     name='ScriptRunner',
     full_name='broker.ScriptRunner',
     file=DESCRIPTOR,
     index=0,
-    options=None,
-    serialized_start=432,
-    serialized_end=494,
+    serialized_options=None,
+    serialized_start=431,
+    serialized_end=495,
     methods=[
-      _descriptor.MethodDescriptor(
-          name='Run',
-          full_name='broker.ScriptRunner.Run',
-          index=0,
-          containing_service=None,
-          input_type=_RUNREQUEST,
-          output_type=_RUNRESPONSE,
-          options=None,
-      ),
+        _descriptor.MethodDescriptor(
+            name='Run',
+            full_name='broker.ScriptRunner.Run',
+            index=0,
+            containing_service=None,
+            input_type=_RUNREQUEST,
+            output_type=pkg_dot_script_dot_proto_dot_script__pb2._RUNRESPONSE,
+            serialized_options=None,
+        ),
     ])
 _sym_db.RegisterServiceDescriptor(_SCRIPTRUNNER)
 

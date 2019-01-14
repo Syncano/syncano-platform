@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -20,6 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     name='pkg/lb/proto/runner.proto',
     package='lb',
     syntax='proto3',
+    serialized_options=_b('Z\'github.com/Syncano/codebox/pkg/lb/proto'),
     serialized_pb=_b('\n\x19pkg/lb/proto/runner.proto\x12\x02lb\x1a\x1dpkg/script/proto/script.proto\"\xa9\x01\n\nRunRequest\x12*\n\x04meta\x18\x01 \x01(\x0b\x32\x1a.lb.RunRequest.MetaMessageH\x00\x12%\n\x07request\x18\x02 \x01(\x0b\x32\x12.script.RunRequestH\x00\x1a?\n\x0bMetaMessage\x12\x16\n\x0e\x63oncurrencyKey\x18\x01 \x01(\t\x12\x18\n\x10\x63oncurrencyLimit\x18\x02 \x01(\x05\x42\x07\n\x05value2>\n\x0cScriptRunner\x12.\n\x03Run\x12\x0e.lb.RunRequest\x1a\x13.script.RunResponse(\x01\x30\x01\x42)Z\'github.com/Syncano/codebox/pkg/lb/protob\x06proto3')
     ,
     dependencies=[pkg_dot_script_dot_proto_dot_script__pb2.DESCRIPTOR,])
@@ -34,27 +34,27 @@ _RUNREQUEST_METAMESSAGE = _descriptor.Descriptor(
     file=DESCRIPTOR,
     containing_type=None,
     fields=[
-      _descriptor.FieldDescriptor(
-          name='concurrencyKey', full_name='lb.RunRequest.MetaMessage.concurrencyKey', index=0,
-          number=1, type=9, cpp_type=9, label=1,
-          has_default_value=False, default_value=_b("").decode('utf-8'),
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
-      _descriptor.FieldDescriptor(
-          name='concurrencyLimit', full_name='lb.RunRequest.MetaMessage.concurrencyLimit', index=1,
-          number=2, type=5, cpp_type=1, label=1,
-          has_default_value=False, default_value=0,
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='concurrencyKey', full_name='lb.RunRequest.MetaMessage.concurrencyKey', index=0,
+            number=1, type=9, cpp_type=9, label=1,
+            has_default_value=False, default_value=_b("").decode('utf-8'),
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='concurrencyLimit', full_name='lb.RunRequest.MetaMessage.concurrencyLimit', index=1,
+            number=2, type=5, cpp_type=1, label=1,
+            has_default_value=False, default_value=0,
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
     ],
     extensions=[
     ],
     nested_types=[],
     enum_types=[
     ],
-    options=None,
+    serialized_options=None,
     is_extendable=False,
     syntax='proto3',
     extension_ranges=[],
@@ -71,34 +71,34 @@ _RUNREQUEST = _descriptor.Descriptor(
     file=DESCRIPTOR,
     containing_type=None,
     fields=[
-      _descriptor.FieldDescriptor(
-          name='meta', full_name='lb.RunRequest.meta', index=0,
-          number=1, type=11, cpp_type=10, label=1,
-          has_default_value=False, default_value=None,
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
-      _descriptor.FieldDescriptor(
-          name='request', full_name='lb.RunRequest.request', index=1,
-          number=2, type=11, cpp_type=10, label=1,
-          has_default_value=False, default_value=None,
-          message_type=None, enum_type=None, containing_type=None,
-          is_extension=False, extension_scope=None,
-          options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='meta', full_name='lb.RunRequest.meta', index=0,
+            number=1, type=11, cpp_type=10, label=1,
+            has_default_value=False, default_value=None,
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
+        _descriptor.FieldDescriptor(
+            name='request', full_name='lb.RunRequest.request', index=1,
+            number=2, type=11, cpp_type=10, label=1,
+            has_default_value=False, default_value=None,
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            serialized_options=None, file=DESCRIPTOR),
     ],
     extensions=[
     ],
     nested_types=[_RUNREQUEST_METAMESSAGE, ],
     enum_types=[
     ],
-    options=None,
+    serialized_options=None,
     is_extendable=False,
     syntax='proto3',
     extension_ranges=[],
     oneofs=[
-      _descriptor.OneofDescriptor(
-          name='value', full_name='lb.RunRequest.value',
-          index=0, containing_type=None, fields=[]),
+        _descriptor.OneofDescriptor(
+            name='value', full_name='lb.RunRequest.value',
+            index=0, containing_type=None, fields=[]),
     ],
     serialized_start=65,
     serialized_end=234,
@@ -132,27 +132,26 @@ _sym_db.RegisterMessage(RunRequest)
 _sym_db.RegisterMessage(RunRequest.MetaMessage)
 
 
-DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('Z\'github.com/Syncano/codebox/pkg/lb/proto'))
+DESCRIPTOR._options = None
 
 _SCRIPTRUNNER = _descriptor.ServiceDescriptor(
     name='ScriptRunner',
     full_name='lb.ScriptRunner',
     file=DESCRIPTOR,
     index=0,
-    options=None,
+    serialized_options=None,
     serialized_start=236,
     serialized_end=298,
     methods=[
-      _descriptor.MethodDescriptor(
-          name='Run',
-          full_name='lb.ScriptRunner.Run',
-          index=0,
-          containing_service=None,
-          input_type=_RUNREQUEST,
-          output_type=pkg_dot_script_dot_proto_dot_script__pb2._RUNRESPONSE,
-          options=None,
-      ),
+        _descriptor.MethodDescriptor(
+            name='Run',
+            full_name='lb.ScriptRunner.Run',
+            index=0,
+            containing_service=None,
+            input_type=_RUNREQUEST,
+            output_type=pkg_dot_script_dot_proto_dot_script__pb2._RUNRESPONSE,
+            serialized_options=None,
+        ),
     ])
 _sym_db.RegisterServiceDescriptor(_SCRIPTRUNNER)
 
