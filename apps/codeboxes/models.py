@@ -125,6 +125,7 @@ class Trace(RedisModel):
     status = redis_fields.CharField(default=STATUS_CHOICES.PENDING)
     executed_at = redis_fields.DatetimeField()
     duration = redis_fields.IntegerField()
+    weight = redis_fields.IntegerField(default=1)
     result = redis_fields.JSONField(default={})
     executed_by_staff = redis_fields.BooleanField(default=False)
 
