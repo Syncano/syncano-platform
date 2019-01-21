@@ -8,6 +8,7 @@ from django.conf import settings
 from gevent.event import Event
 from gevent.queue import Empty, Full, Queue
 from gevent.select import select
+from redis import Redis
 from rest_framework import exceptions, status
 
 from apps.async_tasks.clients import WebSocketClient
@@ -138,8 +139,7 @@ class RedisPubSubHandler(BasicHandler):
                             self.pubsub.unsubscribe(channel, client_uuid=client_uuid)
 
     def reset(self):
-        redis.connection_pool.disconnect()
-        redis.connection_pool.reset()
+        self.redis_client = Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
         self.client_data.clear()
         self.channel_data.clear()
         self._pubsub = self.redis_client.pubsub()
