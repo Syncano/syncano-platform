@@ -25,7 +25,7 @@ class HostingMiddleware:
             except Instance.DoesNotExist:
                 raise Http404()
         else:
-            instance = host.split(settings.HOSTING_DOMAIN)[0]
+            instance = host.split('.')[0]
             # Check if we're dealing with: <prefix>--<instance_name>
             domain_data = instance.rsplit('--', 1)
             if len(domain_data) == 2:
