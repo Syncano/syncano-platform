@@ -66,7 +66,9 @@ class HostingAddSecureCustomDomainTask(TaskLockMixin, InstanceBasedTask):
             raise WrongCName()
 
         cname = answers[0].target.to_unicode()
+        self.validate_cname(cname)
 
+    def validate_cname(self, cname):
         # Check expected CNAME value
         expected_cnames = ['{}.{}{}.'.format(self.instance.name, settings.LOCATION, settings.HOSTING_DOMAIN)]
         if settings.MAIN_LOCATION:
