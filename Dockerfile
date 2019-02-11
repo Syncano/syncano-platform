@@ -11,6 +11,7 @@ ENV PYTHON_EGG_CACHE=/home/syncano/.python-eggs \
     GEOS_LIBRARY_PATH=/usr/lib/libgeos_c.so.1
 
 RUN set -ex \
+    && pip install --upgrade pip \
     && adduser -D -s /bin/bash syncano \
     && apk add --no-cache \
         bash \

@@ -52,23 +52,31 @@ class HostingAddSecureCustomDomainTask(TaskLockMixin, InstanceBasedTask):
             answers = resolver.query(domain, 'CNAME')
         except DNSException:
             # If domain has no CNAME and it's a root domain, check if CNAME flattening is used
-            try:
-                r = requests.get('http://{}/2a1b7ceb-2b7c-4bd2-a40f-8b021278f5ea/'.format(domain),
-                                 timeout=(1.0, 3.0), allow_redirects=False)
-                if r.status_code == requests.codes.ok and r.content == b'OK':
-                    return
-            except requests.RequestException:
-                pass
+            if domain.count('.') == 1:
+                try:
+                    r = requests.get('http://{}/2a1b7ceb-2b7c-4bd2-a40f-8b021278f5ea/'.format(domain),
+                                     timeout=(1.0, 3.0), allow_redirects=False)
+                    if r.status_code == requests.codes.ok and r.content.decode() == settings.LOCATION:
+                        return
+                except requests.RequestException:
+                    pass
             raise CNameNotSet()
 
-        # Check expected CNAME value
-        expected_cname = '{}{}.'.format(self.instance.name, settings.HOSTING_DOMAIN)
         if len(answers) != 1:
             raise WrongCName()
 
         cname = answers[0].target.to_unicode()
-        if cname != expected_cname and not re.match(r'^[a-z0-9-]+--%s$' % expected_cname, cname):
-            raise WrongCName()
+        self.validate_cname(cname)
+
+    def validate_cname(self, cname):
+        # Check expected CNAME value
+        expected_cnames = ['{}.{}{}.'.format(self.instance.name, settings.LOCATION, settings.HOSTING_DOMAIN)]
+        if settings.MAIN_LOCATION:
+            expected_cnames.append('{}{}.'.format(self.instance.name, settings.HOSTING_DOMAIN))
+        for expected_cname in expected_cnames:
+            if cname == expected_cname or re.match(r'^[a-z0-9-]+--%s$' % expected_cname, cname):
+                return
+        raise WrongCName()
 
     def run(self, hosting_pk, domain, **kwargs):
         hosting_qs = Hosting.objects.filter(pk=hosting_pk)
