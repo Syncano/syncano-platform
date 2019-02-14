@@ -156,7 +156,7 @@ class NestedViewSetMixin(_NestedViewSetMixin):
                         obj = Cached(model, kwargs=lookup_kwargs).get()
                     else:
                         obj = model.objects.get(**lookup_kwargs)
-                except (ValidationError, ObjectDoesNotExist):
+                except (ValidationError, ObjectDoesNotExist, ValueError):
                     # If value is not valid for a field or model not found - raise an error
                     raise ModelNotFound(model)
             else:
