@@ -38,7 +38,7 @@ if $LINTER; then
     make lint
 fi
 
-CMD="manage.py test --noinput --parallel ${PARALLEL_COUNT:-1} $*"
+CMD="manage.py test --noinput --parallel ${PARALLEL_COUNT:-2} $*"
 
 if [ "${LEGACY_CODEBOX_ENABLED:-false}" != "true" ]; then
     CMD="${CMD} --exclude-tag legacy_codebox"

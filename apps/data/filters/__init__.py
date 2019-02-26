@@ -1,8 +1,7 @@
 # coding=UTF8
 import rapidjson as json
-
 from django.core.exceptions import ValidationError
-from django.db.models import Q, FieldDoesNotExist
+from django.db.models import FieldDoesNotExist, Q
 from django.db.models.sql import EmptyResultSet
 from rest_framework import filters
 
