@@ -13,7 +13,8 @@ from django.utils.encoding import force_text
 from requests import RequestException
 from settings.celeryconf import register_task
 
-from apps.core.helpers import download_file
+from apps.admins.models import Admin
+from apps.core.helpers import Cached, download_file
 from apps.core.tasks import ObjectProcessorBaseTask as _ObjectProcessorBaseTask
 from apps.instances.helpers import get_current_instance, get_instance_db
 from apps.sockets.exceptions import ObjectProcessingError
@@ -136,7 +137,8 @@ class SocketProcessorTask(ObjectProcessorBaseTask):
             'data': []
         }
 
-        dependencies, is_partial = self.importer(socket).process()
+        is_trusted = Cached(Admin, kwargs={'id': get_current_instance().owner_id}).get().is_trusted
+        dependencies, is_partial = self.importer(socket, is_trusted=is_trusted).process()
         self.add_socket_for_installation(socket, dependencies, is_partial)
 
     def save_object(self, obj):

@@ -59,6 +59,7 @@ class Admin(CacheableAbstractModel, MetadataAbstractModel, LiveAbstractModel, Tr
     is_superuser = models.BooleanField(_('superuser status'), default=False,
                                        help_text=_('Designates that this user has all permissions without '
                                                    'explicitly assigning them.'))
+    is_trusted = models.BooleanField('trusted status', default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     last_access = models.DateTimeField(auto_now_add=True)
