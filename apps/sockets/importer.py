@@ -42,10 +42,11 @@ class SocketImporter:
         (('nodejs_v6',), NODEJS_V6_RUNTIME),
     )
 
-    def __init__(self, socket):
+    def __init__(self, socket, is_trusted=False):
         self.socket = socket
         self.zip_handler = ZipDownloadFileHandler(self.socket)
         self.files_processed = set()
+        self.is_trusted = is_trusted
 
     def load_socket_spec(self, socket_spec):
         """
@@ -254,10 +255,14 @@ class SocketImporter:
             dependency['source'] = spec
         else:
             self.ensure_dict(spec, 'script')
-            dependency['config']['timeout'] = spec.get('timeout')
-
             self.validate_min_max_value(spec, 'cache', 0, settings.SOCKETS_MAX_CACHE_TIME, lineno=name.line)
             self.validate_min_max_value(spec, 'timeout', 0, settings.SOCKETS_MAX_TIMEOUT, lineno=name.line)
+            self.validate_min_max_value(spec, 'async', 0, settings.SOCKETS_MAX_ASYNC, lineno=name.line)
+            self.validate_min_max_value(spec, 'mcpu', 0, settings.SOCKETS_MAX_MCPU, lineno=name.line)
+            if ('async' in spec or 'mcpu' in spec) and not self.is_trusted:
+                raise SocketValidationError('Cannot set Async/MCPU on this account. Contact administrator.', name.line)
+
+            dependency['config']['timeout'] = spec.get('timeout')
 
             if 'source' in spec:
                 dependency['source'] = spec.pop('source')

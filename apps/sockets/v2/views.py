@@ -252,10 +252,14 @@ class SocketEndpointViewSet(CacheableObjectMixin,
         # (for backwards compatibility when depending on META.user, META.admin)
         uwsgi.add_var('PAYLOAD_PARSED', '0' if skip_payload else '1')
 
-        script = Munch(config={'allow_full_access': True,
-                               'timeout': metadata.get('timeout', settings.SOCKETS_DEFAULT_TIMEOUT)},
-                       runtime_name=kwargs.get('runtime', LATEST_NODEJS_RUNTIME),
-                       source='')
+        script = Munch(config={
+            'allow_full_access': True,
+            'timeout': metadata.get('timeout', settings.SOCKETS_DEFAULT_TIMEOUT),
+            'async': metadata.get('async', settings.SOCKETS_DEFAULT_ASYNC),
+            'mcpu': metadata.get('mcpu', settings.SOCKETS_DEFAULT_MCPU)
+        },
+            runtime_name=kwargs.get('runtime', LATEST_NODEJS_RUNTIME),
+            source='')
 
         if path in socket.file_list:
             # Prepare spec.

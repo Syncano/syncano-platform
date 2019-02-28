@@ -3,6 +3,8 @@ from contextlib import contextmanager
 
 from django.db import IntegrityError, router, transaction
 
+REVALIDATE_MAX_RETRY = 3
+
 
 def blank_function(*args, **kwargs):
     pass
@@ -21,7 +23,7 @@ def ignore_signal(*signals):
 
 
 @contextmanager
-def revalidate_integrityerror(model, validate_func):
+def revalidate_integrityerror(model, validate_func, try_=1):
     db = router.db_for_write(model)
 
     try:
@@ -29,4 +31,6 @@ def revalidate_integrityerror(model, validate_func):
             yield
     except IntegrityError:
         validate_func()
-        raise
+        if try_ >= REVALIDATE_MAX_RETRY:
+            raise
+        return revalidate_integrityerror(model, validate_func, try_ + 1)

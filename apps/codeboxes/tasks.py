@@ -164,6 +164,8 @@ class BaseIncentiveTask(app.Task):
     @classmethod
     def create_run_spec(cls, instance, codebox, additional_args, meta, dumps=True, socket=None):
         custom_timeout = codebox.config.pop('timeout', None)
+        async_mode = codebox.config.pop('async', 0)
+        mcpu = codebox.config.pop('mcpu', 0)
         timeout = cls.default_timeout
 
         if custom_timeout and isinstance(custom_timeout, (int, float)) and custom_timeout > 0:
@@ -192,6 +194,8 @@ class BaseIncentiveTask(app.Task):
             'original_source': codebox.source,
             'config': json.dumps(config),
             'timeout': timeout,
+            'async': async_mode,
+            'mcpu': mcpu,
             'additional_args': additional_args,
             'meta': json.dumps(meta),
             'concurrency_limit': AdminLimit.get_for_admin(instance.owner_id).get_codebox_concurrency(),
@@ -309,6 +313,8 @@ class BaseIncentiveTask(app.Task):
                         'entryPoint': entrypoint,
                         'outputLimit': settings.CODEBOX_RESULT_SIZE_LIMIT,
                         'timeout': int(spec['run']['timeout'] * 1000),
+                        'async': spec['run']['async'],
+                        'mCPU': spec['run']['mcpu'],
                         'args': spec['run']['additional_args'].encode(),
                         'config': spec['run']['config'].encode(),
                         'meta': spec['run']['meta'].encode(),
