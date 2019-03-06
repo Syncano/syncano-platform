@@ -2,6 +2,7 @@
 from zipfile import BadZipfile
 
 from celery.utils.log import get_task_logger
+from django.db import IntegrityError
 from settings.celeryconf import app, register_task
 
 from apps.core.exceptions import SyncanoException
@@ -24,13 +25,18 @@ class RunBackupTask(app.Task):
 
         try:
             backup.run()
-        except SyncanoException as e:
-            backup.change_status(Backup.STATUSES.ERROR, e)
+        except (SyncanoException, IntegrityError) as e:
             logger.warning('Error processing Backup[pk=%s]: %s', backup_pk, e)
+            status_info = ''
+            if isinstance(e, SyncanoException):
+                status_info = e
+            backup.change_status(status=Backup.STATUSES.ERROR, status_info=status_info)
+            DeleteFilesTask.delay(backup.storage_path)
+
         except Exception:
             logger.exception('Error processing Backup[pk=%s].', backup_pk)
-            DeleteFilesTask.delay(backup.storage_path)
             backup.change_status(status=Backup.STATUSES.ERROR)
+            DeleteFilesTask.delay(backup.storage_path)
             raise
 
 
