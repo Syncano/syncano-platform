@@ -3,7 +3,6 @@ from zipfile import BadZipfile
 
 from celery.utils.log import get_task_logger
 from django.db import IntegrityError
-
 from settings.celeryconf import app, register_task
 
 from apps.core.exceptions import SyncanoException
