@@ -52,7 +52,7 @@ done
 envsubst() {
     for var in $(compgen -e); do
         echo "$var: \"${!var//\"/\\\"}\""
-    done | jinja2 $1
+    done | PYTHONWARNINGS=ignore jinja2 $1
 }
 
 
