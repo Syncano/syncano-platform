@@ -35,17 +35,20 @@ class InstanceBasedMixin:
             self.kwargs['instance'] = instance
             set_current_instance(instance)
 
+            if instance.version > 1:
+                request.error = InstanceVersionMismatch()
+            if instance.location != settings.LOCATION:
+                request.error = InstanceLocationMismatch()
+
         request.instance = instance
+        if not request.instance:
+            raise ModelNotFound(Instance)
+
         return super().initialize_request(request, *args, **kwargs)
 
     def initial(self, request, *args, **kwargs):
         if not request.instance:
             raise ModelNotFound(Instance)
-
-        instance = request.instance
-        if instance.version > 1:
-            raise InstanceVersionMismatch()
-        if instance.location != settings.LOCATION:
-            raise InstanceLocationMismatch()
-
+        if getattr(request, 'error', None):
+            raise request.error
         return super().initial(request, *args, **kwargs)

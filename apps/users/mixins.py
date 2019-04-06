@@ -6,8 +6,8 @@ from apps.data.models import DataObject, Klass
 class UserProfileViewMixin(ObjectSchemaProcessViewMixin):
     model = DataObject
 
-    def initial(self, request, *args, **kwargs):
-        initial = super().initial(request, *args, **kwargs)
-        self.klass = Klass.get_user_profile()
-        DataObject.load_klass(self.klass)
-        return initial
+    def initialize_request(self, request, *args, **kwargs):
+        request = super().initialize_request(request, *args, **kwargs)
+        if request.instance:
+            self.klass = Klass.get_user_profile()
+        return request
