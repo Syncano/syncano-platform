@@ -41,9 +41,6 @@ class InstanceBasedMixin:
                 request.error = InstanceLocationMismatch()
 
         request.instance = instance
-        if not request.instance:
-            raise ModelNotFound(Instance)
-
         return super().initialize_request(request, *args, **kwargs)
 
     def initial(self, request, *args, **kwargs):
