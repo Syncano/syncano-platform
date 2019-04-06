@@ -4,7 +4,7 @@ import re
 from django.conf import settings
 
 from apps.admins.models import Admin
-from apps.core.exceptions import ModelNotFound
+from apps.core.exceptions import ModelNotFound, SyncanoException
 from apps.core.helpers import Cached
 from apps.instances.exceptions import InstanceLocationMismatch, InstanceVersionMismatch
 from apps.instances.helpers import set_current_instance
@@ -15,6 +15,12 @@ INSTANCE_NAME_REGEX = re.compile('^[a-z0-9-_]{,64}$')
 
 
 class InstanceBasedMixin:
+    def validate_instance(self, instance):
+        if instance.version > 1:
+            raise InstanceVersionMismatch()
+        if instance.location != settings.LOCATION:
+            raise InstanceLocationMismatch()
+
     def initialize_request(self, request, *args, **kwargs):
         instance = getattr(request, 'instance', kwargs.get('instance', None))
 
@@ -28,17 +34,18 @@ class InstanceBasedMixin:
                     pass
 
         if instance is not None:
-            if getattr(request, 'instance', None) is None and request.META.get('HTTP_HOST_TYPE') != 'hosting':
-                admin = Cached(Admin, kwargs={'id': instance.owner_id}).get()
-                admin.update_last_access()
+            try:
+                self.validate_instance(instance)
 
-            self.kwargs['instance'] = instance
-            set_current_instance(instance)
+                if getattr(request, 'instance', None) is None and request.META.get('HTTP_HOST_TYPE') != 'hosting':
+                    admin = Cached(Admin, kwargs={'id': instance.owner_id}).get()
+                    admin.update_last_access()
 
-            if instance.version > 1:
-                request.error = InstanceVersionMismatch()
-            if instance.location != settings.LOCATION:
-                request.error = InstanceLocationMismatch()
+                self.kwargs['instance'] = instance
+                set_current_instance(instance)
+            except SyncanoException as ex:
+                request.error = ex
+                instance = None
 
         request.instance = instance
         return super().initialize_request(request, *args, **kwargs)
