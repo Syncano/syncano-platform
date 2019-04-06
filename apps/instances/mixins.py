@@ -51,8 +51,8 @@ class InstanceBasedMixin:
         return super().initialize_request(request, *args, **kwargs)
 
     def initial(self, request, *args, **kwargs):
-        if not request.instance:
-            raise ModelNotFound(Instance)
         if getattr(request, 'error', None):
             raise request.error
+        if not request.instance:
+            raise ModelNotFound(Instance)
         return super().initial(request, *args, **kwargs)
