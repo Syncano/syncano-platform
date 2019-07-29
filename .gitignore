@@ -1,3 +1,4 @@
+.envrc
 .coverage
 coverage*.out
 dev
