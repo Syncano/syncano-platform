@@ -39,7 +39,7 @@ class HostingConfigValidator:
 
     def validate_sockets_mapping(self, v):
         if len(v) > self.sockets_mapping_max:
-            raise serializers.ValidationError('Too many sockets mapping specified (exceeds max}).'.format(
+            raise serializers.ValidationError('Too many sockets mapping specified (exceeds {max}).'.format(
                 max=self.sockets_mapping_max))
         for idx, mapping in enumerate(v):
             if not isinstance(mapping, list) or len(mapping) != 2 or not all(isinstance(m, str) for m in mapping):

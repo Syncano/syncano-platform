@@ -103,14 +103,14 @@ if $MIGRATIONS; then
         echo ". Waiting for migration job."
         sleep 1
         PODNAME=$(kubectl get pods -l job-name=platform-migration -a --sort-by=.status.startTime -o name 2>/dev/null | tail -n1)
-        [[ -z $PODNAME ]] && continue
+        [ -z "$PODNAME" ] && continue
 
-        kubectl attach $PODNAME || true
+        kubectl attach $PODNAME 2> /dev/null || true
         SUCCESS=$(kubectl get jobs platform-migration -o jsonpath='{.status.succeeded}' 2>/dev/null | grep -v 0 || true)
-        [[ -z $SUCCESS ]] || break
+        [ -n $SUCCESS ] && break
     done
 
-    if [[ -z $SUCCESS ]]; then
+    if [ -z "$SUCCESS" ]; then
         echo "! Migration failed!"
         exit 1
     fi

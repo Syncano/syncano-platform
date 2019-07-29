@@ -16,14 +16,14 @@ services:
   redis:
     image: redis:3.2-alpine
     volumes:
-      - /var/docker/redis:/data
+      - data-redis:/data
     ports:
       - "6379"
 
   rabbitmq:
     image: rabbitmq:3.6-alpine
     volumes:
-      - /var/docker/rabbit:/data
+      - data-rabbitmq:/data
     ports:
       - "5672"
       - "15672"
@@ -152,3 +152,7 @@ services:
       - HOST_STORAGE_PATH=/tmp/storage
       - LB_ADDR=codebox-lb:9000
       - SERVICE_NAME=codebox-worker
+
+volumes:
+  data-rabbitmq:
+  data-redis:
