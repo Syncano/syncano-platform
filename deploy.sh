@@ -107,7 +107,7 @@ if $MIGRATIONS; then
 
         kubectl attach $PODNAME 2> /dev/null || true
         SUCCESS=$(kubectl get jobs platform-migration -o jsonpath='{.status.succeeded}' 2>/dev/null | grep -v 0 || true)
-        [ -n $SUCCESS ] && break
+        [ -n "$SUCCESS" ] && break
     done
 
     if [ -z "$SUCCESS" ]; then
