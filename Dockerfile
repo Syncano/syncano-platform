@@ -3,7 +3,7 @@ FROM python:3.6-alpine3.8
 
 ARG EMAIL=devops@syncano.com
 ENV PYTHON_EGG_CACHE=/home/syncano/.python-eggs \
-    ACME_VERSION=2.7.9 \
+    ACME_VERSION=2.8.3 \
     LE_WORKING_DIR=/acme/home \
     LE_CONFIG_HOME=/acme/config \
     CERT_HOME=/acme/certs \
