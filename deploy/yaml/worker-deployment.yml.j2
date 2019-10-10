@@ -67,7 +67,10 @@ spec:
 {%- endif %}
           resources:
             requests:
-              memory: "1500Mi"
+              memory: "1536Mi"
+              cpu: 0.5
+            limits:
+              memory: "2048Mi"
               cpu: 1
           env:
             - name: INSTANCE_TYPE
