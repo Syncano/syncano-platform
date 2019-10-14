@@ -330,7 +330,10 @@ class BaseIncentiveTask(app.Task):
 
         for i in range(self.grpc_run_retries + 1):
             try:
-                self.runner.Run(req, timeout=GRPC_RUN_TIMEOUT, metadata=metadata)
+                response = self.runner.Run(req, timeout=GRPC_RUN_TIMEOUT, metadata=metadata)
+                for _ in response:
+                    # Drain response so it is processed and not queued
+                    pass
                 return
             except Exception:
                 if i + 1 > self.grpc_run_retries:
