@@ -13,6 +13,7 @@ from apps.triggers.v2.serializers import TriggerTraceSerializer
 class HandleTriggerEventTask(InstanceBasedTask):
     def run(self, event, signal, data, **kwargs):
         triggers = Trigger.match(self.instance.pk, event, signal)
+        self.get_logger().info("TRIGGERS: %s %s %s", triggers, event, signal)
 
         # add kwargs to meta
         meta = {'event': event, 'signal': signal}
@@ -49,6 +50,7 @@ class TriggerTask(BaseIncentiveTask):
         return codebox_spec
 
     def run(self, incentive_pk, instance_pk, additional_args, meta, **kwargs):
+        self.get_logger().info("PROCESSING TRIGGER: %s %s %s %s", incentive_pk, instance_pk, additional_args, meta)
         self.process(instance_pk=instance_pk,
                      incentive_pk=incentive_pk,
                      additional_args=additional_args,
