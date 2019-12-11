@@ -65,11 +65,11 @@ jobs:
 
             make decrypt
 
-            if [ "$CIRCLE_BRANCH" = "devel" ]; then
+            if [ "$CIRCLE_BRANCH" == "master" ]; then
               kops export kubecfg --name=k8s.syncano.rocks --state=s3://k8s-syncano-rocks-state-store
               make deploy-staging push-cache
 
-            elif [ "$CIRCLE_BRANCH" = "master" ]; then
+            elif [ "$CIRCLE_BRANCH" == "stable" ]; then
               kops export kubecfg --name=k8s.syncano.io --state=s3://k8s-syncano-io-state-store
               echo $GCLOUD_EU1_SERVICE_KEY > gcloud-service-key.json
               gcloud auth activate-service-account --key-file=gcloud-service-key.json
