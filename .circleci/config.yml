@@ -89,7 +89,7 @@ workflows:
             branches:
               ignore:
                 - master
-                - devel
+                - stable
 
   deploy:
     jobs:
@@ -98,4 +98,4 @@ workflows:
             branches:
               only:
                 - master
-                - devel
+                - stable
