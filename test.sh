@@ -57,12 +57,14 @@ export DJANGO_SETTINGS_MODULE=settings.tests
 if $COVERAGE; then
     coverage erase
     for cmd in "${CMDS[@]}"; do
-        coverage run "$cmd"
+        # shellcheck disable=SC2086
+        coverage run $cmd
     done
     coverage combine
 else
     for cmd in "${CMDS[@]}"; do
-        python "$cmd"
+        # shellcheck disable=SC2086
+        python $cmd
     done
 fi
 
