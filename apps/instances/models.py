@@ -32,7 +32,7 @@ INSTANCE_PROTECTED_NAMES = {'devcenter', 'support', 'sentry', 'admin', 'platform
 
 class Instance(DescriptionAbstractModel, MetadataAbstractModel, CacheableAbstractModel, TrackChangesAbstractModel,
                LiveAbstractModel):
-
+    SYNC_INVALIDATION = True
     PERMISSION_CONFIG = {'api_key': {API_PERMISSIONS.READ}}
 
     LOCK_KEY_TEMPLATE = 'lock:instance:{instance_pk}'

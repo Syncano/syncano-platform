@@ -1,5 +1,5 @@
 .envrc
-.coverage
+.coverage*
 coverage*.out
 dev
 *.swagger.json
