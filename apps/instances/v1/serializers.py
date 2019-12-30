@@ -49,6 +49,7 @@ class InstanceSerializer(RevalidateMixin, DynamicFieldsMixin, MetadataMixin, Hyp
         ])
     role = serializers.SerializerMethodField()
     owner = AdminFullSerializer(read_only=True)
+    location = serializers.CharField(read_only=True)
 
     class Meta:
         model = Instance
