@@ -4,9 +4,12 @@ import shutil
 import tempfile
 from collections import defaultdict
 from zipfile import ZIP_DEFLATED, ZipFile
+
 import rapidjson as json
 from django.core.files.base import ContentFile, File
+
 from apps.core.backends.storage import DefaultStorage
+
 from .exceptions import SizeLimitExceeded
 
 

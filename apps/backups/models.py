@@ -15,6 +15,7 @@ from apps.core.abstract_models import (
     LiveAbstractModel,
     MetadataAbstractModel
 )
+from apps.core.backends.storage import DefaultStorage
 from apps.core.exceptions import SyncanoException
 from apps.core.helpers import MetaIntEnum, generate_key
 from apps.core.permissions import FULL_PERMISSIONS
@@ -23,7 +24,6 @@ from apps.instances.models import Instance, InstanceIndicator
 from .exceptions import EmptyBackupException
 from .site import default_site
 from .storage import SolutionZipStorage, ZipStorage
-from apps.core.backends.storage import DefaultStorage
 
 Admin = settings.AUTH_USER_MODEL
 
