@@ -20,7 +20,7 @@ from apps.core.abstract_models import (
     TrackChangesAbstractModel,
     UniqueKeyAbstractModel
 )
-from apps.core.backends.storage import DefaultStorage, default_storage
+from apps.core.backends.storage import DefaultStorage
 from apps.core.fields import NullableJSONField, StrippedSlugField
 from apps.core.helpers import MetaEnum, MetaIntEnum, generate_key
 from apps.core.permissions import API_PERMISSIONS, FULL_PERMISSIONS, Permission
@@ -80,7 +80,7 @@ class Socket(TrackChangesAbstractModel, DescriptionAbstractModel, CreatedUpdated
     install_url = models.URLField(default=None, null=True)
     config = JSONField(default={}, blank=True)
     install_config = NullableJSONField(default={})
-    zip_file = models.FileField(blank=True, null=True, upload_to=upload_custom_socket_file_to, storage=default_storage)
+    zip_file = models.FileField(blank=True, null=True, upload_to=upload_custom_socket_file_to)
     zip_file_list = JSONField(null=True)
     version = models.CharField(max_length=32, default=settings.SOCKETS_DEFAULT_VERSION)
     size = models.IntegerField(default=0)
@@ -266,10 +266,8 @@ class SocketEnvironment(TrackChangesAbstractModel, DescriptionAbstractModel, Cre
     name = StrippedSlugField(max_length=64)
     status = models.SmallIntegerField(choices=STATUSES.as_choices(), default=STATUSES.PROCESSING.value)
     status_info = JSONField(default=None, null=True)
-    zip_file = models.FileField(blank=True, null=True, upload_to=upload_custom_socketenvironment_file_to,
-                                storage=default_storage)
-    fs_file = models.FileField(blank=True, null=True, upload_to=upload_custom_socketenvironment_file_to,
-                               storage=default_storage)
+    zip_file = models.FileField(blank=True, null=True, upload_to=upload_custom_socketenvironment_file_to)
+    fs_file = models.FileField(blank=True, null=True, upload_to=upload_custom_socketenvironment_file_to)
     checksum = models.CharField(max_length=32, null=True)
 
     _storage = None

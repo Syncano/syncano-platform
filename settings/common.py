@@ -232,26 +232,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+LOCAL_MEDIA_STORAGE = False
 
 # S3 - django-storages settings
-STORAGE_TYPE = os.environ.get('STORAGE_TYPE', 'local')
 AWS_IS_GZIPPED = False
 AWS_S3_FILE_OVERWRITE = False
 AWS_S3_SECURE_URLS = True  # use https
 AWS_QUERYSTRING_AUTH = False  # don't add complex authentication-related query parameters for requests
-AWS_S3_CUSTOM_DOMAIN = os.environ.get('S3_CUSTOM_DOMAIN', '')  # e.g. d1e3fhjr88e1hl.cloudfront.net
 AWS_DEFAULT_ACL = 'public-read'
 GS_DEFAULT_ACL = 'publicRead'
-
-S3_ACCESS_KEY_ID = os.environ.get('S3_ACCESS_KEY_ID', '')
-S3_SECRET_ACCESS_KEY = os.environ.get('S3_SECRET_ACCESS_KEY', '')
-S3_REGION = os.environ.get('S3_REGION')
-S3_ENDPOINT = os.environ.get('S3_ENDPOINT')
-
-STORAGE_HOSTING_BUCKET = os.environ.get('STORAGE_HOSTING_BUCKET', '')
-STORAGE_BUCKET = os.environ.get('STORAGE_BUCKET', '')
-
-LOCAL_MEDIA_STORAGE = STORAGE_TYPE == 'local'
 
 DEFAULT_FILE_STORAGE = 'apps.core.backends.storage.DefaultStorage'
 
@@ -843,6 +832,7 @@ BILLING_GRACE_PERIOD_FOR_PLAN_CHANGING = 1  # hours
 BILLING_DISPATCH_ALL_INVOICES = os.environ.get('BILLING_DISPATCH_ALL_INVOICES') == 'true'
 BILLING_ALARM_POINTS = (80,)
 
+BILLING_BACKUP_CROSS_REGION_LIMIT = {'default': 20 * 1024 * 1024, 'builder': 10 * 1024 * 1024}  # 20MB, 10MB
 BILLING_STORAGE_LIMITS = {'default': -1, 'builder': 10 * 1024 * 1024 * 1024}  # 10GB
 BILLING_RATE_LIMITS = {'default': 60, 'builder': 60}
 BILLING_POLL_RATE_LIMITS = {'default': 240, 'builder': 60}

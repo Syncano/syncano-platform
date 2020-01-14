@@ -4,6 +4,7 @@ from collections import OrderedDict, defaultdict
 from io import BytesIO
 
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.utils.encoding import force_bytes
 from rest_framework import serializers
 
@@ -13,7 +14,6 @@ from apps.codeboxes.models import CodeBox, CodeBoxSchedule
 from apps.codeboxes.runtimes import LATEST_NODEJS_RUNTIME
 from apps.codeboxes.v1.serializers import CodeBoxSerializer
 from apps.codeboxes.v1_1.serializers import CodeBoxScheduleSerializer
-from apps.core.backends.storage import default_storage
 from apps.core.exceptions import SyncanoException
 from apps.core.helpers import format_error
 from apps.data.exceptions import KlassCountExceeded

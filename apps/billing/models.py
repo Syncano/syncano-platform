@@ -797,3 +797,8 @@ class AdminLimit(CacheableAbstractModel):
         return self.get_for_plan('instances_count',
                                  settings.BILLING_INSTANCES_COUNT,
                                  hard_default=0)
+
+    def get_backup_cross_region_limit(self):
+        return self.get_for_plan('backup_xregion_limit',
+                                 settings.BILLING_BACKUP_CROSS_REGION_LIMIT,
+                                 hard_default=0)

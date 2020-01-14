@@ -108,8 +108,7 @@ class TestBlockingInstancesInPoorStanding(CleanupTestCaseMixin, APITestCase):
         response = self.client.get(reverse('v1:klass-list', args=(self.instance.name,)))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @override_settings(DEFAULT_FILE_STORAGE='apps.core.backends.storage.FileSystemStorageWithTransactionSupport',
-                       POST_TRANSACTION_SUCCESS_EAGER=True)
+    @override_settings(POST_TRANSACTION_SUCCESS_EAGER=True)
     @mock.patch('apps.billing.models.AdminLimit.get_storage', mock.Mock(return_value=1000))
     def test_storage_limit_causes_a_block(self):
         set_current_instance(self.instance)

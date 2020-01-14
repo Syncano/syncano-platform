@@ -16,7 +16,7 @@ from apps.admins.permissions import AdminHasPermissions
 from apps.billing.permissions import OwnerInGoodStanding
 from apps.core.authentication import AUTHORIZATION_HEADER
 from apps.core.exceptions import ModelNotFound
-from apps.core.helpers import Cached, glob, redis, run_api_view
+from apps.core.helpers import Cached, get_cur_loc_env, glob, redis, run_api_view
 from apps.core.mixins.views import AtomicMixin, NestedViewSetMixin
 from apps.hosting.exceptions import ValidCNameMissing
 from apps.hosting.models import Hosting, HostingFile
@@ -143,7 +143,7 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
         bucket, instance_id, hosting_id, path = cls.split_url(url)
         _, _, _, path_404 = cls.split_url(url_404)
         redirect_url = '/internal_redirect/{}/{}/{}/{}/{}/{}'.format(
-            settings.STORAGE_TYPE, bucket, instance_id, hosting_id, path_404, path)
+            get_cur_loc_env('STORAGE', 'local'), bucket, instance_id, hosting_id, path_404, path)
 
         if query:
             redirect_url += '?%s' % query
@@ -165,7 +165,7 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
             url == url[len(settings.MEDIA_URL):]
         else:
             _, url = url.split('//', 1)
-        if settings.STORAGE_TYPE == 'gcloud':
+        if get_cur_loc_env('STORAGE') == 'gcloud':
             _, url = url.split('/', 1)
         return url.split('/', 3)
 

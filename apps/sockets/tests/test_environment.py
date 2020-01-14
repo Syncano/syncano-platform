@@ -3,12 +3,12 @@ from hashlib import md5
 from unittest import mock
 
 import lazy_object_proxy
+from django.core.files.storage import default_storage
 from django.test import override_settings
 from django.urls import reverse
 from django_dynamic_fixture import G
 from rest_framework import status
 
-from apps.core.backends.storage import default_storage
 from apps.core.tests.testcases import SyncanoAPITestBase
 from apps.sockets.models import Socket, SocketEnvironment
 from apps.sockets.tests.test_api_v2 import ZipFileMixin

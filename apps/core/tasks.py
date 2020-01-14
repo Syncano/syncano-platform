@@ -1,6 +1,4 @@
 import hmac
-import os
-import shutil
 from abc import ABC, abstractmethod, abstractproperty
 from hashlib import sha256
 
@@ -10,12 +8,12 @@ from celery.signals import task_prerun, task_retry
 from celery.utils.log import get_task_logger
 from django.apps import apps
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.db import models, router, transaction
 from py_zipkin.zipkin import zipkin_span
 from settings.celeryconf import app, register_task
 
 from apps.core import zipkin
-from apps.core.backends.storage import default_storage
 from apps.core.exceptions import ObjectProcessingError
 from apps.core.helpers import Cached, get_tracing_attrs, redis, set_tracing_attrs
 from apps.core.middleware import clear_request_data
@@ -134,41 +132,18 @@ class DeleteLiveObjectTask(app.Task):
 
 @register_task
 class DeleteFilesTask(TaskLockMixin, app.Task):
-    buckets = (settings.STORAGE_BUCKET, settings.STORAGE_HOSTING_BUCKET)
+    buckets = ('STORAGE_BUCKET', 'STORAGE_HOSTING_BUCKET')
 
     def run(self, prefix, all_buckets=False):
         """
         Remove all files with path starting with given prefix
         """
 
-        storage = default_storage
-
-        if settings.STORAGE_TYPE == 'local':
-            path_to_del = os.path.join(default_storage.location, prefix)
-            if os.path.exists(path_to_del):
-                shutil.rmtree(path_to_del)
-            return
-
-        if not prefix.endswith('/'):
-            prefix += '/'
-
         buckets = self.buckets
         if not all_buckets:
             buckets = buckets[:1]
 
-        if settings.STORAGE_TYPE == 's3':
-            s3 = storage.connection
-            for bucket_name in buckets:
-                s3.Bucket(bucket_name).objects.filter(Prefix=prefix).delete()
-            return
-
-        if settings.STORAGE_TYPE == 'gcloud':
-            gcloud = storage.client
-            for bucket_name in buckets:
-                bucket = gcloud.get_bucket(bucket_name)
-                for blob in bucket.list_blobs(prefix=prefix):
-                    blob.delete()
-            return
+        default_storage.delete_files(prefix, buckets=buckets)
 
 
 class ObjectProcessorBaseTask(TaskLockMixin, InstanceBasedTask, ABC):

@@ -4,6 +4,7 @@ from time import time
 from unittest import mock
 
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
@@ -11,7 +12,6 @@ from django_dynamic_fixture import G
 from psycopg2._psycopg import QueryCanceledError
 from rest_framework import status
 
-from apps.core.backends.storage import default_storage
 from apps.core.tests.testcases import SyncanoAPITestBase
 from apps.instances.helpers import set_current_instance
 from apps.instances.models import InstanceIndicator
