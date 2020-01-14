@@ -4,7 +4,6 @@ from crypt import crypt
 from random import choice
 from string import ascii_letters, digits
 
-from django.conf import settings
 from django.contrib.postgres.fields import ArrayField, HStoreField
 from django.db import models
 

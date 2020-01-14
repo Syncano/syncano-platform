@@ -5,7 +5,6 @@ import tempfile
 
 from django.conf import settings
 from django.core.files import File
-from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
 from jsonfield import JSONField
@@ -165,7 +164,8 @@ class Restore(CreatedUpdatedAtAbstractModel, LabelDescriptionAbstractModel):
         if is_partial:
             storage = SolutionZipStorage.open(fileobject, 'r')
         else:
-            storage = ZipStorage.open(fileobject, 'r', storage_path=self.backup.storage_path, location=self.backup.location)
+            storage = ZipStorage.open(fileobject, 'r', storage_path=self.backup.storage_path,
+                                      location=self.backup.location)
         default_site.restore_to_new_schema(storage, self.target_instance, partial=is_partial)
         storage.close()
 
