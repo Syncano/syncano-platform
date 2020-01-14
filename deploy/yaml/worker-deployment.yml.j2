@@ -34,11 +34,9 @@ spec:
         - name: acme
           secret:
             secretName: platform-acme
-{%- if STORAGE_TYPE == "gcloud" %}
-        - name: storage-credentials
+        - name: eu1-storage-credentials
           secret:
-            secretName: storage-credentials
-{%- endif %}
+            secretName: eu1-storage-credentials
 
       terminationGracePeriodSeconds: 360
       imagePullSecrets:
@@ -60,11 +58,9 @@ spec:
               mountPath: "/acme/config/account.thumb"
               readOnly: true
               subPath: account.thumb
-{%- if STORAGE_TYPE == "gcloud" %}
-            - name: storage-credentials
-              mountPath: /secrets/storage
+            - name: eu1-storage-credentials
+              mountPath: /secrets/eu1-storage
               readOnly: true
-{%- endif %}
           resources:
             requests:
               memory: "1536Mi"

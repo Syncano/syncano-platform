@@ -44,7 +44,7 @@ class RunBackupTask(app.Task):
 class RunRestoreTask(app.Task):
     def run(self, restore_pk):
         try:
-            restore = Restore.objects.get(pk=restore_pk)
+            restore = Restore.objects.select_related('backup').get(pk=restore_pk)
         except Restore.DoesNotExist:
             logger.warning('Cannot process Restore[pk=%s] as it no longer exists.',
                            restore_pk)

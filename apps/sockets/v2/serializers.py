@@ -1,13 +1,13 @@
 # coding=UTF8
 import copy
 
+from django.core.files.storage import default_storage
 from rest_framework import serializers
 from rest_framework.fields import CharField, FileField
 from rest_framework.relations import SlugRelatedField
 from rest_framework.serializers import ModelSerializer
 from rest_framework.validators import UniqueValidator
 
-from apps.core.backends.storage import default_storage
 from apps.core.field_serializers import DisplayedChoiceField, JSONField, LowercaseCharField
 from apps.core.mixins.serializers import (
     AclMixin,

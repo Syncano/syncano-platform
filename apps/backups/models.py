@@ -5,6 +5,7 @@ import tempfile
 
 from django.conf import settings
 from django.core.files import File
+from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
 from jsonfield import JSONField
@@ -15,7 +16,6 @@ from apps.core.abstract_models import (
     LiveAbstractModel,
     MetadataAbstractModel
 )
-from apps.core.backends.storage import default_storage
 from apps.core.exceptions import SyncanoException
 from apps.core.helpers import MetaIntEnum, generate_key
 from apps.core.permissions import FULL_PERMISSIONS
@@ -24,6 +24,7 @@ from apps.instances.models import Instance, InstanceIndicator
 from .exceptions import EmptyBackupException
 from .site import default_site
 from .storage import SolutionZipStorage, ZipStorage
+from apps.core.backends.storage import DefaultStorage
 
 Admin = settings.AUTH_USER_MODEL
 
@@ -53,7 +54,7 @@ class Backup(LiveAbstractModel, CreatedUpdatedAtAbstractModel, LabelDescriptionA
     status = models.SmallIntegerField(choices=STATUSES.as_choices(), default=STATUSES.SCHEDULED.value)
     status_info = models.TextField(blank=True)
     instance = models.ForeignKey(Instance, null=True, on_delete=models.SET_NULL, related_name='backups')
-    archive = models.FileField(upload_to=backup_filename, storage=default_storage)
+    archive = models.FileField(upload_to=backup_filename)
     size = models.BigIntegerField(null=True)
     query_args = JSONField(default={})
     details = JSONField(default={})
@@ -92,7 +93,8 @@ class Backup(LiveAbstractModel, CreatedUpdatedAtAbstractModel, LabelDescriptionA
             if self.is_partial:
                 storage = SolutionZipStorage.open(tmp, 'w')
             else:
-                storage = ZipStorage.open(tmp, 'w', storage_path=os.path.join(self.storage_path, 'files'))
+                storage = ZipStorage.open(tmp, 'w', storage_path=os.path.join(self.storage_path, 'files'),
+                                          location=settings.LOCATION)
 
             try:
                 default_site.backup_instance(storage, self.instance, self.query_args)
@@ -135,7 +137,7 @@ class Restore(CreatedUpdatedAtAbstractModel, LabelDescriptionAbstractModel):
     status_info = models.TextField(blank=True)
     target_instance = models.ForeignKey(Instance, null=False, on_delete=models.CASCADE)
     backup = models.ForeignKey(Backup, null=True, on_delete=models.CASCADE)
-    archive = models.FileField(upload_to=restore_filename, null=True, storage=default_storage)
+    archive = models.FileField(upload_to=restore_filename, null=True)
 
     class Meta:
         ordering = ('id',)
@@ -149,7 +151,9 @@ class Restore(CreatedUpdatedAtAbstractModel, LabelDescriptionAbstractModel):
 
     def run(self):
         self.change_status(self.STATUSES.RUNNING)
+
         if self.backup_id:
+            self.backup.archive.storage = DefaultStorage.create_storage(self.backup.location)
             fileobject = self.backup.archive.file
             is_partial = self.backup.is_partial
         elif self.archive:
@@ -157,10 +161,11 @@ class Restore(CreatedUpdatedAtAbstractModel, LabelDescriptionAbstractModel):
             is_partial = True
         else:
             raise Exception('You have to provide either backup or archive file.')
+
         if is_partial:
             storage = SolutionZipStorage.open(fileobject, 'r')
         else:
-            storage = ZipStorage.open(fileobject, 'r', storage_path=self.backup.storage_path)
+            storage = ZipStorage.open(fileobject, 'r', storage_path=self.backup.storage_path, location=self.backup.location)
         default_site.restore_to_new_schema(storage, self.target_instance, partial=is_partial)
         storage.close()
 

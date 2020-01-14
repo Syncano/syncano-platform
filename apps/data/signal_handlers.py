@@ -1,8 +1,8 @@
+from django.core.files.storage import default_storage
 from django.db import transaction
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
-from apps.core.backends.storage import default_storage
 from apps.core.helpers import add_post_transaction_success_operation
 from apps.data.models import DataObject, Klass
 from apps.data.tasks import DeleteKlassIndexesTask, IndexKlassTask

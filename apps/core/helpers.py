@@ -2,6 +2,7 @@
 import collections
 import hmac
 import inspect
+import os
 import re
 import socket
 import string
@@ -691,3 +692,11 @@ class ReentrantLock(Lock):
         registry[self.name] -= 1
         if registry[self.name] <= 0:
             del registry[self.name]
+
+
+def get_cur_loc_env(name, default=None):
+    return get_loc_env(settings.LOCATION, name, default)
+
+
+def get_loc_env(location, name, default=None):
+    return os.environ.get('{}_{}'.format(location.upper(), name), os.environ.get(name, default))

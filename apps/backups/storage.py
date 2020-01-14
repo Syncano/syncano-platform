@@ -4,12 +4,10 @@ import shutil
 import tempfile
 from collections import defaultdict
 from zipfile import ZIP_DEFLATED, ZipFile
-
 import rapidjson as json
 from django.core.files.base import ContentFile, File
-
-from apps.core.backends.storage import default_storage
-
+from django.core.files.storage import default_storage
+from apps.core.backends.storage import DefaultStorage
 from .exceptions import SizeLimitExceeded
 
 
@@ -194,14 +192,15 @@ class SolutionZipStorage(BaseStorage):
 class ZipStorage(SolutionZipStorage):
     ARCHIVE_SIZE_LIMIT = None
 
-    def __init__(self, zipfile, storage_path):
+    def __init__(self, zipfile, storage_path, location):
+        self.storage = DefaultStorage.create_storage(location)
         self.storage_path = storage_path
         super().__init__(zipfile)
 
     def add_file(self, file):
         dest = os.path.join(self.storage_path, self._generate_file_name(file.name))
         self.update_size(file.size)
-        return default_storage.save(dest, file)
+        return self.storage.save(dest, file)
 
     def get_file(self, name):
-        return default_storage.open(name)
+        return self.storage.open(name)

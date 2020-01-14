@@ -3,11 +3,11 @@
 import django.db.models.deletion
 import jsonfield.fields
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.db import migrations, models
 
 import apps.backups.models
 import apps.core.fields
-from apps.core.backends.storage import default_storage
 
 
 class Migration(migrations.Migration):

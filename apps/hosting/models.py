@@ -18,7 +18,7 @@ from apps.core.abstract_models import (
 from apps.core.backends.storage import DefaultStorage
 from apps.core.decorators import cached
 from apps.core.fields import LowercaseCharField, NullableJSONField
-from apps.core.helpers import Cached, MetaIntEnum, generate_key
+from apps.core.helpers import Cached, MetaIntEnum, generate_key, get_cur_loc_env
 from apps.core.permissions import API_PERMISSIONS, FULL_PERMISSIONS
 from apps.hosting.validators import VALID_DOMAIN_REGEX
 from apps.instances.helpers import get_current_instance
@@ -78,7 +78,7 @@ class Hosting(LiveAbstractModel, DescriptionAbstractModel,
     @classmethod
     def get_storage(cls):
         if cls._storage is None:
-            cls._storage = DefaultStorage.create_storage(bucket_name=settings.STORAGE_HOSTING_BUCKET,
+            cls._storage = DefaultStorage.create_storage(bucket_name=get_cur_loc_env('STORAGE_HOSTING_BUCKET'),
                                                          custom_domain=None)
         return cls._storage
 

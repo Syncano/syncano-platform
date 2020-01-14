@@ -1,9 +1,9 @@
 # coding=UTF8
 import os
 
+from django.core.files.storage import default_storage
 from django.db import connection, connections, models
 
-from apps.core.backends.storage import default_storage
 from apps.core.helpers import generate_key, import_class
 from apps.instances.helpers import get_current_instance, get_instance_db
 

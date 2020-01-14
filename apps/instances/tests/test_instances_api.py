@@ -1,5 +1,6 @@
 from unittest import mock
 
+from django.core.files.storage import default_storage
 from django.test import override_settings
 from django.urls import reverse
 from django_dynamic_fixture import G
@@ -7,7 +8,6 @@ from rest_framework import status
 
 from apps.admins.models import Admin
 from apps.apikeys.models import ApiKey
-from apps.core.backends.storage import default_storage
 from apps.core.tests.testcases import SyncanoAPITestBase
 from apps.users.models import User
 
@@ -89,12 +89,12 @@ class TestInstancesDetailAPI(SyncanoAPITestBase):
         response = self.client.delete(self.url, HTTP_X_API_KEY=admin.key)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    @override_settings(LOCAL_MEDIA_STORAGE=False, STORAGE_TYPE='s3')
+    @override_settings(DEFAULT_FILE_STORAGE='apps.core.backends.storage.S3BotoStorage')
     def test_if_delete_deletes_files(self):
         bucket = mock.Mock()
         connection = mock.Mock()
         connection.Bucket = mock.Mock(return_value=bucket)
-        default_storage.connection = connection
+        default_storage._connections.connection = connection
 
         prefix = '%d' % self.instance.pk
         self.instance.hard_delete()

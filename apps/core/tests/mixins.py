@@ -3,8 +3,8 @@ import os
 import shutil
 
 from django.core.cache import cache
+from django.core.files.storage import default_storage
 
-from apps.core.backends.storage import default_storage
 from apps.core.helpers import get_local_cache
 from apps.core.middleware import clear_request_data
 

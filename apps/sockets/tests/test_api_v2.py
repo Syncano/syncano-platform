@@ -6,6 +6,7 @@ from unittest import mock
 
 import lazy_object_proxy
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
@@ -13,7 +14,6 @@ from django_dynamic_fixture import G
 from rest_framework import status
 
 from apps.codeboxes.models import CodeBox
-from apps.core.backends.storage import default_storage
 from apps.core.tests.testcases import SyncanoAPITestBase
 from apps.data.models import Klass
 from apps.sockets.exceptions import SocketMissingFile

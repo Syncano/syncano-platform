@@ -63,13 +63,11 @@ spec:
               path: /healthz
               port: 80
             initialDelaySeconds: 5
-{%- if STORAGE_TYPE == "gcloud" %}
           volumeMounts:
-            - name: storage-credentials
-              mountPath: /secrets/storage
+            - name: eu1-storage-credentials
+              mountPath: /secrets/eu1-storage
               readOnly: true
       volumes:
-        - name: storage-credentials
+        - name: eu1-storage-credentials
           secret:
-            secretName: storage-credentials
-{%- endif %}
+            secretName: eu1-storage-credentials

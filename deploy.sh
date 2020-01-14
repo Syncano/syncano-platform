@@ -59,8 +59,10 @@ envsubst() {
 echo "* Starting deployment for $TARGET at $VERSION for $DOCKERIMAGE."
 
 # Setup environment variables.
-# shellcheck disable=SC2046
-export $(xargs < deploy/env/"${TARGET}".env)
+set -a
+# shellcheck disable=SC1090
+source deploy/env/"${TARGET}".env
+set +a
 BUILDTIME=$(date +%Y-%m-%dT%H%M)
 export BUILDTIME
 

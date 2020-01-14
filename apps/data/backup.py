@@ -2,11 +2,11 @@
 import os
 from collections import defaultdict
 
+from django.core.files.storage import default_storage
 from munch import Munch
 
 from apps.backups import site
 from apps.backups.options import ModelBackup
-from apps.core.backends.storage import default_storage
 from apps.data.tasks import IndexKlassTask
 from apps.instances.helpers import get_current_instance
 

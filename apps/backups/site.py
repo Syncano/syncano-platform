@@ -224,6 +224,7 @@ class BackupSite:
         schema = {'type': 'object',
                   'properties': {},
                   'additionalProperties': False}
+
         for model in self.default_sorted:
             opt = self.get_options_for_model(model)
             if opt.lookup_field == 'id':

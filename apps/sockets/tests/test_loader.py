@@ -4,6 +4,7 @@ import json
 from unittest import mock
 
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
@@ -13,7 +14,6 @@ from rest_framework import status
 
 from apps.codeboxes.models import CodeBox, CodeBoxSchedule
 from apps.codeboxes.runtimes import LATEST_NODEJS_RUNTIME
-from apps.core.backends.storage import default_storage
 from apps.core.tests.testcases import SyncanoAPITestBase
 from apps.data.models import Klass
 from apps.hosting.models import Hosting
