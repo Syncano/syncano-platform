@@ -27,11 +27,19 @@ spec:
                 name: platform
             - secretRef:
                 name: platform
+{%- if GCP_LOCATIONS %}
           volumeMounts:
-            - name: eu1-storage-credentials
-              mountPath: /secrets/eu1-storage
+  {%- for item in GCP_LOCATIONS.split(',') %}
+            - name: {{ item }}-storage-credentials
+              mountPath: /secrets/{{ item }}-storage
               readOnly: true
+  {%- endfor %}
+{%- endif %}
+{%- if GCP_LOCATIONS %}
       volumes:
-        - name: eu1-storage-credentials
+  {%- for item in GCP_LOCATIONS.split(',') %}
+        - name: {{ item }}-storage-credentials
           secret:
-            secretName: eu1-storage-credentials
+            secretName: {{ item }}-storage-credentials
+  {%- endfor %}
+{%- endif %}

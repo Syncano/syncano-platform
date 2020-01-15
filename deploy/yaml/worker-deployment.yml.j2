@@ -34,9 +34,13 @@ spec:
         - name: acme
           secret:
             secretName: platform-acme
-        - name: eu1-storage-credentials
+{%- if GCP_LOCATIONS %}
+  {%- for item in GCP_LOCATIONS.split(',') %}
+        - name: {{ item }}-storage-credentials
           secret:
-            secretName: eu1-storage-credentials
+            secretName: {{ item }}-storage-credentials
+  {%- endfor %}
+{%- endif %}
 
       terminationGracePeriodSeconds: 360
       imagePullSecrets:
@@ -58,9 +62,13 @@ spec:
               mountPath: "/acme/config/account.thumb"
               readOnly: true
               subPath: account.thumb
-            - name: eu1-storage-credentials
-              mountPath: /secrets/eu1-storage
+{%- if GCP_LOCATIONS %}
+  {%- for item in GCP_LOCATIONS.split(',') %}
+            - name: {{ item }}-storage-credentials
+              mountPath: /secrets/{{ item }}-storage
               readOnly: true
+  {%- endfor %}
+{%- endif %}
           resources:
             requests:
               memory: "1536Mi"
