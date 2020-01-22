@@ -81,7 +81,7 @@ fi
 echo "* Updating ConfigMap."
 CONFIGMAP="apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: platform\ndata:\n"
 while read -r line; do
-    if [[ -n "${line}" && "${line}" != *"#"* ]]; then
+    if [[ -n "${line}" && "${line}" != "#"* ]]; then
         CONFIGMAP+="  ${line%%=*}: \"${line#*=}\"\n"
     fi
 done < deploy/env/"${TARGET}".env
@@ -92,7 +92,7 @@ echo -e "$CONFIGMAP" | kubectl apply -f -
 echo "* Updating Secrets."
 SECRETS="apiVersion: v1\nkind: Secret\nmetadata:\n  name: platform\ntype: Opaque\ndata:\n"
 while read -r line; do
-    if [[ -n "${line}" && "${line}" != *"#"* ]]; then
+    if [[ -n "${line}" && "${line}" != "#"* ]]; then
         SECRETS+="  ${line%%=*}: $(echo -n "${line#*=}" | base64 | tr -d '\n')\n"
     fi
 done < deploy/env/"${TARGET}".secrets.unenc
