@@ -10,11 +10,11 @@ spec:
     app: platform
     type: web
   ports:
-    - name: http
+    - name: uwsgi
       protocol: TCP
-      port: 80
-      targetPort: http
-    - name: http-long
+      port: 8000
+      targetPort: uwsgi
+    - name: uwsgi-long
       protocol: TCP
-      port: 81
-      targetPort: http-long
+      port: 8001
+      targetPort: uwsgi-long

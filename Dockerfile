@@ -19,12 +19,10 @@ RUN set -ex \
         supervisor \
         postgresql-client \
         make \
+        libxml2 \
         # openssl support
         ca-certificates \
         openssl \
-        # nginx
-        nginx \
-        libxml2 \
         # unzip and mksquashfs for env zip processing
         squashfs-tools \
         unzip \
@@ -74,9 +72,6 @@ killall Xvfb\
     && ln -s ${LE_WORKING_DIR}/acme.sh /usr/bin/acme.sh \
     && cd .. \
     && rm -rf ${ACME_VERSION}.zip acme.sh-${ACME_VERSION} \
-    # Remove default nginx config
-    && mkdir -p /run/nginx \
-    && rm -rf /etc/nginx/conf.d/*
 
 # Install python dependencies
 COPY ./requirements.txt /home/syncano/app/

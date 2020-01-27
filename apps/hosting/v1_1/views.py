@@ -165,7 +165,7 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
             url == url[len(settings.MEDIA_URL):]
         else:
             _, url = url.split('//', 1)
-        if get_cur_loc_env('STORAGE') == 'gcloud':
+        if get_cur_loc_env('STORAGE') == 'gcs':
             _, url = url.split('/', 1)
         return url.split('/', 3)
 

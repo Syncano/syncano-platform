@@ -41,10 +41,10 @@ spec:
               memory: "1536Mi"
               cpu: 1
           ports:
-            - name: http
-              containerPort: 80
-            - name: http-long
-              containerPort: 81
+            - name: uwsgi
+              containerPort: 8000
+            - name: uwsgi-long
+              containerPort: 8001
           env:
             - name: INSTANCE_TYPE
               value: web
@@ -55,13 +55,13 @@ spec:
                 name: platform
           livenessProbe:
             httpGet:
-              path: /healthz
-              port: 80
+              path: /healthz/
+              port: 8100
             initialDelaySeconds: 10
           readinessProbe:
             httpGet:
-              path: /healthz
-              port: 80
+              path: /healthz/
+              port: 8100
             initialDelaySeconds: 5
 {%- if GCP_LOCATIONS %}
           volumeMounts:

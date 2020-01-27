@@ -157,7 +157,7 @@ class DefaultStorage(LazyObject):
             opts.update(kwargs)
             return S3BotoStorage(location, **opts)
 
-        if storage_type == 'gcloud':
+        if storage_type == 'gcs':
             opts = {
                 'bucket_name': get_loc_env(location, 'STORAGE_BUCKET'),
                 'credentials': service_account.Credentials.from_service_account_file(
