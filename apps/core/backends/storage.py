@@ -135,7 +135,11 @@ class DefaultStorage(LazyObject):
     @classmethod
     def create_storage(cls, location=settings.LOCATION, **kwargs):
         storage_type = get_loc_env(location, 'STORAGE', 'local')
-        cache_key = (location, frozenset(kwargs.items()))
+        if storage_type == 'local':
+            cache_key = storage_type
+        else:
+            cache_key = (location, frozenset(kwargs.items()))
+
         if cache_key in cls._cache:
             return cls._cache[cache_key]
 
@@ -157,7 +161,7 @@ class DefaultStorage(LazyObject):
             opts.update(kwargs)
             return S3BotoStorage(location, **opts)
 
-        if storage_type == 'gcloud':
+        if storage_type == 'gcs':
             opts = {
                 'bucket_name': get_loc_env(location, 'STORAGE_BUCKET'),
                 'credentials': service_account.Credentials.from_service_account_file(

@@ -11,10 +11,6 @@ SUPERVISOR_APP_PATH="$APP_DIR/conf/supervisor"
 CELERY_LOG_DIR="/var/log/celery"
 
 
-function configure_nginx() {
-    cp -ru $APP_DIR/conf/nginx/* /etc/nginx
-}
-
 function link_supervisor_configs() {
     mkdir -p $SUPERVISOR_CONFIG_PATH
     ln -fs $SUPERVISOR_APP_PATH/supervisord.conf /etc
@@ -35,7 +31,6 @@ if [ "$INSTANCE_TYPE" = "web" ]; then
     chown -R syncano $APP_DIR/static
 
     link_supervisor_configs uwsgi.conf
-    configure_nginx
 
 elif [ "$INSTANCE_TYPE" = "worker" ]; then
     link_supervisor_configs celery.conf
