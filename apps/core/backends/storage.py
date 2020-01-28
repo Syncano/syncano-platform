@@ -140,7 +140,6 @@ class DefaultStorage(LazyObject):
         else:
             cache_key = (location, frozenset(kwargs.items()))
 
-        cache_key = (location, frozenset(kwargs.items()))
         if cache_key in cls._cache:
             return cls._cache[cache_key]
 
