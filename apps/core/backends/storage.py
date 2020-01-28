@@ -135,6 +135,11 @@ class DefaultStorage(LazyObject):
     @classmethod
     def create_storage(cls, location=settings.LOCATION, **kwargs):
         storage_type = get_loc_env(location, 'STORAGE', 'local')
+        if storage_type == 'local':
+            cache_key = storage_type
+        else:
+            cache_key = (location, frozenset(kwargs.items()))
+
         cache_key = (location, frozenset(kwargs.items()))
         if cache_key in cls._cache:
             return cls._cache[cache_key]
