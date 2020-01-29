@@ -52,6 +52,7 @@ services:
     privileged: true
     ports:
       - "8100"
+      - "8101"
     depends_on:
       - postgresql
       - redis
