@@ -70,7 +70,7 @@ spec:
                   - /bin/bash
                   - -c
                   - >-
-                    PID=$(cat /tmp/uwsgi_offload.pid) && kill -HUP $PID && timeout 300 tail --pid=$PID -f /dev/null
+                    PID=$(cat /tmp/uwsgi_offload.pid) && kill -HUP $PID && timeout 300 tail --pid=$PID -f /dev/null &&
                     uwsgi --reload /tmp/uwsgi_long.pid &&
                     uwsgi --reload /tmp/uwsgi.pid
 
