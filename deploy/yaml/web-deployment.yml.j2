@@ -72,7 +72,7 @@ spec:
                   - >-
                     touch /tmp/uwsgi_stop &&
                     uwsgi --reload /tmp/uwsgi.pid &&
-                    uwsgi --reload /tmp/uwsgi_offload.pid
+                    PID=$(cat /tmp/uwsgi_offload.pid) && kill -HUP $PID && tail --pid=$PID -f /dev/null
 
 {%- if GCP_LOCATIONS %}
           volumeMounts:

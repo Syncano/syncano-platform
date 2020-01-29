@@ -14,6 +14,7 @@ RUN set -ex \
     && adduser -D -s /bin/bash syncano \
     && apk add --no-cache \
         bash \
+        coreutils \
         curl \
         supervisor \
         postgresql-client \
