@@ -72,8 +72,7 @@ spec:
                   - >-
                     touch /tmp/uwsgi_stop &&
                     uwsgi --reload /tmp/uwsgi.pid &&
-                    uwsgi --reload /tmp/uwsgi_offload.pid &&
-                    uwsgi --reload /tmp/uwsgi_long.ini
+                    uwsgi --reload /tmp/uwsgi_offload.pid
 
 {%- if GCP_LOCATIONS %}
           volumeMounts:
