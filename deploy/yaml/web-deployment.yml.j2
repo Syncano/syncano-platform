@@ -42,9 +42,9 @@ spec:
               cpu: 1
           ports:
             - name: uwsgi
-              containerPort: 8000
+              containerPort: 7000
             - name: uwsgi-long
-              containerPort: 8001
+              containerPort: 7001
           env:
             - name: INSTANCE_TYPE
               value: web
@@ -56,24 +56,24 @@ spec:
           livenessProbe:
             httpGet:
               path: /healthz/
-              port: 8100
+              port: 80
             initialDelaySeconds: 10
           readinessProbe:
             httpGet:
               path: /healthz/
-              port: 8100
+              port: 80
             initialDelaySeconds: 5
-          lifecycle:
-            preStop:
-              exec:
-                command:
-                  - /bin/bash
-                  - -c
-                  - >-
-                    touch /tmp/uwsgi_stop &&
-                    PID=$(cat /tmp/uwsgi_offload.pid) && kill -HUP $PID && timeout 300 tail --pid=$PID -f /dev/null &&
-                    uwsgi --reload /tmp/uwsgi_long.pid &&
-                    uwsgi --reload /tmp/uwsgi.pid
+          # lifecycle:
+          #   preStop:
+          #     exec:
+          #       command:
+          #         - /bin/bash
+          #         - -c
+          #         - >-
+          #           touch /tmp/uwsgi_stop &&
+          #           PID=$(cat /tmp/uwsgi_offload.pid) && kill -HUP $PID && timeout 300 tail --pid=$PID -f /dev/null &&
+          #           uwsgi --reload /tmp/uwsgi_long.pid &&
+          #           uwsgi --reload /tmp/uwsgi.pid
 
 {%- if GCP_LOCATIONS %}
           volumeMounts:

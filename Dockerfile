@@ -44,6 +44,8 @@ RUN set -ex \
         # postgis dependencies
         geos \
         gdal \
+        # haproxy
+        haproxy \
     \
     # Symlink libgeos so it gets picked up correctly
     && ln -s /usr/lib/libgeos_c.so.1 /usr/lib/libgeos_c.so \
