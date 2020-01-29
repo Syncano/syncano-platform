@@ -5,9 +5,9 @@ from django.core.exceptions import FieldDoesNotExist, FieldError, ValidationErro
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.db import connections, transaction
-from django.utils.topological_sort import topological_sort_as_sets
 from django.db.models.base import ModelBase
 from django.utils.functional import cached_property
+from django.utils.topological_sort import topological_sort_as_sets
 
 from apps.core import signals
 from apps.core.helpers import generate_key
