@@ -1,7 +1,6 @@
 # coding=UTF8
 import django_filters
 from django_filters.filters import Filter, UUIDFilter
-from django_filters.filterset import STRICTNESS
 
 from apps.core.filter_fields import LowercaseBooleanFilter
 from apps.push_notifications.forms import HexIntegerFormField
@@ -17,7 +16,6 @@ class BaseDeviceFilter(django_filters.FilterSet):
 
     class Meta:
         fields = ['device_id', 'is_active', 'user']
-        strict = STRICTNESS.RAISE_VALIDATION_ERROR
 
 
 class HexIntegerFilter(Filter):

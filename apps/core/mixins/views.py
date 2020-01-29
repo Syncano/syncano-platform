@@ -217,7 +217,7 @@ class AutocompleteMixin(View):
                 model = getattr(cls, 'model', cls.queryset.model)
                 fields = {cls.autocomplete_field: ['startswith']}
 
-        cls.filter_class = AutocompleteFilter
+        cls.filterset_class = AutocompleteFilter
         return super().as_view(*args, **kwargs)
 
 

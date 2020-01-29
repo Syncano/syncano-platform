@@ -110,7 +110,7 @@ class GCMDeviceViewSet(BaseDeviceViewSet):
     serializer_detail_class = GCMDeviceDetailSerializer
     message_serializer = GCMMessageSerializer
     lookup_field = 'registration_id'
-    filter_class = GCMDeviceFilter
+    filterset_class = GCMDeviceFilter
 
 
 class APNSDeviceViewSet(BaseDeviceViewSet):
@@ -120,7 +120,7 @@ class APNSDeviceViewSet(BaseDeviceViewSet):
     serializer_detail_class = APNSDeviceDetailSerializer
     message_serializer = APNSMessageSerializer
     lookup_field = 'registration_id'
-    filter_class = APNSDeviceFilter
+    filterset_class = APNSDeviceFilter
 
 
 class GCMMessageViewSet(InstanceBasedMixin,

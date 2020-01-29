@@ -25,7 +25,7 @@ class AdminViewSet(AtomicMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = AdminForStaffSerializer
     permission_classes = (IsStaffUser,)
     filter_backends = (DjangoFilterBackend,)
-    filter_class = AdminViewFilter
+    filterset_class = AdminViewFilter
 
     @detail_route(methods=['post'], serializer_class=ExtendSerializer)
     def extend_builder_plan(self, request, *args, **kwargs):
