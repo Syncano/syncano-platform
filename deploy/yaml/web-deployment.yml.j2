@@ -71,8 +71,8 @@ spec:
                   - -c
                   - >-
                     touch /tmp/uwsgi_stop &&
-                    uwsgi --reload /tmp/uwsgi.pid &&
-                    PID=$(cat /tmp/uwsgi_offload.pid) && kill -HUP $PID && tail --pid=$PID -f /dev/null
+                    uwsgi --reload /tmp/uwsgi.pid && supervisorctl stop uwsgi &&
+                    PID=$(cat /tmp/uwsgi_offload.pid) && kill -HUP $PID && timeout 300 tail --pid=$PID -f /dev/null
 
 {%- if GCP_LOCATIONS %}
           volumeMounts:
