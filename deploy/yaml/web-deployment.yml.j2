@@ -25,7 +25,7 @@ spec:
         app: platform
         type: web
     spec:
-      terminationGracePeriodSeconds: 360
+      terminationGracePeriodSeconds: 330
       imagePullSecrets:
         - name: syncano-k8s-pull-secret
       containers:
@@ -63,6 +63,18 @@ spec:
               path: /healthz/
               port: 8100
             initialDelaySeconds: 5
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/bash
+                  - -c
+                  - >-
+                    touch /tmp/uwsgi_stop &&
+                    uwsgi --reload /tmp/uwsgi.pid &&
+                    uwsgi --reload /tmp/uwsgi_long.ini &&
+                    uwsgi --reload /tmp/uwsgi_offload.pid
+
 {%- if GCP_LOCATIONS %}
           volumeMounts:
   {%- for item in GCP_LOCATIONS.split(',') %}
