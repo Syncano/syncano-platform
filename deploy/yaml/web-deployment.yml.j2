@@ -63,17 +63,6 @@ spec:
               path: /healthz/
               port: 80
             initialDelaySeconds: 5
-          # lifecycle:
-          #   preStop:
-          #     exec:
-          #       command:
-          #         - /bin/bash
-          #         - -c
-          #         - >-
-          #           touch /tmp/uwsgi_stop &&
-          #           PID=$(cat /tmp/uwsgi_offload.pid) && kill -HUP $PID && timeout 300 tail --pid=$PID -f /dev/null &&
-          #           uwsgi --reload /tmp/uwsgi_long.pid &&
-          #           uwsgi --reload /tmp/uwsgi.pid
 
 {%- if GCP_LOCATIONS %}
           volumeMounts:
