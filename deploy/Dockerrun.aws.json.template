@@ -1,7 +1,7 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-      "Name": "quay.io/syncano/syncano-platform:<TAG>",
+      "Name": "syncano/platform:<TAG>",
       "Update": "true"
   },
   "Authentication": {

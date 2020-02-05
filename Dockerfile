@@ -34,12 +34,7 @@ RUN set -ex \
         su-exec \
         # real ps
         procps \
-        # pdf packages
-        xvfb \
-        ttf-freefont \
-        fontconfig \
-        dbus \
-        # wkhtmltopdf
+        # pdf rendering
         wkhtmltopdf \
         # postgis dependencies
         geos \
