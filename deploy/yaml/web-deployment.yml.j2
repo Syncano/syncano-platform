@@ -26,11 +26,9 @@ spec:
         type: web
     spec:
       terminationGracePeriodSeconds: 330
-      imagePullSecrets:
-        - name: syncano-k8s-pull-secret
       containers:
         - name: web
-          image: {{ DOCKERIMAGE }}:{{ VERSION }}
+          image: {{ IMAGE }}
           securityContext:
             privileged: true
           resources:

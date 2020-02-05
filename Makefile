@@ -1,5 +1,5 @@
 ifndef DOCKERIMAGE
-DOCKERIMAGE := quay.io/syncano/syncano-platform
+DOCKERIMAGE := syncano/platform
 endif
 
 SHELL := /bin/bash
@@ -59,16 +59,16 @@ makemigrations: require-docker-compose ## Make django migrations
 deploy-staging: require-kubectl ## Deploy application to staging
 	echo "=== deploying staging ==="
 	kubectl config use-context k8s.syncano.rocks
-	./deploy.sh staging stg-$(GITSHA) $(ARGS)
+	./deploy.sh staging $(GITSHA) $(ARGS)
 
 deploy-production: require-kubectl ## Deploy application to production
 	echo "=== deploying us1 ==="
 	kubectl config use-context k8s.syncano.io
-	./deploy.sh us1 prd-$(GITSHA) $(ARGS)
+	./deploy.sh us1 $(GITSHA) $(ARGS)
 
 	echo "=== deploying eu1 ==="
 	kubectl config use-context gke_pioner-syncano-prod-9cfb_europe-west1_syncano-eu1
-	./deploy.sh eu1 prd-$(GITSHA) --no-codebox --skip-push
+	./deploy.sh eu1 $(GITSHA) --no-codebox --skip-push
 
 encrypt: ## Encrypt unencrypted files (for secrets)
 	find deploy -name "*.unenc" -exec sh -c 'gpg --batch --yes --passphrase "$(PLATFORM_VAULT_PASS)" --symmetric --cipher-algo AES256 -o "$${1%.unenc}.gpg" "$$1"' _ {} \;

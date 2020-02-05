@@ -12,7 +12,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: platform-web
-          image: {{ DOCKERIMAGE }}:{{ VERSION }}
+          image: {{ IMAGE }}
           command:
             - "./run_care.sh"
             - "{{ CARE_ARGUMENTS }}"

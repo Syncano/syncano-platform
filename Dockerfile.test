@@ -1,4 +1,4 @@
-FROM quay.io/syncano/syncano-platform
+FROM syncano/platform
 
 COPY ./requirements_development.txt /home/syncano/app/
 RUN set -ex \

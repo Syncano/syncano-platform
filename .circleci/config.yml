@@ -7,7 +7,7 @@ jobs:
 
       - run:
           name: Setup
-          command: docker login -u="$DOCKER_LOGIN" -p="$DOCKER_PASS" quay.io
+          command: docker login -u="$DOCKER_LOGIN" -p="$DOCKER_PASS" $DOCKER_SERVER
 
       - run:
           name: Build image
@@ -33,7 +33,7 @@ jobs:
       - run:
           name: Setup system
           command: |
-            docker login -u="$DOCKER_LOGIN" -p="$DOCKER_PASS" quay.io
+            docker login -u="$DOCKER_LOGIN" -p="$DOCKER_PASS" $DOCKER_SERVER
             pip install ebs-deploy==2.0.1
 
       - run:
