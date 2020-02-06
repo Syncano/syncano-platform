@@ -79,6 +79,7 @@ fi
 IMAGE="$DOCKERIMAGE":"$VERSION"
 export IMAGE
 
+
 # Create configmap.
 echo "* Updating ConfigMap."
 CONFIGMAP="apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: platform\ndata:\n"
