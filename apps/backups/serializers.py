@@ -83,9 +83,10 @@ class RestoreSerializer(HyperlinkedMixin, ModelSerializer):
 
         if has_backup:
             backup = attrs['backup']
-            cross_region_limit = AdminLimit.get_for_admin(self.context['view'].request.instance.owner_id).get_storage()
+            cross_region_limit = AdminLimit.get_for_admin(
+                self.context['view'].request.instance.owner_id).get_backup_cross_region_limit()
 
-            if backup.location != settings.LOCATION and backup.size > cross_region_limit:
+            if backup.location != settings.LOCATION and backup.size > cross_region_limit and cross_region_limit >= 0:
                 raise ValidationError('You cannot restore cross region backup of size > {}.'.format(cross_region_limit))
 
         return super().validate(attrs)

@@ -43,11 +43,9 @@ spec:
 {%- endif %}
 
       terminationGracePeriodSeconds: 360
-      imagePullSecrets:
-        - name: syncano-k8s-pull-secret
       containers:
         - name: worker
-          image: {{ DOCKERIMAGE }}:{{ VERSION }}
+          image: {{ IMAGE }}
           securityContext:
             privileged: true
           volumeMounts:

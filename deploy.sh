@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export DOCKERIMAGE=${DOCKERIMAGE:-quay.io/syncano/syncano-platform}
+export DOCKERIMAGE=${DOCKERIMAGE:-syncano/platform}
 export VERSION="$2"
 
 TARGET="$1"
@@ -75,6 +75,9 @@ if $PUSH; then
     echo "* Pushing $DOCKERIMAGE:$VERSION."
     docker push "$DOCKERIMAGE":"$VERSION"
 fi
+
+IMAGE="$DOCKERIMAGE":"$VERSION"
+export IMAGE
 
 
 # Create configmap.

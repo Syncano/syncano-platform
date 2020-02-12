@@ -45,7 +45,7 @@ services:
       - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
 
   web:
-    image: quay.io/syncano/syncano-platform:test
+    image: syncano/platform:test
     build:
       context: .
       dockerfile: Dockerfile.test
@@ -81,7 +81,7 @@ services:
       - TRACING_ENABLED
 
   worker:
-    image: quay.io/syncano/syncano-platform:test
+    image: syncano/platform:test
     build:
       context: .
       dockerfile: Dockerfile.test
@@ -105,7 +105,7 @@ services:
       - TRACING_ENABLED
 
   codebox:
-    image: quay.io/syncano/syncano-platform:test
+    image: syncano/platform:test
     build:
       context: .
       dockerfile: Dockerfile.test
@@ -124,7 +124,7 @@ services:
 
   codebox-broker:
     command: codebox --debug broker
-    image: quay.io/syncano/codebox
+    image: syncano/codebox
     depends_on:
       - codebox-lb
     ports:
@@ -136,14 +136,14 @@ services:
 
   codebox-lb:
     command: codebox --debug lb
-    image: quay.io/syncano/codebox
+    image: syncano/codebox
     environment:
       - SERVICE_NAME=codebox-lb
 
   codebox-worker:
     command: codebox --debug worker
     user: root
-    image: quay.io/syncano/codebox
+    image: syncano/codebox
     privileged: true
     depends_on:
       - codebox-lb
