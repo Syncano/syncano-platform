@@ -130,8 +130,6 @@ class AsyncScriptRunnerMixin(ValidateRequestSizeMixin):
 
         task_spec = AsyncScriptTask.create_script_spec(instance, kwargs['script'], payload_data, meta, '', trace_spec,
                                                        obj.socket)
-        print(trace_spec)
-        print('task spec', task_spec)
         spec.update(task_spec)
 
         # Save spec to redis
