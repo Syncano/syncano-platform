@@ -69,7 +69,7 @@ class TestSocketLoadAPI(SyncanoAPITestBase):
         self.assertEqual(set(response.data.keys()), {'name', 'install_url'})
 
     @mock.patch('apps.hosting.tasks.HostingAddSecureCustomDomainTask.delay', mock.Mock())
-    def test_creating_socket_from_url(self, download_mock):
+    def test_creating_socket(self, download_mock):
         # Create full blown socket
         user = G(User, username='username')
         group = G(Group, name='groupname')
@@ -255,7 +255,7 @@ event_handlers:
             'hosting': {'production': 'production.my-domain.com', 'staging': None}
         })
 
-    def test_socket_from_url_configuring(self, download_mock):
+    def test_socket_with_config(self, download_mock):
         socket_source = """
 name: my_tweet
 
@@ -276,7 +276,7 @@ config:
         response = self.client.get(detail_url)
         self.assertEqual(response.data['status'], Socket.STATUSES.OK.verbose)
 
-    def test_creating_socket_from_url_with_error(self, download_mock):
+    def test_creating_socket_with_error(self, download_mock):
         self.load_socket('siubidubijukendens', download_mock)
         socket = Socket.objects.first()
         self.assertEqual(socket.status, Socket.STATUSES.ERROR)
@@ -284,7 +284,7 @@ config:
         self.assertTrue(response.data['objects'][0]['status_info']['error'])
 
     @mock.patch('apps.hosting.tasks.HostingAddSecureCustomDomainTask.delay', mock.Mock())
-    def test_updating_socket_with_url(self, download_mock):
+    def test_updating_socket(self, download_mock):
         first_yaml = """
 endpoints:
   my_endpoint_1/test:

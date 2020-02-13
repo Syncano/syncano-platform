@@ -87,6 +87,15 @@ class SocketImporter:
         if len(socket_spec) > self.max_number_of_keys:
             raise SocketValidationError('Too many properties defined.')
 
+    def validate_common_settings(self, spec, lineno=None):
+        self.validate_min_max_value(spec, 'cache', 0.0, settings.SOCKETS_MAX_CACHE_TIME, lineno=lineno)
+        self.validate_min_max_value(spec, 'timeout', 0.0, settings.SOCKETS_MAX_TIMEOUT, lineno=lineno)
+        self.validate_min_max_value(spec, 'async', 0, settings.SOCKETS_MAX_ASYNC, lineno=lineno)
+        self.validate_min_max_value(spec, 'mcpu', 0, settings.SOCKETS_MAX_MCPU, lineno=lineno)
+
+        if ('async' in spec or 'mcpu' in spec) and not self.is_trusted:
+            raise SocketValidationError('Cannot set Async/MCPU on this account. Contact administrator.', lineno=lineno)
+
     def process_endpoint_dependency(self, endpoint_spec):
         """
         Process YAML endpoints to JSON socket endpoints structure.
@@ -100,8 +109,24 @@ class SocketImporter:
         return dependencies
 
     def map_endpoint_settings(self, call, spec):
-        if isinstance(spec, dict) and bool(spec.pop('private', False)):
+        call['runtime'] = self.socket_runtime['name']
+
+        if not isinstance(spec, dict):
+            spec = {}
+
+        self.set_endpoint_setting(call, spec, 'async', self.socket_async)
+        self.set_endpoint_setting(call, spec, 'mcpu', self.socket_mcpu)
+        self.set_endpoint_setting(call, spec, 'timeout', self.socket_timeout)
+        self.set_endpoint_setting(call, spec, 'cache', self.socket_cache)
+
+        if bool(spec.pop('private', False)):
             call['private'] = True
+
+    def set_endpoint_setting(self, call, spec, key, default):
+        if key not in spec and default is None:
+            return
+
+        call[key] = spec.pop(key, default)
 
     def map_channel_endpoint(self, name, spec):
         channel = spec.pop('channel')
@@ -112,6 +137,7 @@ class SocketImporter:
 
         call = {'type': 'channel', 'channel': channel, 'methods': ['GET']}
         self.map_endpoint_settings(call, spec)
+
         return {'name': name, 'type': 'endpoint', 'acl': {}, 'calls': [call]}
 
     def map_script_endpoint(self, name, spec):
@@ -146,8 +172,8 @@ class SocketImporter:
                 'type': 'script',
                 'path': script_dep['path'],
                 'methods': list(unused_methods),
-                'runtime': self.runtime['name'],
             }
+
             self.map_endpoint_settings(default, spec)
             endpoint['calls'].append(default)
 
@@ -215,13 +241,11 @@ class SocketImporter:
             call = {
                 'type': 'script',
                 'path': script_dep['path'],
-                'runtime': self.runtime['name'],
                 'methods': [method],
             }
 
             # Use global spec first and override with method_spec settings
-            self.map_endpoint_settings(call, spec)
-            self.map_endpoint_settings(call, method_spec)
+            self.map_endpoint_settings(call, spec.update(method_spec))
             calls.append(call)
 
             # Add rest to metadata
@@ -234,7 +258,11 @@ class SocketImporter:
             return
 
         try:
-            v = float(spec[key])
+            if isinstance(min_val, float):
+                v = float(spec[key])
+            elif isinstance(min_val, int):
+                v = int(spec[key])
+
             if v <= min_val or v > max_val:
                 raise ValueError
             spec[key] = v
@@ -249,20 +277,17 @@ class SocketImporter:
         Process script dependency from YAML. Returns dependency dict.
         """
         dependency = {'type': 'script', 'config': {'allow_full_access': True}, 'path': '<YAML:{}>'.format(path),
-                      'runtime_name': self.runtime['name'], 'line': name.line}
+                      'runtime_name': self.socket_runtime['name'], 'line': name.line}
 
         if isinstance(spec, str):
             dependency['source'] = spec
         else:
             self.ensure_dict(spec, 'script')
-            self.validate_min_max_value(spec, 'cache', 0, settings.SOCKETS_MAX_CACHE_TIME, lineno=name.line)
-            self.validate_min_max_value(spec, 'timeout', 0, settings.SOCKETS_MAX_TIMEOUT, lineno=name.line)
-            self.validate_min_max_value(spec, 'async', 0, settings.SOCKETS_MAX_ASYNC, lineno=name.line)
-            self.validate_min_max_value(spec, 'mcpu', 0, settings.SOCKETS_MAX_MCPU, lineno=name.line)
-            if ('async' in spec or 'mcpu' in spec) and not self.is_trusted:
-                raise SocketValidationError('Cannot set Async/MCPU on this account. Contact administrator.', name.line)
+            self.validate_common_settings(spec, name.line)
 
-            dependency['config']['timeout'] = spec.get('timeout')
+            dependency['config']['timeout'] = spec.get('timeout', self.socket_timeout)
+            dependency['config']['async'] = spec.get('async', self.socket_async)
+            dependency['config']['mcpu'] = spec.get('mcpu', self.socket_mcpu)
 
             if 'source' in spec:
                 dependency['source'] = spec.pop('source')
@@ -272,15 +297,17 @@ class SocketImporter:
                 if file_path is not None:
                     allow_empty = False
                     self.ensure_string(file_path, 'file')
+
                     if len(file_path) > self.max_path_length:
                         raise SocketValidationError('Source file path is too long.', name.line)
                     if not VALID_PATH_REGEX.match(file_path):
                         raise SocketValidationError('Source file path contains invalid characters.', name.line)
                 else:
-                    file_path = '{}.{}'.format(path[path.find('/') + 1:], self.runtime['ext'])
+                    file_path = '{}.{}'.format(path[path.find('/') + 1:], self.socket_runtime['ext'])
 
                 dependency['path'] = file_path
                 self.files_processed.add(file_path)
+
                 try:
                     dependency['source'] = self.zip_handler.read_file(file_path)
                 except SocketMissingFile:
@@ -459,7 +486,7 @@ class SocketImporter:
             possible_runtimes = self.old_possible_runtimes
 
         # Default runtime is the first possible.
-        self.runtime = possible_runtimes[0][1]
+        self.socket_runtime = possible_runtimes[0][1]
 
         if not runtime:
             return
@@ -467,8 +494,9 @@ class SocketImporter:
         self.ensure_string(runtime, 'runtime')
         for alias, runtime_data in possible_runtimes:
             if runtime in alias:
-                self.runtime = runtime_data
+                self.socket_runtime = runtime_data
                 return
+
         raise SocketValidationError('Incorrect runtime value.', runtime.line)
 
     def add_size(self, size):
@@ -537,6 +565,13 @@ class SocketImporter:
         # Load socket YAML and validate
         socket_spec = self.load_socket_spec(socket_spec_raw)
         self.validate_socket_spec(socket_spec)
+        self.validate_common_settings(socket_spec)
+
+        # set socket level defaults
+        self.socket_mcpu = socket_spec.pop('mcpu', None)
+        self.socket_async = socket_spec.pop('async', None)
+        self.socket_timeout = socket_spec.pop('timeout', None)
+        self.socket_cache = socket_spec.pop('cache', None)
 
         data = {
             'description': socket_spec.pop('description', ''),

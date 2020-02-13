@@ -89,7 +89,9 @@ class AsyncScriptRunnerMixin(ValidateRequestSizeMixin):
 
         trace = self.create_trace(meta=request_meta, args=trace_args, executed_by_staff=as_staff, obj=obj, **kwargs)
 
+
         meta = {'request': request_meta, 'metadata': kwargs.get('metadata', {})}
+
         user = getattr(request, 'auth_user', None)
         if user:
             meta['user'] = {
@@ -129,6 +131,8 @@ class AsyncScriptRunnerMixin(ValidateRequestSizeMixin):
 
         task_spec = AsyncScriptTask.create_script_spec(instance, kwargs['script'], payload_data, meta, '', trace_spec,
                                                        obj.socket)
+        print(trace_spec)
+        print('task spec', task_spec)
         spec.update(task_spec)
 
         # Save spec to redis
