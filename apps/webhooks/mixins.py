@@ -88,8 +88,6 @@ class AsyncScriptRunnerMixin(ValidateRequestSizeMixin):
         as_staff = getattr(request, 'staff_user', None) is not None
 
         trace = self.create_trace(meta=request_meta, args=trace_args, executed_by_staff=as_staff, obj=obj, **kwargs)
-
-
         meta = {'request': request_meta, 'metadata': kwargs.get('metadata', {})}
 
         user = getattr(request, 'auth_user', None)
@@ -99,6 +97,7 @@ class AsyncScriptRunnerMixin(ValidateRequestSizeMixin):
                 'username': user.username,
                 'user_key': user.key
             }
+
         admin = getattr(request, 'user', None)
         if admin.is_authenticated:
             meta['admin'] = {
