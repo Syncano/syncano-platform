@@ -175,7 +175,7 @@ event_handlers:
         self.assertEqual(SocketEndpoint.objects.count(), 3)
         endpoint1 = SocketEndpoint.objects.get(name='abc/my_endpoint_1/test')
         endpoint2 = SocketEndpoint.objects.get(name='abc/my_endpoint_2')
-        self.assertEqual(endpoint1.metadata, {'cache': 1800})
+        self.assertEqual(endpoint1.metadata, {})
         self.assertEqual(endpoint1.acl, {'users': {str(user.id): ['POST', 'PATCH']},
                                          'groups': {str(group.id): ['GET']}})
         self.assertEqual(endpoint2.metadata, {'author': {'name': 'MagicJohnson'},
@@ -396,7 +396,7 @@ event_handlers:
         script = CodeBox.objects.get(path='script1.py')
         self.assertEqual(script.id, old_script.id)
         self.assertEqual(script.source, updated_script)
-        self.assertEqual(script.config, {'allow_full_access': True, 'timeout': None})
+        self.assertEqual(script.config, {'allow_full_access': True})
         self.assertEqual(Klass.objects.get(name='class_1').schema, [{'name': 'field1', 'type': 'integer'},
                                                                     {'name': 'field2', 'type': 'string'},
                                                                     {'name': 'field_unique', 'type': 'datetime',
@@ -748,7 +748,6 @@ endpoints:
         self.assertEqual(socket.status, Socket.STATUSES.OK)
 
         codebox = CodeBox.objects.first()
-        self.assertIsNone(codebox.config['timeout'])
 
         # Update socket
         url = reverse('v2:socket-detail', args=(self.instance.name, 'abc'))

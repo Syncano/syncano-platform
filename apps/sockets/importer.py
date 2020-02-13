@@ -108,25 +108,30 @@ class SocketImporter:
 
         return dependencies
 
-    def map_endpoint_settings(self, call, spec):
+    def map_endpoint_settings(self, call, spec, delete=True):
         call['runtime'] = self.socket_runtime['name']
 
         if not isinstance(spec, dict):
             spec = {}
 
-        self.set_endpoint_setting(call, spec, 'async', self.socket_async)
-        self.set_endpoint_setting(call, spec, 'mcpu', self.socket_mcpu)
-        self.set_endpoint_setting(call, spec, 'timeout', self.socket_timeout)
-        self.set_endpoint_setting(call, spec, 'cache', self.socket_cache)
+        for key, default in (('async', self.socket_async),
+                             ('mcpu', self.socket_mcpu),
+                             ('timeout', self.socket_timeout),
+                             ('cache', self.socket_cache)):
 
-        if bool(spec.pop('private', False)):
+            self.set_endpoint_setting(call, spec, key, default)
+
+            if delete and key in spec:
+                del spec[key]
+
+        if bool(spec.get('private', False)):
             call['private'] = True
 
     def set_endpoint_setting(self, call, spec, key, default):
-        if key not in spec and default is None:
+        if key not in spec and (default is None or key in call):
             return
 
-        call[key] = spec.pop(key, default)
+        call[key] = spec.get(key, default)
 
     def map_channel_endpoint(self, name, spec):
         channel = spec.pop('channel')
@@ -220,6 +225,7 @@ class SocketImporter:
         dependencies = []
         calls = []
         metadata = {}
+
         for method in list(spec.keys()):
             if method not in self.http_methods:
                 continue
@@ -244,8 +250,9 @@ class SocketImporter:
                 'methods': [method],
             }
 
-            # Use global spec first and override with method_spec settings
-            self.map_endpoint_settings(call, spec.update(method_spec))
+            # Use method_spec first and default to global spec if needed
+            self.map_endpoint_settings(call, method_spec)
+            self.map_endpoint_settings(call, spec, delete=False)
             calls.append(call)
 
             # Add rest to metadata
@@ -285,9 +292,12 @@ class SocketImporter:
             self.ensure_dict(spec, 'script')
             self.validate_common_settings(spec, name.line)
 
-            dependency['config']['timeout'] = spec.get('timeout', self.socket_timeout)
-            dependency['config']['async'] = spec.get('async', self.socket_async)
-            dependency['config']['mcpu'] = spec.get('mcpu', self.socket_mcpu)
+            for key, default in (('timeout', self.socket_timeout),
+                                 ('async', self.socket_async),
+                                 ('mcpu', self.socket_mcpu)):
+                val = spec.get(key, default)
+                if val is not None:
+                    dependency['config'][key] = val
 
             if 'source' in spec:
                 dependency['source'] = spec.pop('source')
