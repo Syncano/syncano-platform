@@ -36,6 +36,7 @@ RUN set -ex \
         procps \
         # pdf rendering
         wkhtmltopdf \
+        ttf-freefont \
         # postgis dependencies
         geos \
         gdal \

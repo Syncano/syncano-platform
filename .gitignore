@@ -9,6 +9,7 @@ coverage_report/
 dist/
 media/
 static/
+_storage/
 *.egg-info/
 *.pyc
 *.pyo

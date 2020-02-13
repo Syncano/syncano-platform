@@ -69,7 +69,7 @@ class TestSocketLoadAPI(SyncanoAPITestBase):
         self.assertEqual(set(response.data.keys()), {'name', 'install_url'})
 
     @mock.patch('apps.hosting.tasks.HostingAddSecureCustomDomainTask.delay', mock.Mock())
-    def test_creating_socket_from_url(self, download_mock):
+    def test_creating_socket(self, download_mock):
         # Create full blown socket
         user = G(User, username='username')
         group = G(Group, name='groupname')
@@ -175,7 +175,7 @@ event_handlers:
         self.assertEqual(SocketEndpoint.objects.count(), 3)
         endpoint1 = SocketEndpoint.objects.get(name='abc/my_endpoint_1/test')
         endpoint2 = SocketEndpoint.objects.get(name='abc/my_endpoint_2')
-        self.assertEqual(endpoint1.metadata, {'cache': 1800})
+        self.assertEqual(endpoint1.metadata, {})
         self.assertEqual(endpoint1.acl, {'users': {str(user.id): ['POST', 'PATCH']},
                                          'groups': {str(group.id): ['GET']}})
         self.assertEqual(endpoint2.metadata, {'author': {'name': 'MagicJohnson'},
@@ -255,7 +255,7 @@ event_handlers:
             'hosting': {'production': 'production.my-domain.com', 'staging': None}
         })
 
-    def test_socket_from_url_configuring(self, download_mock):
+    def test_socket_with_config(self, download_mock):
         socket_source = """
 name: my_tweet
 
@@ -276,7 +276,7 @@ config:
         response = self.client.get(detail_url)
         self.assertEqual(response.data['status'], Socket.STATUSES.OK.verbose)
 
-    def test_creating_socket_from_url_with_error(self, download_mock):
+    def test_creating_socket_with_error(self, download_mock):
         self.load_socket('siubidubijukendens', download_mock)
         socket = Socket.objects.first()
         self.assertEqual(socket.status, Socket.STATUSES.ERROR)
@@ -284,7 +284,7 @@ config:
         self.assertTrue(response.data['objects'][0]['status_info']['error'])
 
     @mock.patch('apps.hosting.tasks.HostingAddSecureCustomDomainTask.delay', mock.Mock())
-    def test_updating_socket_with_url(self, download_mock):
+    def test_updating_socket(self, download_mock):
         first_yaml = """
 endpoints:
   my_endpoint_1/test:
@@ -396,7 +396,7 @@ event_handlers:
         script = CodeBox.objects.get(path='script1.py')
         self.assertEqual(script.id, old_script.id)
         self.assertEqual(script.source, updated_script)
-        self.assertEqual(script.config, {'allow_full_access': True, 'timeout': None})
+        self.assertEqual(script.config, {'allow_full_access': True})
         self.assertEqual(Klass.objects.get(name='class_1').schema, [{'name': 'field1', 'type': 'integer'},
                                                                     {'name': 'field2', 'type': 'string'},
                                                                     {'name': 'field_unique', 'type': 'datetime',
@@ -748,7 +748,6 @@ endpoints:
         self.assertEqual(socket.status, Socket.STATUSES.OK)
 
         codebox = CodeBox.objects.first()
-        self.assertIsNone(codebox.config['timeout'])
 
         # Update socket
         url = reverse('v2:socket-detail', args=(self.instance.name, 'abc'))

@@ -254,9 +254,9 @@ class SocketEndpointViewSet(CacheableObjectMixin,
 
         script = Munch(config={
             'allow_full_access': True,
-            'timeout': metadata.get('timeout', settings.SOCKETS_DEFAULT_TIMEOUT),
-            'async': metadata.get('async', settings.SOCKETS_DEFAULT_ASYNC),
-            'mcpu': metadata.get('mcpu', settings.SOCKETS_DEFAULT_MCPU)
+            'timeout': kwargs.get('timeout', settings.SOCKETS_DEFAULT_TIMEOUT),
+            'async': kwargs.get('async', settings.SOCKETS_DEFAULT_ASYNC),
+            'mcpu': kwargs.get('mcpu', settings.SOCKETS_DEFAULT_MCPU),
         },
             runtime_name=kwargs.get('runtime', LATEST_NODEJS_RUNTIME),
             source='')
@@ -271,15 +271,8 @@ class SocketEndpointViewSet(CacheableObjectMixin,
                 'entrypoint': entrypoint,
                 'output_limit': settings.SOCKETS_MAX_RESULT_SIZE,
                 'name': endpoint.name,
+                'cache': kwargs.get('cache', 0),
             }
-
-            # Add cache param
-            try:
-                cache = float(metadata.pop('cache'))
-                if settings.SOCKETS_MAX_CACHE_TIME >= cache > 0:
-                    spec['cache'] = cache
-            except (ValueError, KeyError):
-                pass
 
             # Add environment
             if socket.environment_id:
