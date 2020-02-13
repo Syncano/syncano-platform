@@ -61,10 +61,14 @@ class ContainerManager:
         source_dir = None
         tmp_dir = None
 
+        if not os.path.exists(settings.DOCKER_SHARED_DIRECTORY):
+            os.makedirs(settings.DOCKER_SHARED_DIRECTORY)
+
         try:
             prefix = 'mount_{}_'.format(socket.gethostname())
             source_dir = tempfile.mkdtemp(prefix=prefix, suffix='_src', dir=settings.DOCKER_SHARED_DIRECTORY)
             tmp_dir = tempfile.mkdtemp(prefix=prefix, suffix='_tmp', dir=settings.DOCKER_SHARED_DIRECTORY)
+
             return source_dir, tmp_dir
         except Exception:
             if source_dir:
