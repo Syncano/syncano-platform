@@ -727,6 +727,7 @@ class Profile(CacheableAbstractModel, TrackChangesAbstractModel):
 
 
 class AdminLimit(CacheableAbstractModel):
+    SYNC_INVALIDATION = True
     LIMIT_FIELDS = ('storage', 'rate', 'codebox_concurrency', 'classes_count', 'instances_count', 'poll_rate',
                     'sockets_count', 'schedules_count', 'backup_xregion_limit')
 
