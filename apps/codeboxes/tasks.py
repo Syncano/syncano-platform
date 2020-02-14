@@ -187,6 +187,7 @@ class BaseIncentiveTask(app.Task):
             meta['token'] = make_token(instance)
         meta['api_host'] = settings.API_DOMAIN
         meta['space_host'] = settings.SPACE_DOMAIN
+        meta['async'] = async_mode
 
         return {
             'instance': instance.name,
