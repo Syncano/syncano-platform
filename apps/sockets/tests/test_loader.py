@@ -699,7 +699,7 @@ endpoints:
     print 1
 """
         updated_yaml = """
-runtime: nodejs_v6
+runtime: nodejs_v12
 endpoints:
   my_endpoint_1/test:
     print 1
@@ -721,9 +721,9 @@ endpoints:
         socket = Socket.objects.first()
         self.assertEqual(socket.status, Socket.STATUSES.OK)
         endpoint = SocketEndpoint.objects.first()
-        self.assertEqual(endpoint.calls[0]['runtime'], 'nodejs_v6')
+        self.assertEqual(endpoint.calls[0]['runtime'], 'nodejs_v12')
         codebox = CodeBox.objects.first()
-        self.assertEqual(codebox.runtime_name, 'nodejs_v6')
+        self.assertEqual(codebox.runtime_name, 'nodejs_v12')
 
     @override_settings(CODEBOX_RELEASE=datetime.date(2000, 1, 1))
     def test_changing_timeout(self, download_mock):
@@ -805,7 +805,7 @@ classes:
       type: string
 """
         updated_yaml_1 = """
-runtime: nodejs_v6
+runtime: nodejs_v12
 classes:
   class_1:
     - name: field1
@@ -815,7 +815,7 @@ classes:
 """
 
         updated_yaml_2 = """
-runtime: nodejs_v6
+runtime: nodejs_v12
 classes:
   class_1:
     - name: field1
