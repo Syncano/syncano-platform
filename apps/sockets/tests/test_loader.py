@@ -792,6 +792,7 @@ event_handlers:
         codebox = CodeBox.objects.first()
         self.assertEqual(codebox.path, 'file1.js')
 
+    @override_settings(CODEBOX_RELEASE=datetime.date(2000, 1, 1))
     def test_removing_class_with_nodelete(self, download_mock):
         first_yaml = """
 classes:
