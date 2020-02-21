@@ -24,6 +24,7 @@ CHANNEL_REGEX = re.compile(r'^(?=.{1,64}$)(?:(?:\{[a-z.\-_0-9]+\})?[a-z.\-_0-9]*
 
 NODEJS_V6_RUNTIME = {'name': 'nodejs_v6', 'ext': 'js'}
 NODEJS_V8_RUNTIME = {'name': 'nodejs_v8', 'ext': 'js'}
+NODEJS_V12_RUNTIME = {'name': 'nodejs_v12', 'ext': 'js'}
 
 
 class SocketImporter:
@@ -39,7 +40,7 @@ class SocketImporter:
     )
     possible_runtimes = (
         (('nodejs_v8',), NODEJS_V8_RUNTIME),
-        (('nodejs_v6',), NODEJS_V6_RUNTIME),
+        (('nodejs_v12',), NODEJS_V12_RUNTIME),
     )
 
     def __init__(self, socket, is_trusted=False):
