@@ -56,9 +56,11 @@ spec:
             - secretRef:
                 name: platform
           livenessProbe:
-            httpGet:
-              path: /healthz/
-              port: 80
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - curl -f :80 && curl -f :81
             initialDelaySeconds: 10
           readinessProbe:
             httpGet:
