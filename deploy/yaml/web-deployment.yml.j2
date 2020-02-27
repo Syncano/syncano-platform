@@ -43,6 +43,10 @@ spec:
               containerPort: 7000
             - name: uwsgi-long
               containerPort: 7001
+            - name: http
+              containerPort: 80
+            - name: http-long
+              containerPort: 81
           env:
             - name: INSTANCE_TYPE
               value: web
@@ -52,14 +56,18 @@ spec:
             - secretRef:
                 name: platform
           livenessProbe:
-            httpGet:
-              path: /healthz/
-              port: 80
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - curl -f localhost:80/healthz/ && curl -f localhost:81/healthz/
             initialDelaySeconds: 10
           readinessProbe:
-            httpGet:
-              path: /healthz/
-              port: 80
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - curl -f localhost:80/healthz/ && curl -f localhost:81/healthz/
             initialDelaySeconds: 5
           lifecycle:
             preStop:

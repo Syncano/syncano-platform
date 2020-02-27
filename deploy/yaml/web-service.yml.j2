@@ -18,3 +18,11 @@ spec:
       protocol: TCP
       port: 8001
       targetPort: uwsgi-long
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http
+    - name: http-long
+      protocol: TCP
+      port: 81
+      targetPort: http-long
