@@ -60,12 +60,14 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - curl -f :80 && curl -f :81
+                - curl -f localhost:80/healthz/ && curl -f localhost:81/healthz/
             initialDelaySeconds: 10
           readinessProbe:
-            httpGet:
-              path: /healthz/
-              port: 80
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - curl -f localhost:80/healthz/ && curl -f localhost:81/healthz/
             initialDelaySeconds: 5
           lifecycle:
             preStop:
