@@ -43,6 +43,10 @@ spec:
               containerPort: 7000
             - name: uwsgi-long
               containerPort: 7001
+            - name: http
+              containerPort: 80
+            - name: http-long
+              containerPort: 81
           env:
             - name: INSTANCE_TYPE
               value: web
