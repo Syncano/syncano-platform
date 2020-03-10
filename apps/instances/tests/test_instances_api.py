@@ -160,12 +160,12 @@ class TestInstancesListAPI(SyncanoAPITestBase):
         self.assertEqual(response.data['name'], data['name'].lower())
 
     @mock.patch('apps.core.tasks.SyncInvalidationTask', mock.Mock())
-    @override_settings(LOCATIONS=['stg', 'test'])
+    @override_settings(LOCATIONS=['dev', 'test'])
     def test_if_cannot_override_location(self):
         data = {'name': 'TeSTInstance2', 'description': 'test test', 'location': 'test'}
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['location'], 'stg')
+        self.assertEqual(response.data['location'], 'dev')
 
     @mock.patch('apps.billing.models.AdminLimit.get_instances_count', mock.MagicMock(return_value=2))
     def test_if_can_create_after_limit_reached(self):
