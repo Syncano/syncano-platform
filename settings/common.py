@@ -22,7 +22,7 @@ CI = False
 DEBUG = os.environ.get('DJANGO_DEBUG', 'false') == 'true'
 
 # Application definition
-LOCATION = os.environ.get('LOCATION', 'stg')
+LOCATION = os.environ.get('LOCATION', 'dev')
 LOCATIONS = os.environ.get('LOCATIONS', LOCATION).split(',')
 MAIN_LOCATION = LOCATIONS[0] == LOCATION
 SITE_ID = 1

@@ -17,10 +17,9 @@ from rest_framework_extensions.settings import extensions_api_settings
 from apps.admins.permissions import AdminHasPermissions
 from apps.billing.permissions import OwnerInGoodStanding
 from apps.core.abstract_models import CacheableAbstractModel
-from apps.core.contextmanagers import revalidate_integrityerror
 from apps.core.decorators import force_atomic
 from apps.core.exceptions import ModelNotFound, RequestLimitExceeded
-from apps.core.helpers import Cached, validate_field
+from apps.core.helpers import Cached, revalidate_integrityerror, validate_field
 from apps.core.serializers import EndpointAclSerializer, NewNameSerializer
 from apps.core.signals import apiview_finalize_response, apiview_view_processed
 from apps.instances.helpers import get_instance_db
@@ -29,11 +28,13 @@ from apps.instances.helpers import get_instance_db
 class SignalSenderModelMixin:
     def perform_create(self, serializer):
         instance = serializer.save()
-        apiview_view_processed.send(sender=self.model, view=self, instance=instance, action='create')
+        if instance is not None:
+            apiview_view_processed.send(sender=self.model, view=self, instance=instance, action='create')
 
     def perform_update(self, serializer):
         instance = serializer.save()
-        apiview_view_processed.send(sender=self.model, view=self, instance=instance, action='update')
+        if instance is not None:
+            apiview_view_processed.send(sender=self.model, view=self, instance=instance, action='update')
 
     def perform_destroy(self, instance):
         instance.delete()
@@ -198,8 +199,7 @@ class RenameNameViewSetMixin:
         self._validate_new_name(field, new_name)
         obj.name = new_name
 
-        with revalidate_integrityerror(self.model, partial(self._validate_new_name, field, new_name)):
-            obj.save()
+        revalidate_integrityerror(self.model, obj.save, partial(self._validate_new_name, field, new_name))
 
         # Set kwargs so we end up with correct new links
         self.kwargs['name'] = new_name

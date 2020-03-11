@@ -117,7 +117,7 @@ class HostingRefreshSecureCustomDomainCertTask(TaskLockMixin, app.Task):
 
             # Try to get instance
             try:
-                instance = Cached(Instance, kwargs={'domains__contains': [domain]}).get()
+                instance = Cached(Instance, kwargs={'domains__contains': [domain], 'location': settings.LOCATION}).get()
             except Instance.DoesNotExist:
                 instance = None
                 logger.warning('Instance with domain %s no longer exists', domain)
