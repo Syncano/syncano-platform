@@ -9,10 +9,9 @@ from rest_framework.renderers import BrowsableAPIRenderer
 from rest_framework.validators import UniqueValidator
 
 import serializer
-from apps.core.contextmanagers import revalidate_integrityerror
 from apps.core.exceptions import RevisionMismatch
 from apps.core.field_serializers import AclField, HyperlinkedField, JSONField
-from apps.core.helpers import get_from_request_query_params
+from apps.core.helpers import get_from_request_query_params, revalidate_integrityerror
 from apps.core.validators import validate_metadata
 
 
@@ -276,8 +275,10 @@ class CleanValidateMixin:
 
     def validate(self, data):
         instance = self.instance or self.Meta.model()
+
         for attr, value in data.items():
             setattr(instance, attr, value)
+
         instance.clean()
         return super().validate(data)
 
@@ -325,13 +326,9 @@ class RevalidateMixin:
     Skips unique checks on first create/update - includes them on integrity error.
     """
 
-    def create(self, validated_data):
-        with revalidate_integrityerror(self.Meta.model, partial(self.run_validation, self.initial_data, False)):
-            return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        with revalidate_integrityerror(self.Meta.model, partial(self.run_validation, self.initial_data, False)):
-            return super().update(instance, validated_data)
+    def save(self, **kwargs):
+        return revalidate_integrityerror(self.Meta.model, partial(super().save, **kwargs),
+                                         partial(self.run_validation, self.initial_data, False))
 
     def run_validation(self, data=empty, skip_unique=True):
         if not skip_unique:

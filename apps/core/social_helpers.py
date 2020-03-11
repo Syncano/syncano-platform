@@ -6,8 +6,8 @@ from django.conf import settings
 from requests_oauthlib import OAuth1
 
 from apps.admins.models import Admin, AdminSocialProfile, SocialProfile
-from apps.core.contextmanagers import revalidate_integrityerror
 from apps.core.exceptions import InvalidSocialScopeMissingEmail, PermissionDenied, UnsupportedSocialBackend
+from apps.core.helpers import revalidate_integrityerror
 from apps.users.models import User, UserSocialProfile
 
 logger = logging.getLogger(__name__)
@@ -136,16 +136,14 @@ class AdminSocialHelper(SocialHelper):
     def _create_new_social_profile(self, social_id, backend, admin=None):
         if admin is None:
             admin = self.user_class(email=self.email, is_active=True)
-            with revalidate_integrityerror(self.user_class, admin.validate_unique):
-                admin.save()
+            revalidate_integrityerror(self.user_class, admin.save, admin.validate_unique)
 
         social_profile = AdminSocialProfile(
             backend=backend,
             social_id=social_id,
             admin=admin,
         )
-        with revalidate_integrityerror(AdminSocialProfile, social_profile.validate_unique):
-            social_profile.save()
+        revalidate_integrityerror(AdminSocialProfile, social_profile.save, social_profile.validate_unique)
 
         return social_profile
 
@@ -172,15 +170,13 @@ class UserSocialHelper(SocialHelper):
     def _create_new_social_profile(self, social_id, backend, user=None):
         if user is None:
             user = self.user_class(username=self.email)
-            with revalidate_integrityerror(self.user_class, user.validate_unique):
-                user.save()
+            revalidate_integrityerror(self.user_class, user.save, user.validate_unique)
 
         social_profile = UserSocialProfile(
             backend=backend,
             social_id=social_id,
             user=user,
         )
-        with revalidate_integrityerror(UserSocialProfile, user.validate_unique):
-            social_profile.save()
+        revalidate_integrityerror(UserSocialProfile, social_profile.save, user.validate_unique)
 
         return social_profile

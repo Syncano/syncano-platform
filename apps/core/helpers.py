@@ -27,7 +27,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.cache.backends.locmem import LocMemCache
 from django.core.exceptions import EmptyResultSet
-from django.db import DEFAULT_DB_ALIAS, models
+from django.db import DEFAULT_DB_ALIAS, IntegrityError, models, router, transaction
 from django.db.models import AutoField
 from django.db.transaction import get_connection
 from django.urls import resolve
@@ -53,6 +53,8 @@ MODEL_VERSION_CACHE_KEY_TEMPLATE = '{schema}:cache:m:%d:{lookup_key}:{pk}:versio
 FUNC_VERSION_CACHE_KEY_TEMPLATE = '0:cache:f:%d:{lookup_key}:{version_key}:version' % settings.CACHE_VERSION
 
 ALL_CONTROL_CHARACTERS = dict.fromkeys(range(33))
+
+REVALIDATE_MAX_RETRY = 2
 
 try:
     redis = get_redis_connection()
@@ -700,3 +702,20 @@ def get_cur_loc_env(name, default=None):
 
 def get_loc_env(location, name, default=None):
     return os.environ.get('{}_{}'.format(location.upper(), name), os.environ.get(name, default))
+
+
+def revalidate_integrityerror(model, save_func, validate_func):
+    db = router.db_for_write(model)
+    err = None
+
+    for i in range(REVALIDATE_MAX_RETRY):
+        try:
+            with transaction.atomic(db):
+                return save_func()
+        except IntegrityError as e:
+            if err is None:
+                err = e
+
+            validate_func()
+
+    raise err
