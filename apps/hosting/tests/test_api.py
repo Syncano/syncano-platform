@@ -367,7 +367,7 @@ class TestHostingWithSSLAPI(SyncanoAPITestBase):
 
     def test_create_hosting_with_domain_with_invalid_cname(self):
         url = reverse('v1.1:hosting-list', args=(self.instance.name,))
-        response = self.client.post(url, {'name': 'test-name-1', 'domains': ['api.syncano.io']})
+        response = self.client.post(url, {'name': 'test-name-1', 'domains': ['api-test.syncano.io']})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['ssl_status'], Hosting.SSL_STATUSES.CHECKING.verbose)
         hosting = Hosting.objects.first()
