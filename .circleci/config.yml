@@ -48,7 +48,7 @@ jobs:
       - run:
           name: Install kops
           command: |
-            sudo curl -L -o /usr/local/bin/kops https://github.com/kubernetes/kops/releases/download/1.10.0/kops-linux-amd64
+            sudo curl -L -o /usr/local/bin/kops https://github.com/kubernetes/kops/releases/download/1.16.0/kops-linux-amd64
             sudo chmod +x /usr/local/bin/kops
       - run:
           name: Install gcloud and kubectl
