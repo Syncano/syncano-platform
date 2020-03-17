@@ -220,7 +220,13 @@ class Cached:
             if apps.get_app_config(app_label).name in settings.TENANT_APPS:
                 from apps.instances.helpers import get_current_instance
 
-                schema = str(get_current_instance().id)
+                instance = get_current_instance()
+
+                if instance is None:
+                    raise target.DoesNotExist()
+
+                schema = str(instance.id)
+
             return lookup_name, schema
 
         lookup_name = key
