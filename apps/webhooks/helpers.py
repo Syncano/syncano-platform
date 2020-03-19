@@ -9,7 +9,6 @@ DISALLOWED_META_KEYS = {
     'HTTP_X_FORWARDED_PORT',
     'HTTP_X_FORWARDED_HOST',
     'HTTP_X_ORIGINAL_FORWARDED_FOR',
-    'HTTP_X_REQUEST_ID',
     'HTTP_X_REAL_IP',
     'HTTP_X_API_KEY',
     'HTTP_X_USER_KEY',
@@ -31,7 +30,7 @@ def strip_meta_from_uwsgi_info(request_meta):
         if key in ALLOWED_META_KEYS or (key not in DISALLOWED_META_KEYS and key.startswith('HTTP_')):
             stripped[key] = request_meta[key]
 
-    ip_header = request_meta.get('HTTP_CF_CONNECTING_IP', request_meta.get('HTTP_X_REAL_IP',
+    ip_header = request_meta.get('HTTP_X_FORWARDED_FOR', request_meta.get('HTTP_X_REAL_IP',
                                  request_meta.get('REMOTE_ADDR', '')))
     stripped['REMOTE_ADDR'] = ip_header.split(',', 2)[0]
     return stripped
