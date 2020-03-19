@@ -13,6 +13,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'secret_key')
 # used for load testing on loader.io
 LOADERIO_TOKEN = os.environ.get('LOADERIO_TOKEN', '')
 
+HOSTING_TOKEN = os.environ.get('HOSTING_TOKEN', 'hosting-token')
+
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH')
 GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH')
