@@ -54,7 +54,7 @@ class HostingAddSecureCustomDomainTask(TaskLockMixin, InstanceBasedTask):
             # If domain has no CNAME and it's a root domain, check if CNAME flattening is used
             if domain.count('.') == 1:
                 try:
-                    r = requests.get('http://{}/2a1b7ceb-2b7c-4bd2-a40f-8b021278f5ea/'.format(domain),
+                    r = requests.get('http://{}/{}/'.format(domain, settings.HOSTING_TOKEN),
                                      timeout=(1.0, 3.0), allow_redirects=False)
                     if r.status_code == requests.codes.ok and r.content.decode() == settings.LOCATION:
                         return
