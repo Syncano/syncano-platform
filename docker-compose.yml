@@ -2,7 +2,7 @@ version: '3'
 
 services:
   postgresql:
-    image: mdillon/postgis:9.6-alpine
+    image: mdillon/postgis:11-alpine
     environment:
       - POSTGRES_USER=syncano
       - POSTGRES_PASSWORD=syncano
@@ -21,7 +21,7 @@ services:
       - "6379"
 
   rabbitmq:
-    image: rabbitmq:3.6-alpine
+    image: rabbitmq:3.8-alpine
     volumes:
       - data-rabbitmq:/data
     ports:
