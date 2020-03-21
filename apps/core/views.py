@@ -11,10 +11,6 @@ from rest_framework.views import APIView
 from apps.core.renderers import JSONRenderer
 
 
-def health_check(request):
-    return HttpResponse(status=status.HTTP_200_OK, content_type='text/plain')
-
-
 def loader_token(request):
     return HttpResponse(settings.LOADERIO_TOKEN, content_type='text/plain')
 
