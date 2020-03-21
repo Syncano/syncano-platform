@@ -557,7 +557,7 @@ CELERY_TASK_ROUTES = {
 TRACING_ENABLED = os.environ.get('TRACING_ENABLED', 'true') == 'true'
 TRACING_PERCENT = float(os.environ.get('TRACING_PERCENT', 100))
 TRACING_SERVICE_NAME = 'platform-{}'.format(os.environ.get('INSTANCE_TYPE', 'web'))
-ZIPKIN_ADDR = os.environ.get('ZIPKIN_ADDR', 'zipkin')
+ZIPKIN_ADDR = os.environ.get('ZIPKIN_ADDR', 'jaeger')
 ZIPKIN_TIMEOUT = 3
 ZIPKIN_RAISE = False
 
