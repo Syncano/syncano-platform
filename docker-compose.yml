@@ -28,9 +28,19 @@ services:
       - "5672"
       - "15672"
 
-  zipkin:
-    image: openzipkin/zipkin:1.26
+  jaeger:
+    image: jaegertracing/all-in-one:1.17
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
     ports:
+      - "5775"
+      - "6831"
+      - "6832"
+      - "5778"
+      - "16686"
+      - "14268"
+      - "14268"
+      - "14250"
       - "9411"
 
   web:
