@@ -56,14 +56,14 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - curl -f localhost:80/healthz/ && curl -f localhost:81/healthz/
+                - curl -f localhost:1717 && curl -f localhost:1718
             initialDelaySeconds: 10
           readinessProbe:
             exec:
               command:
                 - /bin/sh
                 - -c
-                - curl -f localhost:80/healthz/ && curl -f localhost:81/healthz/
+                - curl -f localhost:1717 && curl -f localhost:1718
             initialDelaySeconds: 5
           lifecycle:
             preStop:

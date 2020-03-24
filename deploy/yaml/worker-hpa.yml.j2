@@ -6,7 +6,7 @@ spec:
   minReplicas: {{ WORKER_MIN }}
   maxReplicas: {{ WORKER_MAX }}
   scaleTargetRef:
-    apiVersion: extensions/v1beta1
+    apiVersion: apps/v1
     kind: Deployment
     name: platform-worker
   targetCPUUtilizationPercentage: 70

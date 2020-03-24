@@ -19,7 +19,7 @@ guard-%:
 	fi
 
 require-%:
-	if ! which ${*} > /dev/null; then \
+	if ! hash ${*} 2>/dev/null; then \
 		echo "! ${*} not installed"; \
 		exit 1; \
 	fi
