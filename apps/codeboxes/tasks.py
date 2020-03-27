@@ -185,8 +185,9 @@ class BaseIncentiveTask(app.Task):
         # Add token if allow_full_access is True
         if config.pop('allow_full_access', False) is True:
             meta['token'] = make_token(instance)
-        meta['api_host'] = settings.API_DOMAIN
-        meta['space_host'] = settings.SPACE_DOMAIN
+        meta['api_host'] = settings.API_HOST
+        if settings.SPACE_HOST:
+            meta['space_host'] = settings.SPACE_HOST
         meta['async'] = async_mode
 
         return {

@@ -37,9 +37,9 @@ DATABASE_ROUTERS = (
     'apps.instances.routers.InstanceRouter',
 )
 
-API_DOMAIN = os.environ.get('API_DOMAIN', 'api.syncano.io')
-API_LOCATION_DOMAIN = os.environ.get('API_LOCATION_DOMAIN', 'api-{location}.syncano.io')
-SPACE_DOMAIN = os.environ.get('SPACE_DOMAIN', 'syncano.space')
+API_HOST = os.environ.get('API_HOST', 'api.syncano.io')
+CACHE_SYNC_HOSTS = os.environ.get('CACHE_SYNC_HOSTS', 'api-eu1.syncano.io').split(',')
+SPACE_HOST = os.environ.get('SPACE_HOST')
 
 
 SHARED_APPS = (
@@ -151,14 +151,17 @@ REST_FRAMEWORK = {
 
 # Database
 ORIGINAL_BACKEND = 'django.contrib.gis.db.backends.postgis'
+db_addr = os.environ.get('DB_ADDR', 'postgresql').split(':')
+instances_db_addr = os.environ.get('DB_INSTANCES_ADDR', os.environ.get('DB_ADDR', 'postgresql'))
+
 DATABASES = {
     'default': {
         'ENGINE': 'apps.instances.postgresql_backend',
         'NAME': os.environ.get('DB_NAME', 'syncano'),
         'USER': os.environ.get('DB_USER', 'syncano'),
         'PASSWORD': os.environ.get('DB_PASS', 'syncano'),
-        'HOST': os.environ.get('DB_ADDR', 'postgresql'),
-        'PORT': '',
+        'HOST': db_addr[0],
+        'PORT': '' if len(db_addr) == 1 else db_addr[1],
         'CONN_MAX_AGE': int(os.environ.get('DB_CONN_MAX_AGE', 0))
     },
     'instances': {
@@ -167,8 +170,8 @@ DATABASES = {
         'NAME': os.environ.get('DB_INSTANCES_NAME', os.environ.get('DB_NAME', 'syncano')),
         'USER': os.environ.get('DB_INSTANCES_USER', os.environ.get('DB_USER', 'syncano')),
         'PASSWORD': os.environ.get('DB_INSTANCES_PASS', os.environ.get('DB_PASS', 'syncano')),
-        'HOST': os.environ.get('DB_INSTANCES_ADDR', os.environ.get('DB_ADDR', 'postgresql')),
-        'PORT': '',
+        'HOST': instances_db_addr[0],
+        'PORT': '' if len(instances_db_addr) == 1 else instances_db_addr[1],
         'TEST': {'SERIALIZE': False},
         'CONN_MAX_AGE': int(os.environ.get('DB_INSTANCES_CONN_MAX_AGE',
                                            os.environ.get('DB_CONN_MAX_AGE', 0))),
@@ -176,10 +179,14 @@ DATABASES = {
 }
 
 # Redis
-REDIS_PORT = 6379
 REDIS_DB = 0
-REDIS_HOST = os.environ.get('REDIS_ADDR', 'redis')
+redis_addr = os.environ.get('REDIS_ADDR', 'redis').split(':')
+REDIS_HOST = redis_addr[0]
 
+if len(redis_addr) > 1:
+    REDIS_PORT = redis_addr[1]
+else:
+    REDIS_PORT = 6379
 
 # Cache
 CACHES = {
@@ -555,8 +562,8 @@ CELERY_TASK_ROUTES = {
 
 # Tracing
 TRACING_ENABLED = os.environ.get('TRACING_ENABLED', 'true') == 'true'
-TRACING_PERCENT = float(os.environ.get('TRACING_PERCENT', 100))
-TRACING_SERVICE_NAME = 'platform-{}'.format(os.environ.get('INSTANCE_TYPE', 'web'))
+TRACING_SAMPLING = float(os.environ.get('TRACING_SAMPLING', 100))
+SERVICE_NAME = os.environ.get('SERVICE_NAME', 'platform-{}'.format(os.environ.get('INSTANCE_TYPE', 'web')))
 ZIPKIN_ADDR = os.environ.get('ZIPKIN_ADDR', 'jaeger')
 ZIPKIN_TIMEOUT = 3
 ZIPKIN_RAISE = False
@@ -783,7 +790,7 @@ CHANNEL_TASK_TIMEOUT = int(os.environ.get('CHANNEL_TASK_TIMEOUT', 30))  # 30 sec
 CHANNEL_LAST_ID_TIMEOUT = int(os.environ.get('CHANNEL_LAST_ID_TIMEOUT', 2 * 60 * 60))  # 2 hours
 
 # Hosting
-HOSTING_DOMAIN = os.environ.get('HOSTING_DOMAIN', '.syncano.ninja')
+HOSTING_DOMAINS = os.environ.get('HOSTING_DOMAINS', '.syncano.ninja').split(',')
 HOSTING_SOCKETS_MAPPING_MAX = 20
 
 # Sockets

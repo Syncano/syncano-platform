@@ -143,7 +143,7 @@ class Socket(TrackChangesAbstractModel, DescriptionAbstractModel, CreatedUpdated
 
             file_url = Socket.get_storage().url(script_data['file'])
             if file_url.startswith('/'):
-                file_url = 'http://{}{}'.format(settings.API_DOMAIN, file_url)
+                file_url = 'http://{}{}'.format(settings.API_HOST, file_url)
             script_files[file_url] = self.get_local_path(key)
         return script_files
 
@@ -302,7 +302,7 @@ class SocketEnvironment(TrackChangesAbstractModel, DescriptionAbstractModel, Cre
     def get_url(self):
         url = Socket.get_storage().url(str(self.fs_file))
         if url.startswith('/'):
-            url = 'http://{}{}'.format(settings.API_DOMAIN, url)
+            url = 'http://{}{}'.format(settings.API_HOST, url)
         return url
 
     @classmethod

@@ -73,6 +73,7 @@ def hosting_post_save_handler(sender, instance, created, using, **kwargs):
             HostingAddSecureCustomDomainTask.delay,
             using=using,
             hosting_pk=instance.id,
+            hosting_name=instance.name,
             domain=instance.get_cname(),
             instance_pk=syncano_instance_pk,
         )
