@@ -19,7 +19,7 @@ class TestHostingFileViewBase(TestHostingBase):
     def setUp(self):
         super().setUp()
         self.url = '/'
-        self.client.defaults['HTTP_HOST'] = '{}{}'.format(self.instance.name, settings.HOSTING_DOMAIN)
+        self.client.defaults['HTTP_HOST'] = '{}{}'.format(self.instance.name, settings.HOSTING_DOMAINS[0])
         self.client.defaults['HTTP_HOST_TYPE'] = 'hosting'
 
 
@@ -67,7 +67,7 @@ class TestHostingFileViewRedirect(TestHostingFileViewBase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-        self.client.defaults['HTTP_HOST'] = 'abc--{}{}'.format(self.instance.name, settings.HOSTING_DOMAIN)
+        self.client.defaults['HTTP_HOST'] = 'abc--{}{}'.format(self.instance.name, settings.HOSTING_DOMAINS[0])
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 

@@ -47,7 +47,7 @@ class TestHostingDomainTasks(SyncanoAPITestBase):
         self.assertRaises(WrongCName, task.validate_domain, TEST_DOMAIN)
 
         query_mock.reset_mock()
-        expected_cname = '{}{}.'.format(self.instance.name, settings.HOSTING_DOMAIN)
+        expected_cname = '{}{}.'.format(self.instance.name, settings.HOSTING_DOMAINS[0])
         query_mock.return_value = [Munch(target=Munch(to_unicode=lambda: expected_cname))]
         # This should not raise any error
         task.validate_domain(TEST_DOMAIN)
