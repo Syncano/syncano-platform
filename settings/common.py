@@ -242,6 +242,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 LOCAL_MEDIA_STORAGE = False
+STORAGE_URL = os.environ.get('STORAGE_URL', '')
 
 # S3 - django-storages settings
 AWS_IS_GZIPPED = False
