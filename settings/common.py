@@ -152,7 +152,7 @@ REST_FRAMEWORK = {
 # Database
 ORIGINAL_BACKEND = 'django.contrib.gis.db.backends.postgis'
 db_addr = os.environ.get('DB_ADDR', 'postgresql').split(':')
-instances_db_addr = os.environ.get('DB_INSTANCES_ADDR', os.environ.get('DB_ADDR', 'postgresql'))
+instances_db_addr = os.environ.get('DB_INSTANCES_ADDR', os.environ.get('DB_ADDR', 'postgresql')).split(':')
 
 DATABASES = {
     'default': {
