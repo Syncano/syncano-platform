@@ -25,11 +25,7 @@ class StorageWithTransactionSupportMixin:
         return DEFAULT_DB_ALIAS
 
     def internal_url(self, name):
-        # Remove unnecessary :443 from url that is created by boto for python > 2.7
-        url = super().url(name)
-        if ':443' in url:
-            return url.replace(':443', '')
-        return url
+        return super().url(name)
 
     def url(self, name):
         if settings.STORAGE_URL:
@@ -65,9 +61,15 @@ class FileSystemStorage(StorageWithTransactionSupportMixin, storage.FileSystemSt
 
 
 class S3BotoStorage(StorageWithTransactionSupportMixin, s3boto3.S3Boto3Storage):
-    def __init__(self, location=settings.LOCATION, **settings):
+    def __init__(self, location=settings.LOCATION, storage_url=None, **settings):
         self._location = location
+        self._storage_url = storage_url
         super().__init__(**settings)
+
+    def internal_url(self, name):
+        if self._storage_url:
+            return self._storage_url + filepath_to_uri(name)
+        return super().url(name)
 
     def copy(self, src_name, dest_name):
         self.bucket.copy(
@@ -99,9 +101,20 @@ class S3BotoStorage(StorageWithTransactionSupportMixin, s3boto3.S3Boto3Storage):
 
 
 class GoogleCloudStorage(StorageWithTransactionSupportMixin, gcloud.GoogleCloudStorage):
-    def __init__(self, location=settings.LOCATION, **settings):
+    def __init__(self, location=settings.LOCATION, storage_url=None, **settings):
         self._location = location
+        self._storage_url = storage_url
         super().__init__(**settings)
+
+    def internal_url(self, name):
+        if self._storage_url:
+            return self.storage_url + filepath_to_uri(name)
+
+        # Remove unnecessary :443 from url that is created by boto for python > 2.7
+        url = super().url(name)
+        if ':443' in url:
+            return url.replace(':443', '')
+        return url
 
     def copy(self, src_name, dest_name):
         bucket = self.bucket
@@ -162,6 +175,7 @@ class DefaultStorage(LazyObject):
                 'secret_key': get_loc_env(location, 'S3_SECRET_ACCESS_KEY'),
                 'region_name': get_loc_env(location, 'S3_REGION'),
                 'endpoint_url': get_loc_env(location, 'S3_ENDPOINT'),
+                'storage_url': get_loc_env(location, 'STORAGE_BUCKET_URL'),
             }
             opts.update(kwargs)
             return S3BotoStorage(location, **opts)
@@ -171,6 +185,7 @@ class DefaultStorage(LazyObject):
                 'bucket_name': get_loc_env(location, 'STORAGE_BUCKET'),
                 'credentials': service_account.Credentials.from_service_account_file(
                     get_loc_env(location, 'GOOGLE_APPLICATION_CREDENTIALS')),
+                'storage_url': get_loc_env(location, 'STORAGE_BUCKET_URL'),
             }
             opts.update(kwargs)
             return GoogleCloudStorage(location, **opts)
