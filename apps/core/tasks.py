@@ -53,7 +53,7 @@ class BaseTask(CeleryTask):
             return super().__call__(*args, **kwargs)
 
         with zipkin_span(
-            service_name=settings.TRACING_SERVICE_NAME,
+            service_name=settings.SERVICE_NAME,
             span_name='{0}.{1}'.format(self.__module__, self.__class__.__name__),
             zipkin_attrs=zipkin_attrs,
             transport_handler=zipkin.transport_handler,

@@ -24,7 +24,7 @@ DEFAULT_HEADERS = (
 CORS_HEADER = (
     ('Access-Control-Allow-Origin', '*'),
 )
-ASYNC_SERVICE_NAME = '{}-async'.format(settings.TRACING_SERVICE_NAME)
+ASYNC_SERVICE_NAME = '{}-async'.format(settings.SERVICE_NAME)
 
 HANDLERS = dict()
 

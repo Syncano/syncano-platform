@@ -54,14 +54,14 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - curl -f localhost:1717 && curl -f localhost:1718
+                - curl -f localhost:1717
             initialDelaySeconds: 10
           readinessProbe:
             exec:
               command:
                 - /bin/sh
                 - -c
-                - curl -f localhost:1717 && curl -f localhost:1718
+                - curl -f localhost:1717
             initialDelaySeconds: 5
           lifecycle:
             preStop:
