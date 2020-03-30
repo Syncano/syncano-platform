@@ -70,10 +70,10 @@ spec:
           resources:
             requests:
               memory: "1536Mi"
-              cpu: 0.5
+              cpu: 500m
             limits:
               memory: "2048Mi"
-              cpu: 1
+              cpu: 1000m
           env:
             - name: INSTANCE_TYPE
               value: worker
