@@ -68,7 +68,7 @@ class S3BotoStorage(StorageWithTransactionSupportMixin, s3boto3.S3Boto3Storage):
 
     def internal_url(self, name):
         if self._storage_url:
-            return self.storage_url + filepath_to_uri(name)
+            return self._storage_url + filepath_to_uri(name)
         return super().url(name)
 
     def copy(self, src_name, dest_name):
