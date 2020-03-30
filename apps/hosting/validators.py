@@ -22,7 +22,7 @@ class DomainValidator:
 
     def __call__(self, value):
         if not VALID_PREFIX_REGEX.match(value) and not VALID_DOMAIN_REGEX.match(value) \
-                or value.endswith(settings.HOSTING_DOMAIN):
+                or any(value.endswith(domain) for domain in settings.HOSTING_DOMAINS):
             raise serializers.ValidationError(self.message)
 
 

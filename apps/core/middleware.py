@@ -74,7 +74,7 @@ class ZipkinMiddleware:
 
         if self.zipkin_attrs.is_sampled:
             self.zipkin_context = zipkin_span(
-                service_name=settings.TRACING_SERVICE_NAME,
+                service_name=settings.SERVICE_NAME,
                 span_name='{0} {1}'.format(request.method, request.path),
                 zipkin_attrs=self.zipkin_attrs,
                 transport_handler=zipkin.transport_handler,

@@ -1,6 +1,7 @@
 import os
 
 import rapidjson as json
+from django.core.files.storage import default_storage
 from munch import Munch
 
 from apps.backups import site
@@ -22,11 +23,11 @@ class SocketBackup(ModelBackupByName):
 
     def backup_object(self, storage, obj):
         if obj['zip_file']:
-            obj['zip_file'] = storage.add_file(Socket.get_storage().open(obj['zip_file']))
+            obj['zip_file'] = storage.add_file(default_storage.open(obj['zip_file']))
 
         file_list = json.loads(obj['file_list'])
         for file_data in file_list.values():
-            file_data['file'] = storage.add_file(Socket.get_storage().open(file_data['file']))
+            file_data['file'] = storage.add_file(default_storage.open(file_data['file']))
         obj['file_list'] = file_list
 
         super().backup_object(storage, obj)
@@ -35,7 +36,7 @@ class SocketBackup(ModelBackupByName):
         if representation['zip_file']:
             file_object = storage.get_file(representation['zip_file'])
             new_path = upload_custom_socket_file_to(Munch(representation), os.path.basename(file_object.name))
-            Socket.get_storage().save(new_path, file_object)
+            default_storage.save(new_path, file_object)
 
         # Replace files from file_list with new ones
         file_list = representation.get('file_list', {})
@@ -45,7 +46,7 @@ class SocketBackup(ModelBackupByName):
         for path, file_data in file_list.items():
             f = storage.get_file(file_data['file'])
             new_path = Socket.get_storage_path_for_key(representation['key'], path)
-            Socket.get_storage().save(new_path, f)
+            default_storage.save(new_path, f)
             file_data['file'] = new_path
 
         return super().to_instance(storage, representation)
@@ -55,7 +56,7 @@ class SocketEnvironmentBackup(ModelBackupByName):
     def backup_object(self, storage, obj):
         for f in ('zip_file', 'fs_file'):
             if obj[f]:
-                obj[f] = storage.add_file(SocketEnvironment.get_storage().open(obj[f]))
+                obj[f] = storage.add_file(default_storage.open(obj[f]))
 
         super().backup_object(storage, obj)
 
@@ -65,7 +66,7 @@ class SocketEnvironmentBackup(ModelBackupByName):
                 file_object = storage.get_file(representation[f])
                 new_path = upload_custom_socketenvironment_file_to(Munch(representation),
                                                                    os.path.basename(file_object.name))
-                SocketEnvironment.get_storage().save(new_path, file_object)
+                default_storage.save(new_path, file_object)
                 representation[f] = new_path
 
         return super().to_instance(storage, representation)

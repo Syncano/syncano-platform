@@ -4,6 +4,7 @@ import re
 from hashlib import md5
 
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.crypto import get_random_string
@@ -20,7 +21,6 @@ from apps.core.abstract_models import (
     TrackChangesAbstractModel,
     UniqueKeyAbstractModel
 )
-from apps.core.backends.storage import DefaultStorage
 from apps.core.fields import NullableJSONField, StrippedSlugField
 from apps.core.helpers import MetaEnum, MetaIntEnum, generate_key
 from apps.core.permissions import API_PERMISSIONS, FULL_PERMISSIONS, Permission
@@ -89,8 +89,6 @@ class Socket(TrackChangesAbstractModel, DescriptionAbstractModel, CreatedUpdated
     environment = models.ForeignKey('sockets.SocketEnvironment', null=True, default=None, on_delete=models.SET_NULL)
     checksum = models.CharField(max_length=32, null=True)
 
-    _storage = None
-
     class Meta:
         ordering = ('id',)
         unique_together = (('name', '_is_live'), ('key', '_is_live'))
@@ -141,17 +139,11 @@ class Socket(TrackChangesAbstractModel, DescriptionAbstractModel, CreatedUpdated
             if key == settings.SOCKETS_YAML:
                 continue
 
-            file_url = Socket.get_storage().url(script_data['file'])
+            file_url = default_storage.internal_url(script_data['file'])
             if file_url.startswith('/'):
-                file_url = 'http://{}{}'.format(settings.API_DOMAIN, file_url)
+                file_url = 'http://{}{}'.format(settings.API_HOST, file_url)
             script_files[file_url] = self.get_local_path(key)
         return script_files
-
-    @classmethod
-    def get_storage(cls):
-        if cls._storage is None:
-            cls._storage = DefaultStorage.create_storage(custom_domain=None)
-        return cls._storage
 
     @classmethod
     def get_storage_path_for_key(cls, key, path=''):
@@ -270,8 +262,6 @@ class SocketEnvironment(TrackChangesAbstractModel, DescriptionAbstractModel, Cre
     fs_file = models.FileField(blank=True, null=True, upload_to=upload_custom_socketenvironment_file_to)
     checksum = models.CharField(max_length=32, null=True)
 
-    _storage = None
-
     class Meta:
         ordering = ('id',)
         unique_together = ('name', '_is_live')
@@ -300,13 +290,7 @@ class SocketEnvironment(TrackChangesAbstractModel, DescriptionAbstractModel, Cre
         return 'E:{}'.format(self.checksum)
 
     def get_url(self):
-        url = Socket.get_storage().url(str(self.fs_file))
+        url = default_storage.internal_url(str(self.fs_file))
         if url.startswith('/'):
-            url = 'http://{}{}'.format(settings.API_DOMAIN, url)
+            url = 'http://{}{}'.format(settings.API_HOST, url)
         return url
-
-    @classmethod
-    def get_storage(cls):
-        if cls._storage is None:
-            cls._storage = DefaultStorage.create_storage(custom_domain=None)
-        return cls._storage

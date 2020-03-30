@@ -128,7 +128,7 @@ class TestCodeBoxRunnerIntegration(CodeBoxCleanupTestMixin, TestCase):
         codebox_spec = create_codebox_spec(self.instance, self.codebox)
         _, result = self.runner.run(codebox_spec)
         result_stdout = result['stdout']
-        self.assertEquals(result_stdout, '{} {}'.format(settings.API_DOMAIN, settings.SPACE_DOMAIN))
+        self.assertEquals(result_stdout, '{} {}'.format(settings.API_HOST, settings.SPACE_HOST))
 
     def test_large_payload(self):
         limit = settings.CODEBOX_PAYLOAD_SIZE_LIMIT - 100

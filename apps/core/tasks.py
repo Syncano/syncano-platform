@@ -53,7 +53,7 @@ class BaseTask(CeleryTask):
             return super().__call__(*args, **kwargs)
 
         with zipkin_span(
-            service_name=settings.TRACING_SERVICE_NAME,
+            service_name=settings.SERVICE_NAME,
             span_name='{0}.{1}'.format(self.__module__, self.__class__.__name__),
             zipkin_attrs=zipkin_attrs,
             transport_handler=zipkin.transport_handler,
@@ -238,9 +238,6 @@ class SyncInvalidationTask(app.Task):
     def run(self, version_key, **kwargs):
         signature = hmac.new('{}:{}'.format(version_key, settings.SECRET_KEY).encode(),
                              digestmod=sha256).hexdigest()
-        for loc in settings.LOCATIONS:
-            if loc == settings.LOCATION:
-                continue
-
-            url = 'https://{url}/v3/cache_invalidate/'.format(url=settings.API_LOCATION_DOMAIN.format(location=loc))
+        for syncHost in settings.CACHE_SYNC_HOSTS:
+            url = 'https://{url}/v3/cache_invalidate/'.format(url=syncHost)
             requests.post(url, data={'version_key': version_key, 'signature': signature}).raise_for_status()

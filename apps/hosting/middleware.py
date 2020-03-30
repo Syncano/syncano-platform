@@ -30,7 +30,7 @@ class HostingMiddleware:
             return self.get_response(request)
 
         host = host.split(':', 1)[0]
-        is_custom_domain = not host.endswith(settings.HOSTING_DOMAIN)
+        is_custom_domain = all(not host.endswith(domain) for domain in settings.HOSTING_DOMAINS)
 
         if is_custom_domain:
             try:
