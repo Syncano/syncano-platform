@@ -169,7 +169,7 @@ class DefaultStorage(LazyObject):
                 'secret_key': get_loc_env(location, 'S3_SECRET_ACCESS_KEY'),
                 'region_name': get_loc_env(location, 'S3_REGION'),
                 'endpoint_url': get_loc_env(location, 'S3_ENDPOINT'),
-                'custom_domain': get_loc_env(location, 'STORAGE_URL'),
+                'custom_domain': get_loc_env(location, 'STORAGE_BUCKET_URL'),
             }
             opts.update(kwargs)
             return S3BotoStorage(location, **opts)
@@ -179,7 +179,7 @@ class DefaultStorage(LazyObject):
                 'bucket_name': get_loc_env(location, 'STORAGE_BUCKET'),
                 'credentials': service_account.Credentials.from_service_account_file(
                     get_loc_env(location, 'GOOGLE_APPLICATION_CREDENTIALS')),
-                'custom_domain': get_loc_env(location, 'STORAGE_URL'),
+                'custom_domain': get_loc_env(location, 'STORAGE_BUCKET_URL'),
             }
             opts.update(kwargs)
             return GoogleCloudStorage(location, **opts)

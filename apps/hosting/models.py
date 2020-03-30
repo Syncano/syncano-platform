@@ -79,7 +79,7 @@ class Hosting(LiveAbstractModel, DescriptionAbstractModel,
         if cls._storage is None:
             cls._storage = DefaultStorage.create_storage(
                 bucket_name=get_cur_loc_env('STORAGE_HOSTING_BUCKET'),
-                custom_domain=get_cur_loc_env('STORAGE_HOSTING_URL'),
+                custom_domain=get_cur_loc_env('STORAGE_HOSTING_BUCKET_URL'),
             )
         return cls._storage
 
