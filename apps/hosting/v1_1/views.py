@@ -244,7 +244,7 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
         try:
             hosting_file = HostingFile.get_file(hosting=hosting, path=path)
             return self.get_accel_response(request,
-                                           hosting_file.file_object.url,
+                                           Hosting.get_storage().internal_url(hosting_file.file_object.name),
                                            self.EMPTY_404_KEY,
                                            query)
         except HostingFile.DoesNotExist:
@@ -266,7 +266,7 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
                 pass
             else:
                 return self.get_accel_response(request,
-                                               url=hosting_file.file_object.url,
+                                               url=Hosting.get_storage().internal_url(hosting_file.file_object.name),
                                                url_404=self.EMPTY_404_KEY,
                                                query=query)
 
@@ -276,7 +276,8 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
         except HostingFile.DoesNotExist:
             return self.create_404_response()
 
-        url_404 = hosting_file.file_object.url
+        url_404 = Hosting.get_storage().internal_url(hosting_file.file_object.name),
+
         return self.get_accel_response(request,
                                        url='{}/{}'.format(url_404.rsplit('/', 1)[0], path),
                                        url_404=url_404,
