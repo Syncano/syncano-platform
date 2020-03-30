@@ -33,7 +33,7 @@ class StorageWithTransactionSupportMixin:
 
     def url(self, name):
         if settings.STORAGE_URL:
-            return "%s/%s" % (settings.STORAGE_URL, filepath_to_uri(name))
+            return settings.STORAGE_URL + filepath_to_uri(name)
         return self.internal_url(name)
 
     def _save(self, name, content):
