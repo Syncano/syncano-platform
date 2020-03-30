@@ -290,7 +290,7 @@ class SocketEnvironment(TrackChangesAbstractModel, DescriptionAbstractModel, Cre
         return 'E:{}'.format(self.checksum)
 
     def get_url(self):
-        url = default_storage.internal_url(str(self.fs_file))
+        url = default_storage.internal_url(self.fs_file.name)
         if url.startswith('/'):
             url = 'http://{}{}'.format(settings.API_HOST, url)
         return url
