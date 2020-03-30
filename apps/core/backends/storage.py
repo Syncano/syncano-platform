@@ -5,6 +5,7 @@ import shutil
 from django.conf import settings
 from django.core.files import storage
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.utils.encoding import filepath_to_uri
 from django.utils.functional import LazyObject
 from google.oauth2 import service_account
 from storages.backends import gcloud, s3boto3
@@ -23,12 +24,17 @@ class StorageWithTransactionSupportMixin:
                 return db
         return DEFAULT_DB_ALIAS
 
-    def url(self, name):
+    def internal_url(self, name):
         # Remove unnecessary :443 from url that is created by boto for python > 2.7
         url = super().url(name)
         if ':443' in url:
             return url.replace(':443', '')
         return url
+
+    def url(self, name):
+        if settings.STORAGE_URL:
+            return "%s/%s" % (self.custom_domain, filepath_to_uri(name))
+        return self.internal_url(name)
 
     def _save(self, name, content):
         name = super()._save(name, content)
@@ -156,7 +162,6 @@ class DefaultStorage(LazyObject):
                 'secret_key': get_loc_env(location, 'S3_SECRET_ACCESS_KEY'),
                 'region_name': get_loc_env(location, 'S3_REGION'),
                 'endpoint_url': get_loc_env(location, 'S3_ENDPOINT'),
-                'custom_domain': get_loc_env(location, 'S3_CUSTOM_DOMAIN'),
             }
             opts.update(kwargs)
             return S3BotoStorage(location, **opts)

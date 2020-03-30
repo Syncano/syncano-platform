@@ -60,15 +60,15 @@ def _convert_signed_hex(s):
     return s.zfill(16)
 
 
-def should_sample_as_per_zipkin_tracing_percent(tracing_percent):
+def should_sample_as_per_zipkin_tracing_sampling(tracing_sampling):
     """
     Calculate whether the request should be traced as per tracing percent.
 
-    :param tracing_percent: value between 0.0 to 100.0
-    :type tracing_percent: float
+    :param tracing_sampling: value between 0.0 to 1.0
+    :type tracing_sampling: float
     :returns: boolean whether current request should be sampled.
     """
-    return (random.random() * 100) < tracing_percent
+    return random.random() < tracing_sampling
 
 
 def is_tracing(request):
@@ -82,7 +82,7 @@ def is_tracing(request):
 
     if 'X-B3-SAMPLED' in request.META:
         return request.META['X-B3-SAMPLED'] == '1'
-    return should_sample_as_per_zipkin_tracing_percent(settings.TRACING_PERCENT)
+    return should_sample_as_per_zipkin_tracing_sampling(settings.TRACING_SAMPLING)
 
 
 def create_zipkin_attr_from_request(request):

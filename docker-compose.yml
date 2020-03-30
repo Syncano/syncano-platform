@@ -59,12 +59,13 @@ services:
       - .:/home/syncano/app
     environment:
       - INSTANCE_TYPE=web
-      - API_DOMAIN=api.syncano.test
+      - API_HOST=api.syncano.test
       - AUTORELOAD=true
       - ANALYTICS_WRITE_KEY
-      - S3_ACCESS_KEY_ID
-      - S3_SECRET_ACCESS_KEY
-      - STORAGE_BUCKET
+      - DEV_S3_ACCESS_KEY_ID
+      - DEV_S3_SECRET_ACCESS_KEY
+      - DEV_S3_STORAGE_BUCKET
+      - DEV_S3_REGION
       - CI
       - COLORS_ENABLED=true
       - DB_INSTANCES_NAME
@@ -72,7 +73,7 @@ services:
       - DOCKER_HOST_DIRECTORY
       - LEGACY_CODEBOX_ENABLED=true
       - PARALLEL_COUNT
-      - SPACE_DOMAIN=syncano_space.test
+      - SPACE_HOST=syncano_space.test
       - STRIPE_SECRET_KEY
       - TEST_MIGRATIONS
       - TRACING_ENABLED
@@ -135,10 +136,10 @@ services:
     depends_on:
       - codebox-lb
     ports:
-      - "9000:9000"
+      - "9000:80"
       - "8080:8080"
     environment:
-      - LB_ADDRS=codebox-lb:9000
+      - LB_ADDRS=codebox-lb:80
       - SERVICE_NAME=codebox-broker
 
   codebox-lb:

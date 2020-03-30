@@ -68,7 +68,7 @@ class TestHostingListAPI(TestHostingBase):
 
     def test_domain_validation(self):
         for invalid_domain in ('invalid$domain.io', 'dom_ain.com', '-notok.com', '.domain.com',
-                               'something.{}'.format(settings.HOSTING_DOMAIN)):
+                               'something.{}'.format(settings.HOSTING_DOMAINS[0])):
             response = self.client.post(self.url, data={'domains': [invalid_domain]})
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 

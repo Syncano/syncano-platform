@@ -70,12 +70,12 @@ class HostingAddSecureCustomDomainTask(TaskLockMixin, InstanceBasedTask):
 
     def validate_cname(self, cname):
         # Check expected CNAME value
-        expected_cnames = ['{}.{}{}.'.format(self.instance.name, settings.LOCATION, settings.HOSTING_DOMAIN)]
-        if settings.MAIN_LOCATION:
-            expected_cnames.append('{}{}.'.format(self.instance.name, settings.HOSTING_DOMAIN))
-        for expected_cname in expected_cnames:
+        for domain in settings.HOSTING_DOMAINS:
+            expected_cname = '{}{}.'.format(self.instance.name, domain)
+
             if cname == expected_cname or re.match(r'^[a-z0-9-]+--%s$' % expected_cname, cname):
                 return
+
         raise WrongCName()
 
     def run(self, hosting_pk, domain, **kwargs):

@@ -238,9 +238,6 @@ class SyncInvalidationTask(app.Task):
     def run(self, version_key, **kwargs):
         signature = hmac.new('{}:{}'.format(version_key, settings.SECRET_KEY).encode(),
                              digestmod=sha256).hexdigest()
-        for loc in settings.LOCATIONS:
-            if loc == settings.LOCATION:
-                continue
-
-            url = 'https://{url}/v3/cache_invalidate/'.format(url=settings.API_LOCATION_DOMAIN.format(location=loc))
+        for syncHost in settings.CACHE_SYNC_HOSTS:
+            url = 'https://{url}/v3/cache_invalidate/'.format(url=syncHost)
             requests.post(url, data={'version_key': version_key, 'signature': signature}).raise_for_status()

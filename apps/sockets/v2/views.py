@@ -5,6 +5,7 @@ from socket import gaierror, gethostbyname
 
 import rapidjson as json
 from django.conf import settings
+from django.core.files.storage import default_storage
 from django.http import Http404, HttpResponse
 from django.utils.functional import cached_property
 from django.utils.text import get_valid_filename
@@ -104,7 +105,7 @@ class SocketViewSet(ValidateRequestSizeMixin, DetailSerializerMixin, AtomicMixin
                   throttle_scope='zip_file')
     def zip_file(self, request, *args, **kwargs):
         socket = self.get_object()
-        real_file_list = {f_key: request.build_absolute_uri(Socket.get_storage().url(f_val['file']))
+        real_file_list = {f_key: request.build_absolute_uri(default_storage.internal_url(f_val['file']))
                           for f_key, f_val in socket.file_list.items() if not f_key.startswith('<')}
 
         # File list with full urls can get quite big so we pass it through tempfile
