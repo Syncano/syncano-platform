@@ -108,7 +108,7 @@ class GoogleCloudStorage(StorageWithTransactionSupportMixin, gcloud.GoogleCloudS
 
     def internal_url(self, name):
         if self._storage_url:
-            return self.storage_url + filepath_to_uri(name)
+            return self._storage_url + filepath_to_uri(name)
 
         # Remove unnecessary :443 from url that is created by boto for python > 2.7
         url = super().url(name)
