@@ -25,7 +25,11 @@ FIELD_CLASS_MAP = {
     'float': ('apps.data.fields.IncrementableFloatField', {}),
     'boolean': ('apps.data.fields.NullBooleanField', {}),
     'datetime': ('apps.data.fields.DateTimeField', {}),
-    'file': ('apps.data.fields.HStoreFileField', {'upload_to': upload_file_to, 'storage': default_storage}),
+    'file': ('apps.data.fields.HStoreFileField', {
+        'upload_to': upload_file_to,
+        'storage': default_storage,
+        'max_length': None,
+    }),
     'reference': ('apps.data.fields.ReferenceField', {}),
     'object': ('apps.data.fields.ObjectField', {}),
     'array': ('apps.data.fields.ArrayField', {}),
