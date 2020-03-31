@@ -276,7 +276,7 @@ class HostingView(InstanceBasedMixin, generics.GenericAPIView):
         except HostingFile.DoesNotExist:
             return self.create_404_response()
 
-        url_404 = Hosting.get_storage().internal_url(hosting_file.file_object.name),
+        url_404 = Hosting.get_storage().internal_url(hosting_file.file_object.name)
 
         return self.get_accel_response(request,
                                        url='{}/{}'.format(url_404.rsplit('/', 1)[0], path),
