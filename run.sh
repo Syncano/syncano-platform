@@ -1,8 +1,6 @@
 #!/bin/bash
 set -eo pipefail
 
-sysctl -w net.core.somaxconn=1024
-
 APP_DIR="/home/syncano/app"
 
 SUPERVISOR_CONFIG_PATH="/home/syncano/supervisor"
