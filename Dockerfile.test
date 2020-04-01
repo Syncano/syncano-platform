@@ -1,4 +1,5 @@
 FROM syncano/platform
+ENV PATH /home/syncano/.local/bin:$PATH
 
 COPY ./requirements_development.txt /home/syncano/app/
 RUN set -ex \
