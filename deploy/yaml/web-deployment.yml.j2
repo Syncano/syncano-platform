@@ -26,11 +26,15 @@ spec:
         type: web
     spec:
       terminationGracePeriodSeconds: 330
+      securityContext:
+        fsGroup: 101
       containers:
         - name: web
           image: {{ IMAGE }}
           securityContext:
-            privileged: true
+            runAsGroup: 101
+            runAsNonRoot: true
+            runAsUser: 100
           resources:
             requests:
               memory: "1024Mi"
@@ -40,7 +44,7 @@ spec:
               cpu: 1000m
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
           env:
             - name: INSTANCE_TYPE
               value: web
@@ -63,10 +67,6 @@ spec:
                 - -c
                 - curl -f localhost:1717
             initialDelaySeconds: 5
-          lifecycle:
-            preStop:
-              exec:
-                command: ["/bin/sleep", "5"]
 
 {%- if GCP_LOCATIONS %}
           volumeMounts:

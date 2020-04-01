@@ -47,7 +47,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.test
-    privileged: true
     ports:
       - "8000"
     depends_on:
@@ -93,7 +92,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.test
-    privileged: true
     depends_on:
       - postgresql
       - redis
@@ -136,10 +134,10 @@ services:
     depends_on:
       - codebox-lb
     ports:
-      - "9000:80"
+      - "9000:8000"
       - "8080:8080"
     environment:
-      - LB_ADDRS=codebox-lb:80
+      - LB_ADDRS=codebox-lb:8000
       - SERVICE_NAME=codebox-broker
 
   codebox-lb:

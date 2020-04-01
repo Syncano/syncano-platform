@@ -11,7 +11,8 @@ ENV PYTHON_EGG_CACHE=/home/syncano/.python-eggs \
 
 RUN set -ex \
     && pip install --upgrade pip \
-    && adduser -D -s /bin/bash syncano \
+    && addgroup -S syncano \
+    && adduser -S -D -G syncano -s /bin/bash syncano \
     && apk add --no-cache \
         bash \
         coreutils \
@@ -78,7 +79,7 @@ RUN set -ex \
 
 # Copy the application folder inside the container
 COPY --chown=syncano . /home/syncano/app
-RUN chown syncano:syncano /home/syncano/app
+USER syncano
 
 # Set the default command to execute
 # when creating a new container

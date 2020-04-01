@@ -35,6 +35,6 @@ INIT_CMD='SET client_min_messages TO WARNING;
 
 psql -q -h $PGHOST -d $PGDATABASE -U $PGUSER -c "$INIT_CMD"
 
-exec su-exec syncano python3 manage.py migrate $ADDITIONAL_ARGS --noinput --verbosity 0
+exec python3 manage.py migrate $ADDITIONAL_ARGS --noinput --verbosity 0
 
 echo 'done'
