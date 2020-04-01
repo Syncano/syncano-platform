@@ -48,13 +48,13 @@ clean: stop ## Cleanup repository
 	git clean -f
 
 test: require-docker-compose ## Run tests in container
-	docker-compose run --rm web bash -c "chmod 777 /var/run/docker.sock && ./test.sh ${ARGS}"
+	docker-compose run --rm test bash -c "./test.sh ${ARGS}"
 
 migrate: require-docker-compose ## Migrate container database
-	docker-compose run --rm web ./run_care.sh
+	docker-compose run --rm test ./run_care.sh
 
 makemigrations: require-docker-compose ## Make django migrations
-	docker-compose run --rm --no-deps web ./manage.py makemigrations
+	docker-compose run --rm --no-deps test ./manage.py makemigrations
 
 deploy-staging: require-kubectl ## Deploy application to staging
 	echo "=== deploying staging ==="
