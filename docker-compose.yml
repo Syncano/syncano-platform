@@ -52,7 +52,7 @@ services:
       - postgresql
       - redis
       - rabbitmq
-    user: syncano
+    user: root
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/home/syncano/app

@@ -6,7 +6,7 @@ cd /home/syncano/app/apps
     do
         for migration in `ls ${app}/migrations/*.py`
         do
-            docker-compose run test ./manage.py sqlmigrate ${app} `basename ${migration} | cut -d'_' -f1`
+            docker-compose run web ./manage.py sqlmigrate ${app} `basename ${migration} | cut -d'_' -f1`
         done
     done
 ) | sed -n '/^BEGIN;/,/^COMMIT;/p'
