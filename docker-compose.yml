@@ -176,7 +176,6 @@ services:
 
   codebox-worker:
     command: codebox --debug worker
-    user: root
     image: syncano/codebox
     privileged: true
     depends_on:

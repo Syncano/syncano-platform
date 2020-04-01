@@ -44,6 +44,11 @@ RUN set -ex \
         # nginx
         nginx \
     \
+    # Set nginx and acme permissions
+    && ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log \
+    && chown syncano:syncano -R /var/lib/nginx \
+    \
     # Symlink libgeos so it gets picked up correctly
     && ln -s /usr/lib/libgeos_c.so.1 /usr/lib/libgeos_c.so \
     \
@@ -56,7 +61,8 @@ RUN set -ex \
         --accountemail "${EMAIL}" --accountkey "/acme/config/account.key" \
     && ln -s ${LE_WORKING_DIR}/acme.sh /usr/bin/acme.sh \
     && cd .. \
-    && rm -rf ${ACME_VERSION}.zip acme.sh-${ACME_VERSION}
+    && rm -rf ${ACME_VERSION}.zip acme.sh-${ACME_VERSION} \
+    && chown syncano:syncano -R /acme
 
 # Install python dependencies
 COPY ./requirements.txt /home/syncano/app/
@@ -79,6 +85,9 @@ RUN set -ex \
 
 # Copy the application folder inside the container
 COPY --chown=syncano . /home/syncano/app
+RUN python manage.py collectstatic --noinput \
+    && chown syncano:syncano /home/syncano/app \
+    && chown syncano:syncano -R /home/syncano/app/static
 USER syncano
 
 # Set the default command to execute
