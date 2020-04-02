@@ -1,6 +1,8 @@
 FROM python:3.6-alpine3.11
 
 ARG EMAIL=devops@syncano.com
+ARG UID=1000
+ARG GID=1000
 ENV PYTHON_EGG_CACHE=/home/syncano/.python-eggs \
     ACME_VERSION=2.8.3 \
     LE_WORKING_DIR=/acme/home \
@@ -11,8 +13,8 @@ ENV PYTHON_EGG_CACHE=/home/syncano/.python-eggs \
 
 RUN set -ex \
     && pip install --upgrade pip \
-    && addgroup -S syncano \
-    && adduser -S -D -G syncano -s /bin/bash syncano \
+    && addgroup -S -g $GID syncano \
+    && adduser -S -D -G syncano -s /bin/bash -u $UID syncano \
     && apk add --no-cache \
         bash \
         coreutils \

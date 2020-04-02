@@ -44,7 +44,7 @@ spec:
 
       terminationGracePeriodSeconds: 360
       securityContext:
-        fsGroup: 101
+        fsGroup: 1000
       containers:
         - name: worker
           image: {{ IMAGE }}
@@ -68,9 +68,9 @@ spec:
   {%- endfor %}
 {%- endif %}
           securityContext:
-            runAsGroup: 101
+            runAsGroup: 1000
             runAsNonRoot: true
-            runAsUser: 100
+            runAsUser: 1000
           resources:
             requests:
               memory: "1536Mi"

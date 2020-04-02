@@ -27,14 +27,14 @@ spec:
     spec:
       terminationGracePeriodSeconds: 330
       securityContext:
-        fsGroup: 101
+        fsGroup: 1000
       containers:
         - name: web
           image: {{ IMAGE }}
           securityContext:
-            runAsGroup: 101
+            runAsGroup: 1000
             runAsNonRoot: true
-            runAsUser: 100
+            runAsUser: 1000
           resources:
             requests:
               memory: "1024Mi"
