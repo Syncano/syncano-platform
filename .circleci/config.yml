@@ -19,7 +19,7 @@ jobs:
 
       - run:
           name: Prepare containers
-          command: ./prepare_containers.sh
+          command: docker pull quay.io/syncano/script-docker-image:devel
 
       - run:
           name: Run tests

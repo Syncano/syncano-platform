@@ -12,7 +12,7 @@ from requests import ReadTimeout, Timeout
 from apps.core.helpers import docker_client, get_local_cache
 
 from .exceptions import CannotCleanupContainer, CannotCreateContainer
-from .runtimes import RUNTIMES
+from .runtimes import IMAGE_GID, IMAGE_UID, RUNTIMES
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +68,8 @@ class ContainerManager:
             prefix = 'mount_{}_'.format(socket.gethostname())
             source_dir = tempfile.mkdtemp(prefix=prefix, suffix='_src', dir=settings.DOCKER_SHARED_DIRECTORY)
             tmp_dir = tempfile.mkdtemp(prefix=prefix, suffix='_tmp', dir=settings.DOCKER_SHARED_DIRECTORY)
+            os.chown(source_dir, IMAGE_UID, IMAGE_GID)
+            os.chown(tmp_dir, IMAGE_UID, IMAGE_GID)
 
             return source_dir, tmp_dir
         except Exception:
