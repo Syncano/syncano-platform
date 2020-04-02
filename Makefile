@@ -48,7 +48,7 @@ clean: stop ## Cleanup repository
 	git clean -f
 
 test: require-docker-compose ## Run tests in container
-	docker-compose run --rm test bash -c "chmod 777 /var/run/docker.sock && su-exec syncano ./test.sh ${ARGS}"
+	docker-compose run --rm test ./test.sh ${ARGS}
 
 migrate: require-docker-compose ## Migrate container database
 	docker-compose run --rm web ./run_care.sh
