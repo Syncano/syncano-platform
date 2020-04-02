@@ -64,7 +64,8 @@ services:
       - COLORS_ENABLED=true
       - DB_INSTANCES_NAME
       - DJANGO_DEBUG=true
-      - DOCKER_HOST_DIRECTORY
+      - DJANGO_SETTINGS_MODULE=settings.tests
+      - DOCKER_HOST_DIRECTORY=$PWD
       - LEGACY_CODEBOX_ENABLED=true
       - PARALLEL_COUNT
       - SPACE_HOST=syncano_space.test

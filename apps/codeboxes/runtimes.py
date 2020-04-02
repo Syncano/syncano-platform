@@ -285,6 +285,8 @@ LATEST_NODEJS_LIB_RUNTIME = 'nodejs_library_v1.0'
 LATEST_PYTHON_RUNTIME = 'python_library_v5.0'
 
 IMAGE = 'quay.io/syncano/script-docker-image:{}'.format(settings.CODEBOX_IMAGE_TAG)
+IMAGE_UID = 1000
+IMAGE_GID = 1000
 
 RUNTIMES = {
     'nodejs_library_v0.4': {
