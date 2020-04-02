@@ -3,6 +3,7 @@ FROM python:3.6-alpine3.11
 ARG EMAIL=devops@syncano.com
 ARG UID=1000
 ARG GID=1000
+
 ENV PYTHON_EGG_CACHE=/home/syncano/.python-eggs \
     ACME_VERSION=2.8.3 \
     LE_WORKING_DIR=/acme/home \
