@@ -1,6 +1,9 @@
 FROM python:3.6-alpine3.11
 
 ARG EMAIL=devops@syncano.com
+ARG UID=1000
+ARG GID=1000
+
 ENV PYTHON_EGG_CACHE=/home/syncano/.python-eggs \
     ACME_VERSION=2.8.3 \
     LE_WORKING_DIR=/acme/home \
@@ -11,7 +14,8 @@ ENV PYTHON_EGG_CACHE=/home/syncano/.python-eggs \
 
 RUN set -ex \
     && pip install --upgrade pip \
-    && adduser -D -s /bin/bash syncano \
+    && addgroup -S -g $GID syncano \
+    && adduser -S -D -G syncano -s /bin/bash -u $UID syncano \
     && apk add --no-cache \
         bash \
         coreutils \
@@ -43,6 +47,11 @@ RUN set -ex \
         # nginx
         nginx \
     \
+    # Set nginx and acme permissions
+    && ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log \
+    && chown syncano:syncano -R /var/lib/nginx \
+    \
     # Symlink libgeos so it gets picked up correctly
     && ln -s /usr/lib/libgeos_c.so.1 /usr/lib/libgeos_c.so \
     \
@@ -55,7 +64,8 @@ RUN set -ex \
         --accountemail "${EMAIL}" --accountkey "/acme/config/account.key" \
     && ln -s ${LE_WORKING_DIR}/acme.sh /usr/bin/acme.sh \
     && cd .. \
-    && rm -rf ${ACME_VERSION}.zip acme.sh-${ACME_VERSION}
+    && rm -rf ${ACME_VERSION}.zip acme.sh-${ACME_VERSION} \
+    && chown syncano:syncano -R /acme
 
 # Install python dependencies
 COPY ./requirements.txt /home/syncano/app/
@@ -78,7 +88,10 @@ RUN set -ex \
 
 # Copy the application folder inside the container
 COPY --chown=syncano . /home/syncano/app
-RUN chown syncano:syncano /home/syncano/app
+RUN python manage.py collectstatic --noinput \
+    && chown syncano:syncano /home/syncano/app \
+    && chown syncano:syncano -R /home/syncano/app/static
+USER syncano
 
 # Set the default command to execute
 # when creating a new container

@@ -4,7 +4,7 @@ billiard==3.5.0.4
 boto3==1.9.38
 celery==4.3.0
 django-atomic-signals==1.1.0
-django-cors-headers==2.4.0
+django-cors-headers==3.2.1
 django-filter==1.1.0
 git+https://github.com/djangonauts/django-hstore.git@aac755f587ff8ea95c1f43e7f3df8e339b848b6b
 django_extensions==2.1.3

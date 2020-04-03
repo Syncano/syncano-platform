@@ -4,3 +4,4 @@ db
 deploy
 dev
 media/**
+static/**

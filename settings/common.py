@@ -2,6 +2,7 @@
 import os
 from datetime import timedelta
 
+from corsheaders.defaults import default_headers
 from celery.schedules import crontab
 from django.utils.dateparse import parse_date
 from kombu import Exchange, Queue
@@ -289,7 +290,6 @@ CODEBOX_RUNNER_QUEUE = 'codebox_runner'
 METRICS_QUEUE = 'metrics'
 PUSH_NOTIFICATIONS_QUEUE = 'push_notifications'
 BACKUPS_QUEUE = 'backups'
-ROOT_TASKS_QUEUE = 'root_tasks'
 
 CELERY_TASK_DEFAULT_QUEUE = 'default'
 
@@ -301,7 +301,6 @@ CELERY_TASK_QUEUES = (
     Queue(METRICS_QUEUE, routing_key=METRICS_QUEUE),
     Queue(PUSH_NOTIFICATIONS_QUEUE, routing_key=PUSH_NOTIFICATIONS_QUEUE),
     Queue(BACKUPS_QUEUE, routing_key=BACKUPS_QUEUE),
-    Queue(ROOT_TASKS_QUEUE, routing_key=ROOT_TASKS_QUEUE),
 )
 
 CELERY_BEAT_SCHEDULE = {
@@ -554,10 +553,10 @@ CELERY_TASK_ROUTES = {
 
     # hosting
     'apps.hosting.tasks.HostingAddSecureCustomDomainTask': {
-        'queue': ROOT_TASKS_QUEUE
+        'queue': DEFAULT_QUEUE
     },
     'apps.hosting.tasks.HostingRefreshSecureCustomDomainCertTask': {
-        'queue': ROOT_TASKS_QUEUE
+        'queue': DEFAULT_QUEUE
     },
 }
 
@@ -821,12 +820,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = SOCKETS_MAX_PAYLOAD
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_HEADERS = (
-    'x-requested-with',
-    'content-type',
-    'accept',
-    'origin',
-    'authorization',
+CORS_ALLOW_HEADERS = default_headers + (
     'x-api-key',
     'x-user-key',
 )

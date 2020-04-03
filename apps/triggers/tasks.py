@@ -50,7 +50,6 @@ class TriggerTask(BaseIncentiveTask):
         return codebox_spec
 
     def run(self, incentive_pk, instance_pk, additional_args, meta, **kwargs):
-        self.get_logger().info("PROCESSING TRIGGER: %s %s %s %s", incentive_pk, instance_pk, additional_args, meta)
         self.process(instance_pk=instance_pk,
                      incentive_pk=incentive_pk,
                      additional_args=additional_args,

@@ -43,11 +43,11 @@ spec:
 {%- endif %}
 
       terminationGracePeriodSeconds: 360
+      securityContext:
+        fsGroup: 1000
       containers:
         - name: worker
           image: {{ IMAGE }}
-          securityContext:
-            privileged: true
           volumeMounts:
             - name: cert-data
               mountPath: "/acme/certs"
@@ -67,6 +67,10 @@ spec:
               readOnly: true
   {%- endfor %}
 {%- endif %}
+          securityContext:
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
           resources:
             requests:
               memory: "1536Mi"

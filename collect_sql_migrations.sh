@@ -3,7 +3,7 @@
 cd /home/syncano/app/apps
 (
     for app in `find ./ -maxdepth 1 -type d | sed 's#./##g' | grep -v '^$'`
-    do 
+    do
         for migration in `ls ${app}/migrations/*.py`
         do
             docker-compose run web ./manage.py sqlmigrate ${app} `basename ${migration} | cut -d'_' -f1`
