@@ -2,6 +2,7 @@
 import os
 from datetime import timedelta
 
+from corsheaders.defaults import default_headers
 from celery.schedules import crontab
 from django.utils.dateparse import parse_date
 from kombu import Exchange, Queue
@@ -819,12 +820,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = SOCKETS_MAX_PAYLOAD
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_HEADERS = (
-    'x-requested-with',
-    'content-type',
-    'accept',
-    'origin',
-    'authorization',
+CORS_ALLOW_HEADERS = default_headers + (
     'x-api-key',
     'x-user-key',
 )
