@@ -45,7 +45,7 @@ def application(environ, start_response):
         handler = HANDLERS[offload_handler]
 
     request = WSGIRequest(environ)
-    zipkin_attrs = zipkin.create_zipkin_attr_from_request(request)
+    zipkin_attrs = zipkin.extract_zipkin_attr(environ)
     set_tracing_attrs(zipkin_attrs)
 
     if zipkin_attrs.is_sampled:

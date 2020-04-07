@@ -29,7 +29,7 @@ from apps.core.helpers import (
     redis
 )
 from apps.core.mixins import TaskLockMixin
-from apps.core.zipkin import create_headers_from_zipkin_attrs
+from apps.core import zipkin
 from apps.instances.helpers import set_current_instance
 from apps.instances.models import Instance, InstanceIndicator
 from apps.sockets.models import Socket, SocketEnvironment
@@ -326,9 +326,7 @@ class BaseIncentiveTask(app.Task):
         )
 
         # Retry grpc Run if needed.
-        metadata = create_headers_from_zipkin_attrs(get_tracing_attrs())
-        if metadata is not None:
-            metadata = metadata.items()
+        metadata = zipkin.create_headers_from_zipkin_attrs(get_tracing_attrs()).items()
 
         for i in range(self.grpc_run_retries + 1):
             try:

@@ -39,14 +39,12 @@ class BaseTask(CeleryTask):
     def apply_async(self, args=None, kwargs=None, task_id=None, producer=None,
                     link=None, link_error=None, **options):
         kwargs = kwargs or {}
-        tracing_dict = zipkin.create_dict_from_zipkin_attrs(get_tracing_attrs())
-        if tracing_dict is not None:
-            kwargs['tracing'] = tracing_dict
+        kwargs['tracing'] = zipkin.create_headers_from_zipkin_attrs(get_tracing_attrs())
         return super().apply_async(args, kwargs, task_id, producer, link, link_error,
                                    **options)
 
     def __call__(self, *args, **kwargs):
-        zipkin_attrs = zipkin.create_zipkin_attr_from_dict(kwargs.pop('tracing', None))
+        zipkin_attrs = zipkin.extract_zipkin_attr(kwargs.pop('tracing', None))
         set_tracing_attrs(zipkin_attrs)
 
         if not zipkin_attrs.is_sampled:

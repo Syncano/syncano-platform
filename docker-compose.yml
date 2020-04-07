@@ -71,7 +71,7 @@ services:
       - SPACE_HOST=syncano_space.test
       - STRIPE_SECRET_KEY
       - TEST_MIGRATIONS
-      - TRACING_ENABLED
+      - TRACING_SAMPLING
 
   web:
     image: syncano/platform:test
@@ -102,7 +102,7 @@ services:
       - SPACE_HOST=syncano_space.test
       - STRIPE_SECRET_KEY
       - TEST_MIGRATIONS
-      - TRACING_ENABLED
+      - TRACING_SAMPLING
 
   proxy:
     image: haproxy:1.8-alpine
@@ -136,7 +136,7 @@ services:
       - DJANGO_DEBUG=true
       - LEGACY_CODEBOX_ENABLED=true
       - STRIPE_SECRET_KEY
-      - TRACING_ENABLED
+      - TRACING_SAMPLING
 
   codebox:
     image: syncano/platform:test
