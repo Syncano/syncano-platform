@@ -274,7 +274,7 @@ class BaseIncentiveTask(app.Task):
         from apps.codeboxes.proto import broker_pb2, broker_pb2_grpc
 
         if self.runner is None:
-            self.channel = grpc.insecure_channel(settings.CODEBOX_BROKER_GRPC, settings.CODEBOX_GRPC_OPTIONS)
+            self.channel = grpc.insecure_channel(settings.CODEBOX_BROKER_GRPC)
             self.runner = broker_pb2_grpc.ScriptRunnerStub(self.channel)
         socket = incentive.socket
 

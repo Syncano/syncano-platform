@@ -747,7 +747,6 @@ CODEBOX_PER_INSTANCE_SCHEDULING_CHECK = 20
 PERIODIC_SCHEDULE_MIN_INTERVAL = 30
 
 # New Codebox settings
-CODEBOX_GRPC_OPTIONS = [('grpc.keepalive_time_ms', 5000), ('grpc.keepalive_timeout_ms', 3000)]
 CODEBOX_BROKER_UWSGI = os.environ.get('CODEBOX_BROKER_UWSGI', 'codebox-broker:8080')
 CODEBOX_BROKER_GRPC = os.environ.get('CODEBOX_BROKER_GRPC', 'codebox-broker:9000')
 CODEBOX_RELEASE = parse_date(os.environ.get('CODEBOX_RELEASE', '2017-01-01'))
