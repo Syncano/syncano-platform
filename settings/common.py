@@ -2,8 +2,8 @@
 import os
 from datetime import timedelta
 
-from corsheaders.defaults import default_headers
 from celery.schedules import crontab
+from corsheaders.defaults import default_headers
 from django.utils.dateparse import parse_date
 from kombu import Exchange, Queue
 
@@ -561,8 +561,7 @@ CELERY_TASK_ROUTES = {
 }
 
 # Tracing
-TRACING_ENABLED = os.environ.get('TRACING_ENABLED', 'true') == 'true'
-TRACING_SAMPLING = float(os.environ.get('TRACING_SAMPLING', 100))
+TRACING_SAMPLING = float(os.environ.get('TRACING_SAMPLING', 0))
 SERVICE_NAME = os.environ.get('SERVICE_NAME', 'platform-{}'.format(os.environ.get('INSTANCE_TYPE', 'web')))
 ZIPKIN_ADDR = os.environ.get('ZIPKIN_ADDR', 'jaeger')
 ZIPKIN_TIMEOUT = 3

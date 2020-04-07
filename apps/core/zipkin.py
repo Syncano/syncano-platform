@@ -17,9 +17,6 @@ ZIPKIN_TRANSPORT_URL = 'http://{}:9411/api/v1/spans'.format(settings.ZIPKIN_ADDR
 
 
 def transport_handler(encoded_span):
-    if not settings.TRACING_ENABLED:
-        return
-
     try:
         requests.post(
             ZIPKIN_TRANSPORT_URL,
@@ -71,17 +68,14 @@ def should_sample_as_per_zipkin_tracing_sampling(tracing_sampling):
     return random.random() < tracing_sampling
 
 
-def is_tracing(request):
+def is_request_sampled(request):
     """
     Determine if zipkin should be tracing
     1) If not, check if specific sampled header is present in the request.
     2) If not, Use a tracing percent (default: 0.5%) to decide.
     """
-    if not settings.TRACING_ENABLED:
-        return False
-
-    if 'X-B3-SAMPLED' in request.META:
-        return request.META['X-B3-SAMPLED'] == '1'
+    if 'HTTP_X_B3_SAMPLED' in request.META:
+        return request.META['HTTP_X_B3_SAMPLED'] == '1'
     return should_sample_as_per_zipkin_tracing_sampling(settings.TRACING_SAMPLING)
 
 
@@ -89,73 +83,54 @@ def create_zipkin_attr_from_request(request):
     """
     Create ZipkinAttrs object from a request with sampled flag as True.
     """
-    is_sampled = is_tracing(request)
+    trace_id = get_trace_id(request)
+    span_id = request.META.get('HTTP_X_B3_SPANID', generate_random_64bit_string())
+    parent_span_id = request.META.get('HTTP_X_B3_PARENTSPANID', None)
+    flags = request.META.get('HTTP_X_B3_FLAGS', '0')
+    is_sampled = is_request_sampled(request)
 
-    if is_sampled:
-        trace_id = get_trace_id(request)
-        span_id = request.META.get('X-B3-SPANID', generate_random_64bit_string())
-        parent_span_id = request.META.get('X-B3-PARENTSPANID', None)
-        flags = request.META.get('X-B3-FLAGS', '0')
-
-        return ZipkinAttrs(
-            trace_id=trace_id,
-            span_id=span_id,
-            parent_span_id=parent_span_id,
-            flags=flags,
-            is_sampled=is_sampled,
-        )
-
-    return ZipkinAttrs('', '', '', '0', False)
-
-
-def create_dict_from_zipkin_attrs(zipkin_attrs):
-    """
-    Create dict from ZipkinAttrs object for use in e.g. tasks.
-    """
-    if not zipkin_attrs or not zipkin_attrs.is_sampled:
-        return
-    return {
-        'trace_id': zipkin_attrs.trace_id,
-        'span_id': zipkin_attrs.span_id,
-        'flags': zipkin_attrs.flags
-    }
+    return ZipkinAttrs(
+        trace_id=trace_id,
+        span_id=span_id,
+        parent_span_id=parent_span_id,
+        flags=flags,
+        is_sampled=is_sampled,
+    )
 
 
 def create_headers_from_zipkin_attrs(zipkin_attrs):
     """
     Create headers dict from ZipkinAttrs object for use in requests.
     """
-    if not zipkin_attrs or not zipkin_attrs.is_sampled:
-        return
+    if not zipkin_attrs:
+        return {}
     return {
         'x-b3-traceid': zipkin_attrs.trace_id,
         'x-b3-flags': zipkin_attrs.flags,
         'x-b3-spanid': zipkin_attrs.span_id,
-        'x-b3-sampled': '1',
+        'x-b3-sampled': '1' if zipkin_attrs.is_sampled else '0',
     }
 
 
-def create_zipkin_attr_from_dict(data):
+def extract_zipkin_attr(data):
     """
     Create ZipkinAttrs object from a dict.
     """
-    if not data or 'trace_id' not in data:
+    if not data or 'x-b3-sampled' not in data:
         return ZipkinAttrs('', '', '', '0', False)
     return ZipkinAttrs(
-        trace_id=data['trace_id'],
+        trace_id=data['x-b3-traceid'],
         span_id=generate_random_64bit_string(),
-        parent_span_id=data['span_id'],
-        flags=data['flags'],
-        is_sampled=True,
+        parent_span_id=data['x-b3-spanid'],
+        flags=data['x-b3-flags'],
+        is_sampled=data['x-b3-sampled'],
     )
 
 
 def propagate_uwsgi_params(zipkin_attrs):
-    if zipkin_attrs is not None and zipkin_attrs.is_sampled and uwsgi is not None:
-        uwsgi.add_var('X-B3-SAMPLED', '1')
-        uwsgi.add_var('X-B3-TRACEID', zipkin_attrs.trace_id)
-        uwsgi.add_var('X-B3-PARENTSPANID', zipkin_attrs.span_id)
-        uwsgi.add_var('X-B3-FLAGS', zipkin_attrs.flags)
+    if uwsgi is not None:
+        for k, v in create_headers_from_zipkin_attrs(zipkin_attrs).items():
+            uwsgi.add_var(k, v)
 
 
 def get_binary_annotations(request, response):
