@@ -2,8 +2,8 @@
 import os
 from datetime import timedelta
 
-from corsheaders.defaults import default_headers
 from celery.schedules import crontab
+from corsheaders.defaults import default_headers
 from django.utils.dateparse import parse_date
 from kombu import Exchange, Queue
 
