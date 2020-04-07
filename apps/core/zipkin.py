@@ -123,7 +123,7 @@ def extract_zipkin_attr(data):
         span_id=generate_random_64bit_string(),
         parent_span_id=data['x-b3-spanid'],
         flags=data['x-b3-flags'],
-        is_sampled=data['x-b3-sampled'],
+        is_sampled=data['x-b3-sampled'] == '1',
     )
 
 
