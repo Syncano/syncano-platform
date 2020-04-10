@@ -3,7 +3,6 @@ from settings.common import *  # noqa
 
 # Quick settings
 CACHE = True
-ZIPKIN_RAISE = True
 LOCAL_MEDIA_STORAGE = True
 
 MIDDLEWARE = ('apps.core.middleware.InstrumentMiddleware',) + MIDDLEWARE

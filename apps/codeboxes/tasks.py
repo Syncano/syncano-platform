@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from munch import Munch
+from opencensus.ext.grpc import client_interceptor
 from settings.celeryconf import app, register_task
 
 from apps.admins.models import Admin
@@ -20,11 +21,10 @@ from apps.codeboxes.exceptions import ContainerException
 from apps.codeboxes.helpers import get_codebox_spec
 from apps.codeboxes.signals import codebox_finished
 from apps.codeboxes.v2.serializers import CodeBoxTraceSerializer, ScheduleTraceSerializer
-from apps.core import zipkin
 from apps.core.helpers import (
     Cached,
     generate_key,
-    get_tracing_attrs,
+    get_current_tracer,
     iterate_over_queryset_in_chunks,
     make_token,
     redis
@@ -148,7 +148,6 @@ class BaseIncentiveTask(app.Task):
     max_timeout = settings.CODEBOX_MAX_TIMEOUT
     default_timeout = settings.CODEBOX_DEFAULT_TIMEOUT
 
-    channel = None
     runner = None
 
     trace_type_map = {}
@@ -274,8 +273,12 @@ class BaseIncentiveTask(app.Task):
         from apps.codeboxes.proto import broker_pb2, broker_pb2_grpc
 
         if self.runner is None:
-            self.channel = grpc.insecure_channel(settings.CODEBOX_BROKER_GRPC)
-            self.runner = broker_pb2_grpc.ScriptRunnerStub(self.channel)
+            tracer_interceptor = client_interceptor.OpenCensusClientInterceptor(
+                get_current_tracer(),
+                host_port=settings.CODEBOX_BROKER_GRPC)
+            channel = grpc.insecure_channel(settings.CODEBOX_BROKER_GRPC)
+            channel = grpc.intercept_channel(channel, tracer_interceptor)
+            self.runner = broker_pb2_grpc.ScriptRunnerStub(channel)
         socket = incentive.socket
 
         entrypoint = socket.get_local_path(incentive.codebox.path)
@@ -326,7 +329,8 @@ class BaseIncentiveTask(app.Task):
         )
 
         # Retry grpc Run if needed.
-        metadata = zipkin.create_headers_from_zipkin_attrs(get_tracing_attrs()).items()
+        # ZIPKIN! metadata = zipkin.create_headers_from_zipkin_attrs(get_tracing_attrs()).items()
+        metadata = ()
 
         for i in range(self.grpc_run_retries + 1):
             try:

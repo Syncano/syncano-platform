@@ -29,7 +29,7 @@ from apps.codeboxes.runtimes import LATEST_NODEJS_RUNTIME
 from apps.codeboxes.v1.views import TraceViewSet
 from apps.core.authentication import ApiKeyAuthentication
 from apps.core.exceptions import RequestLimitExceeded
-from apps.core.helpers import Cached, get_tracing_attrs, redis, run_api_view
+from apps.core.helpers import Cached, get_current_span_propagation, propagate_uwsgi_params, redis, run_api_view
 from apps.core.mixins.views import (
     AtomicMixin,
     CacheableObjectMixin,
@@ -37,7 +37,6 @@ from apps.core.mixins.views import (
     NestedViewSetMixin,
     ValidateRequestSizeMixin
 )
-from apps.core.zipkin import propagate_uwsgi_params
 from apps.instances.mixins import InstanceBasedMixin
 from apps.instances.models import Instance
 from apps.instances.throttling import InstanceRateThrottle
@@ -113,7 +112,7 @@ class SocketViewSet(ValidateRequestSizeMixin, DetailSerializerMixin, AtomicMixin
             json.dump(real_file_list, list_file)
 
         try:
-            propagate_uwsgi_params(get_tracing_attrs())
+            propagate_uwsgi_params(get_current_span_propagation())
 
             uwsgi.add_var('OFFLOAD_HANDLER', 'apps.sockets.handlers.SocketZipHandler')
             uwsgi.add_var('LIST_FILE', list_file.name)

@@ -35,6 +35,10 @@ from django.utils.encoding import force_text, smart_text
 from django.utils.functional import Promise
 from django_redis import get_redis_connection
 from munch import Munch
+from opencensus.common import configuration
+from opencensus.trace import execution_context, print_exporter, samplers
+from opencensus.trace import tracer as tracer_module
+from opencensus.trace.propagation import trace_context_http_header_format
 from redis import Redis
 from redis.lock import Lock
 from requests.exceptions import HTTPError, ReadTimeout
@@ -42,6 +46,12 @@ from rest_framework.fields import BooleanField
 from rest_framework.reverse import reverse
 
 from apps.core.validators import validate_id
+
+try:
+    # try to import uwsgi first as that module is not be available outside of uwsgi context (e.g. during tests)
+    import uwsgi
+except ImportError:
+    uwsgi = None
 
 if socket.socket is gevent.socket.socket:
     LOCAL_STORAGE = gevent.local.local()
@@ -97,15 +107,67 @@ def get_schema_cache():
     return LOCAL_STORAGE.schema_cache
 
 
-def get_tracing_attrs():
-    """
-    Tracing attrs to be cleared before every request/task.
-    """
-    return getattr(LOCAL_STORAGE, 'tracing_attrs', None)
+_tracer_sampler = None
+_tracer_exporter = None
+_tracer_propagator = None
 
 
-def set_tracing_attrs(value):
-    LOCAL_STORAGE.tracing_attrs = value
+def get_tracer_propagator():
+    global _tracer_propagator
+
+    if _tracer_propagator is None:
+        settings_ = getattr(settings, 'OPENCENSUS', {})
+        settings_ = settings_.get('TRACE', {})
+
+        _tracer_propagator = settings_.get('PROPAGATOR', None) or \
+            trace_context_http_header_format.TraceContextPropagator()
+        if isinstance(_tracer_propagator, str):
+            _tracer_propagator = configuration.load(_tracer_propagator)
+
+    return _tracer_propagator
+
+
+def create_tracer(span_context=None):
+    global _tracer_sampler, _tracer_exporter
+
+    if _tracer_sampler is None or _tracer_exporter is None:
+        settings_ = getattr(settings, 'OPENCENSUS', {})
+        settings_ = settings_.get('TRACE', {})
+
+        _tracer_sampler = settings_.get('SAMPLER', None) or \
+            samplers.ProbabilitySampler()
+        if isinstance(_tracer_sampler, str):
+            _tracer_sampler = configuration.load(_tracer_sampler)
+
+        _tracer_exporter = settings_.get('EXPORTER', None) or \
+            print_exporter.PrintExporter()
+        if isinstance(_tracer_exporter, str):
+            _tracer_exporter = configuration.load(_tracer_exporter)
+
+    return tracer_module.Tracer(
+        span_context=span_context,
+        sampler=_tracer_sampler,
+        exporter=_tracer_exporter,
+        propagator=get_tracer_propagator())
+
+
+def get_current_tracer():
+    """Get the current request tracer."""
+    return execution_context.get_opencensus_tracer()
+
+
+def get_current_span():
+    return execution_context.get_current_span()
+
+
+def propagate_uwsgi_params(data):
+    for k, v in data.items():
+        uwsgi.add_var(k, v)
+
+
+def get_current_span_propagation():
+    tracer = get_current_tracer()
+    return tracer.propagator.to_headers(tracer.span_context)
 
 
 def get_transaction_blocks_list(using=None):

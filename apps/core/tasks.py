@@ -10,12 +10,10 @@ from django.apps import apps
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.db import models, router, transaction
-from py_zipkin.zipkin import zipkin_span
 from settings.celeryconf import app, register_task
 
-from apps.core import zipkin
 from apps.core.exceptions import ObjectProcessingError
-from apps.core.helpers import Cached, get_tracing_attrs, redis, set_tracing_attrs
+from apps.core.helpers import Cached, create_tracer, get_current_span_propagation, get_tracer_propagator, redis
 from apps.core.middleware import clear_request_data
 from apps.core.mixins import TaskLockMixin
 from apps.instances.helpers import get_current_instance, set_current_instance
@@ -39,24 +37,15 @@ class BaseTask(CeleryTask):
     def apply_async(self, args=None, kwargs=None, task_id=None, producer=None,
                     link=None, link_error=None, **options):
         kwargs = kwargs or {}
-        kwargs['tracing'] = zipkin.create_headers_from_zipkin_attrs(get_tracing_attrs())
+        kwargs['tracing'] = get_current_span_propagation()
         return super().apply_async(args, kwargs, task_id, producer, link, link_error,
                                    **options)
 
     def __call__(self, *args, **kwargs):
-        zipkin_attrs = zipkin.extract_zipkin_attr(kwargs.pop('tracing', None))
-        set_tracing_attrs(zipkin_attrs)
+        propagator = get_tracer_propagator()
+        tracer = create_tracer(propagator.from_headers(kwargs.pop('tracing', {})))
 
-        if not zipkin_attrs.is_sampled:
-            return super().__call__(*args, **kwargs)
-
-        with zipkin_span(
-            service_name=settings.SERVICE_NAME,
-            span_name='{0}.{1}'.format(self.__module__, self.__class__.__name__),
-            zipkin_attrs=zipkin_attrs,
-            transport_handler=zipkin.transport_handler,
-            host='127.0.0.1',
-        ):
+        with tracer.span(name='Task.{0}.{1}'.format(self.__module__, self.__class__.__name__)):
             return super().__call__(*args, **kwargs)
 
     @staticmethod
