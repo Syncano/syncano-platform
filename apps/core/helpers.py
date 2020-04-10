@@ -127,10 +127,10 @@ def get_tracer_propagator():
     return _tracer_propagator
 
 
-def create_tracer(span_context=None):
-    global _tracer_sampler, _tracer_exporter
+def get_tracer_sampler():
+    global _tracer_sampler
 
-    if _tracer_sampler is None or _tracer_exporter is None:
+    if _tracer_sampler is None:
         settings_ = getattr(settings, 'OPENCENSUS', {})
         settings_ = settings_.get('TRACE', {})
 
@@ -139,15 +139,29 @@ def create_tracer(span_context=None):
         if isinstance(_tracer_sampler, str):
             _tracer_sampler = configuration.load(_tracer_sampler)
 
+    return _tracer_sampler
+
+
+def get_tracer_exporter():
+    global _tracer_exporter
+
+    if _tracer_exporter is None:
+        settings_ = getattr(settings, 'OPENCENSUS', {})
+        settings_ = settings_.get('TRACE', {})
+
         _tracer_exporter = settings_.get('EXPORTER', None) or \
             print_exporter.PrintExporter()
         if isinstance(_tracer_exporter, str):
             _tracer_exporter = configuration.load(_tracer_exporter)
 
+    return _tracer_exporter
+
+
+def create_tracer(span_context=None):
     return tracer_module.Tracer(
         span_context=span_context,
-        sampler=_tracer_sampler,
-        exporter=_tracer_exporter,
+        sampler=get_tracer_sampler(),
+        exporter=get_tracer_exporter(),
         propagator=get_tracer_propagator())
 
 

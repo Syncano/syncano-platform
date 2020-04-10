@@ -5,12 +5,22 @@ import logging
 import os
 from datetime import datetime
 
+import django
+from django.conf import settings
+from django.db import connection
 from django.http import HttpResponse
+from opencensus.ext.django.middleware import BLACKLIST_HOSTNAMES, BLACKLIST_PATHS
 from opencensus.ext.django.middleware import OpencensusMiddleware as _OpencensusMiddleware
-from opencensus.ext.django.middleware import _get_current_tracer, utils
+from opencensus.ext.django.middleware import _get_current_tracer, _trace_db_call, utils
 from raven.contrib.django.resolver import RouteResolver
 
-from apps.core.helpers import get_request_cache, get_schema_cache
+from apps.core.helpers import (
+    get_request_cache,
+    get_schema_cache,
+    get_tracer_exporter,
+    get_tracer_propagator,
+    get_tracer_sampler
+)
 from apps.data.models import DataObject
 from apps.instances.helpers import set_current_instance
 
@@ -68,7 +78,17 @@ class InstrumentMiddleware:  # pragma: no cover
 
 class OpencensusMiddleware(_OpencensusMiddleware):
     def __init__(self, get_response=None):
-        super().__init__(get_response)
+        self.get_response = get_response
+
+        self.propagator = get_tracer_propagator()
+        self.exporter = get_tracer_exporter()
+        self.sampler = get_tracer_sampler()
+
+        settings_ = getattr(settings, 'OPENCENSUS', {})
+        settings_ = settings_.get('TRACE', {})
+        self.blacklist_paths = settings_.get(BLACKLIST_PATHS, None)
+        self.blacklist_hostnames = settings_.get(BLACKLIST_HOSTNAMES, None)
+
         self.resolver = RouteResolver()
 
     def process_view(self, request, view_func, *args, **kwargs):
@@ -91,3 +111,10 @@ class OpencensusMiddleware(_OpencensusMiddleware):
                 attribute_value=utils.get_func_name(view_func))
         except Exception:  # pragma: no cover
             logger.error('Failed to trace request', exc_info=True)
+
+    def __call__(self, request):
+        # Fix: from https://github.com/census-instrumentation/opencensus-python/pull/811
+        if django.VERSION >= (2,):  # pragma: NO COVER
+            with connection.execute_wrapper(_trace_db_call):
+                return super(OpencensusMiddleware, self).__call__(request)
+        return super(OpencensusMiddleware, self).__call__(request)
