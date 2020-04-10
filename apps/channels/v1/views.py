@@ -32,7 +32,7 @@ from apps.channels.v1.serializers import (
     ChannelSerializer,
     ChannelSubscribeSerializer
 )
-from apps.core.helpers import get_from_request_query_params, get_tracing_attrs
+from apps.core.helpers import get_current_span_propagation, get_from_request_query_params, propagate_uwsgi_params
 from apps.core.mixins.views import (
     AtomicMixin,
     AutocompleteMixin,
@@ -41,7 +41,6 @@ from apps.core.mixins.views import (
     ValidateRequestSizeMixin
 )
 from apps.core.throttling import AnonRateThrottle
-from apps.core.zipkin import propagate_uwsgi_params
 from apps.instances.mixins import InstanceBasedMixin
 from apps.redis_storage import views as redis_views
 from apps.users.permissions import HasUser
@@ -117,7 +116,7 @@ class ChannelViewSet(CacheableObjectMixin,
 
     def create_uwsgi_response(self, request, channel, last_id, room, transport='poll'):
         try:
-            propagate_uwsgi_params(get_tracing_attrs())
+            propagate_uwsgi_params(get_current_span_propagation())
 
             if transport == 'poll':
                 uwsgi.add_var('OFFLOAD_HANDLER', 'apps.channels.handlers.ChannelPollHandler')

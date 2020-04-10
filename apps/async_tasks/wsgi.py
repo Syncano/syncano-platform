@@ -10,14 +10,22 @@ import django
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import HttpResponseBase
-from django.utils.encoding import force_bytes
-from py_zipkin.zipkin import zipkin_span
+from opencensus.trace import attributes_helper
+from opencensus.trace import span as span_module
+
+from apps.core.helpers import create_tracer, get_tracer_propagator
 
 # Set up Django for logging and stuff, it has to be done before importing django parts in handler
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.development")  # noqa
 django.setup()  # noqa
 
 
+HTTP_HOST = attributes_helper.COMMON_ATTRIBUTES['HTTP_HOST']
+HTTP_METHOD = attributes_helper.COMMON_ATTRIBUTES['HTTP_METHOD']
+HTTP_PATH = attributes_helper.COMMON_ATTRIBUTES['HTTP_PATH']
+HTTP_ROUTE = attributes_helper.COMMON_ATTRIBUTES['HTTP_ROUTE']
+HTTP_URL = attributes_helper.COMMON_ATTRIBUTES['HTTP_URL']
+HTTP_STATUS_CODE = attributes_helper.COMMON_ATTRIBUTES['HTTP_STATUS_CODE']
 DEFAULT_HEADERS = (
     ('Cache-Control', 'no-cache'),
 )
@@ -32,8 +40,7 @@ logger = logging.getLogger(__name__)
 
 
 def application(environ, start_response):
-    from apps.core import zipkin
-    from apps.core.helpers import import_class, set_tracing_attrs
+    from apps.core.helpers import import_class
 
     # Get and initialize if needed defined offload handler
     offload_handler = environ.get('OFFLOAD_HANDLER')
@@ -44,27 +51,36 @@ def application(environ, start_response):
     else:
         handler = HANDLERS[offload_handler]
 
-    request = WSGIRequest(environ)
-    zipkin_attrs = zipkin.extract_zipkin_attr(environ)
-    set_tracing_attrs(zipkin_attrs)
+    propagator = get_tracer_propagator()
+    tracer = create_tracer(propagator.from_headers(environ))
 
-    if zipkin_attrs.is_sampled:
-        with zipkin_span(
-            service_name=ASYNC_SERVICE_NAME,
-            span_name='{0} {1}'.format(request.method, force_bytes(request.path)),
-            zipkin_attrs=zipkin_attrs,
-            transport_handler=zipkin.transport_handler,
-            host='127.0.0.1',
-            port=443,
-        ) as zipkin_context:
-            response = handler.application(request)
-            binary_annotations = zipkin.get_binary_annotations(request, response)
-            binary_annotations['offload_handler'] = offload_handler
-            zipkin_context.update_binary_annotations(
-                binary_annotations
-            )
-    else:
+    request = WSGIRequest(environ)
+
+    with tracer.span(name='Async.' + str(request.path)) as span:
         response = handler.application(request)
+
+        span.span_kind = span_module.SpanKind.SERVER
+        span.add_attribute(
+            attribute_key=HTTP_HOST,
+            attribute_value=request.get_host())
+        span.add_attribute(
+            attribute_key=HTTP_METHOD,
+            attribute_value=request.method)
+        span.add_attribute(
+            attribute_key=HTTP_PATH,
+            attribute_value=str(request.path))
+        span.add_attribute(
+            attribute_key=HTTP_ROUTE,
+            attribute_value=str(request.path))
+        span.add_attribute(
+            attribute_key=HTTP_URL,
+            attribute_value=str(request.build_absolute_uri()))
+        span.add_attribute(
+            attribute_key=HTTP_STATUS_CODE,
+            attribute_value=response.status_code)
+        span.add_attribute(
+            attribute_key='async.offload_handler',
+            attribute_value=offload_handler)
 
     if not isinstance(response, HttpResponseBase):
         return response

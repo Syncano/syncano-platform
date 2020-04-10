@@ -74,7 +74,6 @@ class ChannelHandler(RedisPubSubHandler):
                     yield data
         except Empty:
             # End of results
-            yield ''
             return
 
     def get_change_from_database(self, environ, last_id, limit=1):
@@ -97,12 +96,11 @@ class ChannelHandler(RedisPubSubHandler):
 class ChannelPollHandler(ChannelHandler):
     def get_response(self, request):
         content = list(self.process_channel_subscribe(request.environ, generate_key()))
-        if not content[0]:
+        if not content:
             return JSONResponse(status=status.HTTP_204_NO_CONTENT)
 
-        content_str = ''.join(content)
-        response = JSONResponse(content_str)
-        response['X-Last-Id'] = self.extract_change_id(content_str)
+        response = JSONResponse(content[0])
+        response['X-Last-Id'] = self.extract_change_id(content[0])
         return response
 
 
@@ -114,8 +112,7 @@ class ChannelWSHandler(ChannelHandler, WebSocketHandler, RedisPubSubHandler):
         try:
             for data in self.process_channel_subscribe(request.environ, client.id,
                                                        maxsize=self.max_queue_size):
-                if data:
-                    client.send(data)
+                client.send(data)
         except exceptions.APIException as exc:
             # Process API Exception in similar fashion it is handled in DRF
             field = getattr(exc, 'field', None) or 'detail'

@@ -4,12 +4,12 @@
 
 ## Dependencies
 
-- Python version 3.6+.
+- Python version 3.7+.
 - docker 1.13+ and docker-compose (`pip install docker-compose`).
 
 ## Testing
 
-- Run `make test` to run code checks and all tests with coverage. 
+- Run `make test` to run code checks and all tests with coverage.
 
 ## Starting locally
 

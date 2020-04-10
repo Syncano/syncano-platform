@@ -1,23 +1,35 @@
 # coding=UTF8
 import cProfile
 import io
+import logging
 import os
 from datetime import datetime
 
+import django
 from django.conf import settings
+from django.db import connection
 from django.http import HttpResponse
-from py_zipkin.zipkin import zipkin_span
+from opencensus.ext.django.middleware import BLACKLIST_HOSTNAMES, BLACKLIST_PATHS
+from opencensus.ext.django.middleware import OpencensusMiddleware as _OpencensusMiddleware
+from opencensus.ext.django.middleware import _get_current_tracer, _trace_db_call, utils
+from raven.contrib.django.resolver import RouteResolver
 
-from apps.core import zipkin
-from apps.core.helpers import get_request_cache, get_schema_cache, set_tracing_attrs
+from apps.core.helpers import (
+    get_request_cache,
+    get_schema_cache,
+    get_tracer_exporter,
+    get_tracer_propagator,
+    get_tracer_sampler
+)
 from apps.data.models import DataObject
 from apps.instances.helpers import set_current_instance
+
+logger = logging.getLogger(__name__)
 
 
 def clear_request_data():
     get_request_cache().clear()
     get_schema_cache().clear()
-    set_tracing_attrs(None)
     set_current_instance(None)
     DataObject.loaded_klass = None
 
@@ -64,28 +76,45 @@ class InstrumentMiddleware:  # pragma: no cover
         return response
 
 
-class ZipkinMiddleware:
-    def __init__(self, get_response):
+class OpencensusMiddleware(_OpencensusMiddleware):
+    def __init__(self, get_response=None):
         self.get_response = get_response
 
+        self.propagator = get_tracer_propagator()
+        self.exporter = get_tracer_exporter()
+        self.sampler = get_tracer_sampler()
+
+        settings_ = getattr(settings, 'OPENCENSUS', {})
+        settings_ = settings_.get('TRACE', {})
+        self.blacklist_paths = settings_.get(BLACKLIST_PATHS, None)
+        self.blacklist_hostnames = settings_.get(BLACKLIST_HOSTNAMES, None)
+
+        self.resolver = RouteResolver()
+
+    def process_view(self, request, view_func, *args, **kwargs):
+        """Process view is executed before the view function, here we get the
+        function name add set it as the span name.
+        """
+
+        # Do not trace if the url is blacklisted
+        if utils.disable_tracing_url(request.path, self.blacklist_paths):
+            return
+
+        try:
+            # Get the current span and set the span name to the current
+            # function name of the request.
+            tracer = _get_current_tracer()
+            span = tracer.current_span()
+            span.name = self.resolver.resolve(request.path_info)
+            tracer.add_attribute_to_current_span(
+                attribute_key='django.view',
+                attribute_value=utils.get_func_name(view_func))
+        except Exception:  # pragma: no cover
+            logger.error('Failed to trace request', exc_info=True)
+
     def __call__(self, request):
-        self.zipkin_attrs = zipkin.create_zipkin_attr_from_request(request)
-        set_tracing_attrs(self.zipkin_attrs)
-
-        if self.zipkin_attrs.is_sampled:
-            self.zipkin_context = zipkin_span(
-                service_name=settings.SERVICE_NAME,
-                span_name='{0} {1}'.format(request.method, request.path),
-                zipkin_attrs=self.zipkin_attrs,
-                transport_handler=zipkin.transport_handler,
-            )
-            self.zipkin_context.start()
-
-        response = self.get_response(request)
-
-        if self.zipkin_attrs.is_sampled:
-            self.zipkin_context.update_binary_annotations(
-                zipkin.get_binary_annotations(request, response),
-            )
-            self.zipkin_context.stop()
-        return response
+        # Fix: from https://github.com/census-instrumentation/opencensus-python/pull/811
+        if django.VERSION >= (2,):  # pragma: NO COVER
+            with connection.execute_wrapper(_trace_db_call):
+                return super(OpencensusMiddleware, self).__call__(request)
+        return super(OpencensusMiddleware, self).__call__(request)

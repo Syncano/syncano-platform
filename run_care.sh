@@ -33,7 +33,7 @@ INIT_CMD='SET client_min_messages TO WARNING;
     CREATE EXTENSION IF NOT EXISTS pg_trgm;
     CREATE EXTENSION IF NOT EXISTS postgis;'
 
-psql -q -h $PGHOST -d $PGDATABASE -U $PGUSER -c "$INIT_CMD"
+psql -q -h $PGHOST -d template1 -U $PGUSER -c "$INIT_CMD"
 
 exec python3 manage.py migrate $ADDITIONAL_ARGS --noinput --verbosity 0
 

@@ -225,7 +225,7 @@ TEMPLATES = [
 
 MIDDLEWARE = (
     'apps.core.middleware.PrepareRequestMiddleware',
-    'apps.core.middleware.ZipkinMiddleware',
+    'apps.core.middleware.OpencensusMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'apps.hosting.middleware.HostingMiddleware',
@@ -562,10 +562,20 @@ CELERY_TASK_ROUTES = {
 
 # Tracing
 TRACING_SAMPLING = float(os.environ.get('TRACING_SAMPLING', 0))
+JAEGER_HOST = os.environ.get('JAEGER_HOST', 'jaeger')
+JAEGER_PORT = int(os.environ.get('JAEGER_PORT', 14268))
 SERVICE_NAME = os.environ.get('SERVICE_NAME', 'platform-{}'.format(os.environ.get('INSTANCE_TYPE', 'web')))
-ZIPKIN_ADDR = os.environ.get('ZIPKIN_ADDR', 'jaeger')
-ZIPKIN_TIMEOUT = 3
-ZIPKIN_RAISE = False
+
+OPENCENSUS = {
+    'TRACE': {
+        'SAMPLER': 'opencensus.trace.samplers.ProbabilitySampler(rate=%f)' % (TRACING_SAMPLING),
+        # 'EXPORTER': '''opencensus.ext.jaeger.trace_exporter.JaegerExporter(service_name='%s',
+        #                host_name='%s', port=%d)''' % (SERVICE_NAME, JAEGER_HOST, JAEGER_PORT),
+        'EXPORTER': '''opencensus.ext.zipkin.trace_exporter.ZipkinExporter(service_name='%s',
+                       host_name='%s', port=9411)''' % (SERVICE_NAME, JAEGER_HOST),
+        'PROPAGATOR': 'opencensus.trace.propagation.b3_format.B3FormatPropagator()',
+    }
+}
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
@@ -783,7 +793,7 @@ DATA_OBJECT_RELATION_LIMIT = 1000
 CHANGES_TTL = 24 * 60 * 60
 CHANGES_TRIMMED_TTL = 1 * 60 * 60
 CHANNEL_MAX_ROOM_LENGTH = 128
-CHANNEL_POLL_TIMEOUT = int(os.environ.get('CHANNEL_POLL_TIMEOUT', 5 * 60))  # 5 minutes
+CHANNEL_POLL_TIMEOUT = int(os.environ.get('CHANNEL_POLL_TIMEOUT', 300))  # 5 minutes
 CHANNEL_TASK_TIMEOUT = int(os.environ.get('CHANNEL_TASK_TIMEOUT', 30))  # 30 seconds
 CHANNEL_LAST_ID_TIMEOUT = int(os.environ.get('CHANNEL_LAST_ID_TIMEOUT', 2 * 60 * 60))  # 2 hours
 
