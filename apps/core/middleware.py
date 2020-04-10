@@ -5,13 +5,11 @@ import logging
 import os
 from datetime import datetime
 
-import django
 from django.conf import settings
-from django.db import connection
 from django.http import HttpResponse
 from opencensus.ext.django.middleware import BLACKLIST_HOSTNAMES, BLACKLIST_PATHS
 from opencensus.ext.django.middleware import OpencensusMiddleware as _OpencensusMiddleware
-from opencensus.ext.django.middleware import _get_current_tracer, _trace_db_call, utils
+from opencensus.ext.django.middleware import _get_current_tracer, utils
 from raven.contrib.django.resolver import RouteResolver
 
 from apps.core.helpers import (
@@ -105,16 +103,9 @@ class OpencensusMiddleware(_OpencensusMiddleware):
             # function name of the request.
             tracer = _get_current_tracer()
             span = tracer.current_span()
-            span.name = self.resolver.resolve(request.path_info)
+            span.name = 'Recv.' + self.resolver.resolve(request.path_info)
             tracer.add_attribute_to_current_span(
                 attribute_key='django.view',
                 attribute_value=utils.get_func_name(view_func))
         except Exception:  # pragma: no cover
             logger.error('Failed to trace request', exc_info=True)
-
-    def __call__(self, request):
-        # Fix: from https://github.com/census-instrumentation/opencensus-python/pull/811
-        if django.VERSION >= (2,):  # pragma: NO COVER
-            with connection.execute_wrapper(_trace_db_call):
-                return super(OpencensusMiddleware, self).__call__(request)
-        return super(OpencensusMiddleware, self).__call__(request)
