@@ -1,6 +1,7 @@
 import re
 from datetime import datetime
 
+from django.utils import timezone
 from django.utils.encoding import force_text
 from OpenSSL import crypto
 from rest_framework.serializers import ValidationError
@@ -75,7 +76,7 @@ class APNSCertificateValidator:
             message = 'Invalid expiration date: "{}".'
             raise ValidationError(message.format(not_after))
 
-        if expiration_date < datetime.today():
+        if expiration_date < timezone.now():
             message = 'Your certificate has expired: "{}".'
             raise ValidationError(message.format(expiration_date))
 
