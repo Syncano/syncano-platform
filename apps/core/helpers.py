@@ -161,6 +161,9 @@ def get_current_span():
 
 
 def propagate_uwsgi_params(data):
+    if uwsgi is None:
+        return
+
     for k, v in data.items():
         uwsgi.add_var(k, v)
 
