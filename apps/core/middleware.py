@@ -89,5 +89,5 @@ class OpencensusMiddleware(_OpencensusMiddleware):
             tracer.add_attribute_to_current_span(
                 attribute_key='django.view',
                 attribute_value=utils.get_func_name(view_func))
-        except Exception:  # pragma: NO COVER
+        except Exception:  # pragma: no cover
             logger.error('Failed to trace request', exc_info=True)

@@ -167,7 +167,10 @@ def propagate_uwsgi_params(data):
 
 def get_current_span_propagation():
     tracer = get_current_tracer()
-    return tracer.propagator.to_headers(tracer.span_context)
+    try:
+        return tracer.propagator.to_headers(tracer.span_context)
+    except Exception:  # pragma: no cover
+        return {}
 
 
 def get_transaction_blocks_list(using=None):
