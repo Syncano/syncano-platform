@@ -3,10 +3,15 @@ import gevent.monkey  # isort:skip
 
 gevent.monkey.patch_all()  # noqa
 
-import logging
-import os
+import os # isort:skip
+import django # isort:skip
 
-import django
+# Set up Django for logging and stuff, it has to be done before importing django parts in handler
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.development")  # noqa
+django.setup()  # noqa
+
+import logging
+
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import HttpResponseBase
@@ -14,11 +19,6 @@ from opencensus.trace import attributes_helper
 from opencensus.trace import span as span_module
 
 from apps.core.helpers import create_tracer, get_tracer_propagator
-
-# Set up Django for logging and stuff, it has to be done before importing django parts in handler
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.development")  # noqa
-django.setup()  # noqa
-
 
 HTTP_HOST = attributes_helper.COMMON_ATTRIBUTES['HTTP_HOST']
 HTTP_METHOD = attributes_helper.COMMON_ATTRIBUTES['HTTP_METHOD']
