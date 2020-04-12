@@ -3,8 +3,8 @@ import gevent.monkey  # isort:skip
 
 gevent.monkey.patch_all()  # noqa
 
-import os # isort:skip
-import django # isort:skip
+import os  # isort:skip
+import django  # isort:skip
 
 # Set up Django for logging and stuff, it has to be done before importing django parts in handler
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.development")  # noqa
