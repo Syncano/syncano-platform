@@ -4,9 +4,8 @@ from django.http import HttpResponse
 
 from apps.async_tasks.exceptions import UwsgiValueError
 from apps.batch.decorators import disallow_batching
-from apps.core.helpers import get_tracing_attrs, redis
+from apps.core.helpers import get_current_span_propagation, propagate_uwsgi_params, redis
 from apps.core.mixins.views import ValidateRequestSizeMixin
-from apps.core.zipkin import propagate_uwsgi_params
 from apps.sockets.tasks import AsyncScriptTask
 from apps.webhooks.exceptions import UnsupportedPayload
 from apps.webhooks.helpers import prepare_payload_data, strip_meta_from_uwsgi_info
@@ -144,7 +143,7 @@ class AsyncScriptRunnerMixin(ValidateRequestSizeMixin):
     def create_uwsgi_response(self, request, obj, instance, trace, payload_key, meta_key=None, script=None,
                               offload_handler_class=None, uwsgi_handler=None):
         try:
-            propagate_uwsgi_params(get_tracing_attrs())
+            propagate_uwsgi_params(get_current_span_propagation())
 
             if uwsgi_handler is not None:
                 uwsgi.add_var('UWSGI_HANDLER', uwsgi_handler)

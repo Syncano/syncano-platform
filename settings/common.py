@@ -2,8 +2,8 @@
 import os
 from datetime import timedelta
 
-from corsheaders.defaults import default_headers
 from celery.schedules import crontab
+from corsheaders.defaults import default_headers
 from django.utils.dateparse import parse_date
 from kombu import Exchange, Queue
 
@@ -225,7 +225,7 @@ TEMPLATES = [
 
 MIDDLEWARE = (
     'apps.core.middleware.PrepareRequestMiddleware',
-    'apps.core.middleware.ZipkinMiddleware',
+    'apps.core.middleware.OpencensusMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'apps.hosting.middleware.HostingMiddleware',
@@ -561,12 +561,21 @@ CELERY_TASK_ROUTES = {
 }
 
 # Tracing
-TRACING_ENABLED = os.environ.get('TRACING_ENABLED', 'true') == 'true'
-TRACING_SAMPLING = float(os.environ.get('TRACING_SAMPLING', 100))
+TRACING_SAMPLING = float(os.environ.get('TRACING_SAMPLING', 0))
+JAEGER_HOST = os.environ.get('JAEGER_HOST', 'jaeger')
+JAEGER_PORT = int(os.environ.get('JAEGER_PORT', 14268))
 SERVICE_NAME = os.environ.get('SERVICE_NAME', 'platform-{}'.format(os.environ.get('INSTANCE_TYPE', 'web')))
-ZIPKIN_ADDR = os.environ.get('ZIPKIN_ADDR', 'jaeger')
-ZIPKIN_TIMEOUT = 3
-ZIPKIN_RAISE = False
+
+OPENCENSUS = {
+    'TRACE': {
+        'SAMPLER': 'opencensus.trace.samplers.ProbabilitySampler(rate=%f)' % (TRACING_SAMPLING),
+        # 'EXPORTER': '''opencensus.ext.jaeger.trace_exporter.JaegerExporter(service_name='%s',
+        #                host_name='%s', port=%d)''' % (SERVICE_NAME, JAEGER_HOST, JAEGER_PORT),
+        'EXPORTER': '''opencensus.ext.zipkin.trace_exporter.ZipkinExporter(service_name='%s',
+                       host_name='%s', port=9411)''' % (SERVICE_NAME, JAEGER_HOST),
+        'PROPAGATOR': 'opencensus.trace.propagation.b3_format.B3FormatPropagator()',
+    }
+}
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
@@ -748,7 +757,6 @@ CODEBOX_PER_INSTANCE_SCHEDULING_CHECK = 20
 PERIODIC_SCHEDULE_MIN_INTERVAL = 30
 
 # New Codebox settings
-CODEBOX_GRPC_OPTIONS = [('grpc.keepalive_time_ms', 5000), ('grpc.keepalive_timeout_ms', 3000)]
 CODEBOX_BROKER_UWSGI = os.environ.get('CODEBOX_BROKER_UWSGI', 'codebox-broker:8080')
 CODEBOX_BROKER_GRPC = os.environ.get('CODEBOX_BROKER_GRPC', 'codebox-broker:9000')
 CODEBOX_RELEASE = parse_date(os.environ.get('CODEBOX_RELEASE', '2017-01-01'))
@@ -785,7 +793,7 @@ DATA_OBJECT_RELATION_LIMIT = 1000
 CHANGES_TTL = 24 * 60 * 60
 CHANGES_TRIMMED_TTL = 1 * 60 * 60
 CHANNEL_MAX_ROOM_LENGTH = 128
-CHANNEL_POLL_TIMEOUT = int(os.environ.get('CHANNEL_POLL_TIMEOUT', 5 * 60))  # 5 minutes
+CHANNEL_POLL_TIMEOUT = int(os.environ.get('CHANNEL_POLL_TIMEOUT', 300))  # 5 minutes
 CHANNEL_TASK_TIMEOUT = int(os.environ.get('CHANNEL_TASK_TIMEOUT', 30))  # 30 seconds
 CHANNEL_LAST_ID_TIMEOUT = int(os.environ.get('CHANNEL_LAST_ID_TIMEOUT', 2 * 60 * 60))  # 2 hours
 

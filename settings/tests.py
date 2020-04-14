@@ -32,9 +32,6 @@ if os.environ.get('TEST_MIGRATIONS', '') != 'true':
 # Disable analytics
 ANALYTICS_ENABLED = False
 
-# Disable tracing
-TRACING_ENABLED = False
-
 # Force separate redis db
 REDIS_DB = 1
 CACHES['default']['LOCATION'] = 'redis://{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB),

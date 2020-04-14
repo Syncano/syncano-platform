@@ -32,13 +32,13 @@ class TestChannelHandlerSubscription(CleanupTestCaseMixin, TestCase):
             queue_mock().get = mock.Mock(side_effect=queue.Empty)
             result, event_mock = self.subscribe_to_channel(mock_args={'side_effect': [False, False, True]})
             self.assertEqual(event_mock.call_count, 3)
-            self.assertEqual(result, [''])
+            self.assertEqual(result, [])
 
     def test_timeout_on_getting_results_returns_empty_string(self):
         with mock.patch('apps.async_tasks.handlers.Queue') as queue_mock:
             queue_mock().get = mock.Mock(side_effect=queue.Empty)
             result, _ = self.subscribe_to_channel()
-            self.assertEqual(result, [''])
+            self.assertEqual(result, [])
 
     @override_settings(CHANNEL_POLL_TIMEOUT=0)
     def test_subscribe_returns_none_when_remaining_time_gets_to_zero(self):
@@ -46,10 +46,10 @@ class TestChannelHandlerSubscription(CleanupTestCaseMixin, TestCase):
         self.assertEqual(result, [])
 
     def test_subscribe_filters_results_by_last_id(self):
-        data = ['{"id":123,"abc":321}', '{"id":124,"abc":321}']
+        data = ['{"id":123,"abc":321}', '{"id":124,"abc":321}', queue.Empty]
         for last_id, expected_res in (
             (123, [data[1]]),
-            (122, data),
+            (122, data[:-1]),
         ):
             with mock.patch('apps.async_tasks.handlers.Queue') as queue_mock:
                 queue_mock().get = mock.Mock(side_effect=data)
@@ -61,7 +61,7 @@ class TestChannelPollHandler(CleanupTestCaseMixin, TestCase):
     def setUp(self):
         self.handler = ChannelPollHandler()
 
-    @mock.patch('apps.channels.handlers.ChannelPollHandler.process_channel_subscribe', return_value=[''])
+    @mock.patch('apps.channels.handlers.ChannelPollHandler.process_channel_subscribe', return_value=[])
     def test_get_response_calls_subscribe(self, subscribe_mock):
         response = self.handler.get_response(mock.MagicMock())
         self.assertTrue(subscribe_mock.called)

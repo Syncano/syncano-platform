@@ -28,9 +28,32 @@ spec:
       terminationGracePeriodSeconds: 330
       securityContext:
         fsGroup: 1000
+      volumes:
+        - name: acme
+          secret:
+            secretName: platform-acme
+{%- if GCP_LOCATIONS %}
+  {%- for item in GCP_LOCATIONS.split(',') %}
+        - name: {{ item }}-storage-credentials
+          secret:
+            secretName: {{ item }}-storage-credentials
+  {%- endfor %}
+{%- endif %}
       containers:
         - name: web
           image: {{ IMAGE }}
+          volumeMounts:
+            - name: acme
+              mountPath: "/acme/config/account.thumb"
+              readOnly: true
+              subPath: account.thumb
+{%- if GCP_LOCATIONS %}
+  {%- for item in GCP_LOCATIONS.split(',') %}
+            - name: {{ item }}-storage-credentials
+              mountPath: /secrets/{{ item }}-storage
+              readOnly: true
+  {%- endfor %}
+{%- endif %}
           securityContext:
             runAsGroup: 1000
             runAsNonRoot: true
@@ -67,20 +90,3 @@ spec:
                 - -c
                 - curl -f localhost:1717
             initialDelaySeconds: 5
-
-{%- if GCP_LOCATIONS %}
-          volumeMounts:
-  {%- for item in GCP_LOCATIONS.split(',') %}
-            - name: {{ item }}-storage-credentials
-              mountPath: /secrets/{{ item }}-storage
-              readOnly: true
-  {%- endfor %}
-{%- endif %}
-{%- if GCP_LOCATIONS %}
-      volumes:
-  {%- for item in GCP_LOCATIONS.split(',') %}
-        - name: {{ item }}-storage-credentials
-          secret:
-            secretName: {{ item }}-storage-credentials
-  {%- endfor %}
-{%- endif %}
