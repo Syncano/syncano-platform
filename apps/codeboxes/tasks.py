@@ -47,7 +47,7 @@ QUEUE_PRIORITY_TEMPLATE = "codebox:instance:{instance}:priority_queue"
 QUEUE_TEMPLATE = "codebox:instance:{instance}:queue"
 SPEC_TEMPLATE = 'codebox:spec:{instance_pk}:{incentive_pk}:{spec_id}'
 SPEC_TIMEOUT = 30 * 60  # 30 minutes
-GRPC_RUN_TIMEOUT = 5
+GRPC_RUN_TIMEOUT = 10
 
 
 def _get_instance(instance_pk):
