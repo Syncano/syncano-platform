@@ -207,9 +207,12 @@ class WebSocketHandler(BasicHandler):
         while True:
             if not client.connected:
                 recv_queue.put(None)
+
                 if listener is not None:
                     listener.kill()
+
                 handler.join(client.timeout)
+
                 return ''
 
             # wait for event to draw our attention
@@ -226,4 +229,5 @@ class WebSocketHandler(BasicHandler):
             # handler done, we're outta here
             elif handler.ready():
                 listener.kill()
+
                 return ''

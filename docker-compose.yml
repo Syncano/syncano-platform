@@ -161,7 +161,7 @@ services:
       - "5432"
 
   redis:
-    image: redis:3.2-alpine
+    image: redis:5-alpine
     volumes:
       - data-redis:/data
     ports:
