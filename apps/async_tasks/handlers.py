@@ -5,6 +5,7 @@ from collections import defaultdict
 
 import gevent
 from django.conf import settings
+from django.http import HttpResponse
 from gevent.event import Event
 from gevent.queue import Empty, Full, Queue
 from gevent.select import select
@@ -207,10 +208,13 @@ class WebSocketHandler(BasicHandler):
         while True:
             if not client.connected:
                 recv_queue.put(None)
+
                 if listener is not None:
                     listener.kill()
+
                 handler.join(client.timeout)
-                return ''
+
+                return HttpResponse(status=status.HTTP_200_OK)
 
             # wait for event to draw our attention
             gevent.wait([handler, send_event, recv_event], None, 1)
@@ -226,4 +230,5 @@ class WebSocketHandler(BasicHandler):
             # handler done, we're outta here
             elif handler.ready():
                 listener.kill()
-                return ''
+
+                return HttpResponse(status=status.HTTP_200_OK)
