@@ -76,11 +76,13 @@ def application(environ, start_response):
             attribute_key=HTTP_URL,
             attribute_value=str(request.build_absolute_uri()))
         span.add_attribute(
-            attribute_key=HTTP_STATUS_CODE,
-            attribute_value=response.status_code)
-        span.add_attribute(
             attribute_key='async.offload_handler',
             attribute_value=offload_handler)
+
+        if response:
+            span.add_attribute(
+                attribute_key=HTTP_STATUS_CODE,
+                attribute_value=response.status_code)
 
     if not isinstance(response, HttpResponseBase):
         return response

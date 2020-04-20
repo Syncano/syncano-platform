@@ -46,7 +46,7 @@ python-gcm==0.4
 python-rapidjson==0.6.3
 pytz==2018.7
 PyYAML==3.13
-raven==6.9.0
+raven==6.10.0
 redis==3.3.8
 requests==2.20.0
 requests-oauthlib==1.0.0
