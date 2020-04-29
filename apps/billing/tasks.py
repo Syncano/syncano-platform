@@ -108,6 +108,7 @@ class CreateInvoiceCharge(TaskLockMixin, app.Task):
 
             try:
                 invoice.charge()
+                Profile.invalidate_billing_status(invoice.admin_id)
             except Exception as exc:
                 raise self.retry(exc=exc)
 
