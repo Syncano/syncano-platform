@@ -304,7 +304,7 @@ class BaseIncentiveTask(app.Task):
                 'trace': json.dumps(spec['trace']).encode(),
                 'trace_id': spec['trace']['id'],
             },
-            lbMeta={
+            lb_meta={
                 'concurrency_key': str(instance.pk),
                 'concurrency_limit': spec['run']['concurrency_limit'],
             },
