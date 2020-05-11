@@ -315,8 +315,8 @@ class BaseIncentiveTask(app.Task):
                     'user_id': str(instance.pk),
                     'environment': environment_hash,
                     'options': {
-                        'entryPoint': entrypoint,
-                        'outputLimit': settings.CODEBOX_RESULT_SIZE_LIMIT,
+                        'entrypoint': entrypoint,
+                        'output_limit': settings.CODEBOX_RESULT_SIZE_LIMIT,
                         'timeout': int(spec['run']['timeout'] * 1000),
                         'async': spec['run']['async'],
                         'mcpu': spec['run']['mcpu'],
