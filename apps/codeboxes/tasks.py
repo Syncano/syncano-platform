@@ -12,6 +12,7 @@ from django.utils.dateparse import parse_datetime
 from munch import Munch
 from opencensus.ext.grpc import client_interceptor
 from settings.celeryconf import app, register_task
+from syncano.codebox.broker.v1 import broker_pb2, broker_pb2_grpc
 
 from apps.admins.models import Admin
 from apps.billing.models import AdminLimit
@@ -270,7 +271,6 @@ class BaseIncentiveTask(app.Task):
 
     def process_grpc(self, instance, incentive, spec):
         logger = self.get_logger()
-        from apps.codeboxes.proto import broker_pb2, broker_pb2_grpc
 
         if self.runner is None:
             tracer_interceptor = client_interceptor.OpenCensusClientInterceptor(
