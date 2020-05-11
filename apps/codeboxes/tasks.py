@@ -300,26 +300,26 @@ class BaseIncentiveTask(app.Task):
         req = broker_pb2.RunRequest(
             meta={
                 'files': socket.get_files(),
-                'environmentURL': environment_url,
+                'environment_url': environment_url,
                 'trace': json.dumps(spec['trace']).encode(),
-                'traceID': spec['trace']['id'],
+                'trace_id': spec['trace']['id'],
             },
             lbMeta={
-                'concurrencyKey': str(instance.pk),
-                'concurrencyLimit': spec['run']['concurrency_limit'],
+                'concurrency_key': str(instance.pk),
+                'concurrency_limit': spec['run']['concurrency_limit'],
             },
             request=[{
                 'meta': {
                     'runtime': spec['run']['runtime_name'],
-                    'sourceHash': socket.get_hash(),
-                    'userID': str(instance.pk),
+                    'source_hash': socket.get_hash(),
+                    'user_id': str(instance.pk),
                     'environment': environment_hash,
                     'options': {
                         'entryPoint': entrypoint,
                         'outputLimit': settings.CODEBOX_RESULT_SIZE_LIMIT,
                         'timeout': int(spec['run']['timeout'] * 1000),
                         'async': spec['run']['async'],
-                        'mCPU': spec['run']['mcpu'],
+                        'mcpu': spec['run']['mcpu'],
                         'args': spec['run']['additional_args'].encode(),
                         'config': spec['run']['config'].encode(),
                         'meta': spec['run']['meta'].encode(),
