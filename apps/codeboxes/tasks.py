@@ -297,7 +297,7 @@ class BaseIncentiveTask(app.Task):
             environment_hash = environment.get_hash()
             environment_url = environment.get_url()
 
-        req = broker_pb2.RunRequest(
+        req = broker_pb2.SimpleRunRequest(
             meta={
                 'files': socket.get_files(),
                 'environment_url': environment_url,
@@ -308,33 +308,28 @@ class BaseIncentiveTask(app.Task):
                 'concurrency_key': str(instance.pk),
                 'concurrency_limit': spec['run']['concurrency_limit'],
             },
-            request=[{
-                'meta': {
-                    'runtime': spec['run']['runtime_name'],
-                    'source_hash': socket.get_hash(),
-                    'user_id': str(instance.pk),
-                    'environment': environment_hash,
-                    'options': {
-                        'entrypoint': entrypoint,
-                        'output_limit': settings.CODEBOX_RESULT_SIZE_LIMIT,
-                        'timeout': int(spec['run']['timeout'] * 1000),
-                        'async': spec['run']['async'],
-                        'mcpu': spec['run']['mcpu'],
-                        'args': spec['run']['additional_args'].encode(),
-                        'config': spec['run']['config'].encode(),
-                        'meta': spec['run']['meta'].encode(),
-                    },
+            script_meta={
+                'runtime': spec['run']['runtime_name'],
+                'source_hash': socket.get_hash(),
+                'user_id': str(instance.pk),
+                'environment': environment_hash,
+                'options': {
+                    'entrypoint': entrypoint,
+                    'output_limit': settings.CODEBOX_RESULT_SIZE_LIMIT,
+                    'timeout': int(spec['run']['timeout'] * 1000),
+                    'async': spec['run']['async'],
+                    'mcpu': spec['run']['mcpu'],
+                    'args': spec['run']['additional_args'].encode(),
+                    'config': spec['run']['config'].encode(),
+                    'meta': spec['run']['meta'].encode(),
                 },
-            }]
+            },
         )
 
         # Retry grpc Run if needed.
-        # ZIPKIN! metadata = zipkin.create_headers_from_zipkin_attrs(get_tracing_attrs()).items()
-        metadata = ()
-
         for i in range(self.grpc_run_retries + 1):
             try:
-                response = self.runner.Run(req, timeout=GRPC_RUN_TIMEOUT, metadata=metadata)
+                response = self.runner.Run(req, timeout=GRPC_RUN_TIMEOUT)
                 for _ in response:
                     # Drain response so it is processed and not queued
                     pass
