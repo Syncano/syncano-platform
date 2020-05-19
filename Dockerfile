@@ -1,6 +1,6 @@
 FROM python:3.7-alpine3.11
 
-ARG EMAIL=devops@syncano.com
+ARG EMAIL
 ARG UID=1000
 ARG GID=1000
 

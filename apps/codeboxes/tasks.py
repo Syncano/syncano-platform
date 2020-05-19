@@ -12,6 +12,7 @@ from django.utils.dateparse import parse_datetime
 from munch import Munch
 from opencensus.ext.grpc import client_interceptor
 from settings.celeryconf import app, register_task
+from syncano.codebox.broker.v1 import broker_pb2, broker_pb2_grpc
 
 from apps.admins.models import Admin
 from apps.billing.models import AdminLimit
@@ -270,7 +271,6 @@ class BaseIncentiveTask(app.Task):
 
     def process_grpc(self, instance, incentive, spec):
         logger = self.get_logger()
-        from apps.codeboxes.proto import broker_pb2, broker_pb2_grpc
 
         if self.runner is None:
             tracer_interceptor = client_interceptor.OpenCensusClientInterceptor(
@@ -297,44 +297,39 @@ class BaseIncentiveTask(app.Task):
             environment_hash = environment.get_hash()
             environment_url = environment.get_url()
 
-        req = broker_pb2.RunRequest(
+        req = broker_pb2.SimpleRunRequest(
             meta={
                 'files': socket.get_files(),
-                'environmentURL': environment_url,
+                'environment_url': environment_url,
                 'trace': json.dumps(spec['trace']).encode(),
-                'traceID': spec['trace']['id'],
+                'trace_id': spec['trace']['id'],
             },
-            lbMeta={
-                'concurrencyKey': str(instance.pk),
-                'concurrencyLimit': spec['run']['concurrency_limit'],
+            lb_meta={
+                'concurrency_key': str(instance.pk),
+                'concurrency_limit': spec['run']['concurrency_limit'],
             },
-            request=[{
-                'meta': {
-                    'runtime': spec['run']['runtime_name'],
-                    'sourceHash': socket.get_hash(),
-                    'userID': str(instance.pk),
-                    'environment': environment_hash,
-                    'options': {
-                        'entryPoint': entrypoint,
-                        'outputLimit': settings.CODEBOX_RESULT_SIZE_LIMIT,
-                        'timeout': int(spec['run']['timeout'] * 1000),
-                        'async': spec['run']['async'],
-                        'mCPU': spec['run']['mcpu'],
-                        'args': spec['run']['additional_args'].encode(),
-                        'config': spec['run']['config'].encode(),
-                        'meta': spec['run']['meta'].encode(),
-                    },
+            script_meta={
+                'runtime': spec['run']['runtime_name'],
+                'source_hash': socket.get_hash(),
+                'user_id': str(instance.pk),
+                'environment': environment_hash,
+                'options': {
+                    'entrypoint': entrypoint,
+                    'output_limit': settings.CODEBOX_RESULT_SIZE_LIMIT,
+                    'timeout': int(spec['run']['timeout'] * 1000),
+                    'async': spec['run']['async'],
+                    'mcpu': spec['run']['mcpu'],
+                    'args': spec['run']['additional_args'].encode(),
+                    'config': spec['run']['config'].encode(),
+                    'meta': spec['run']['meta'].encode(),
                 },
-            }]
+            },
         )
 
         # Retry grpc Run if needed.
-        # ZIPKIN! metadata = zipkin.create_headers_from_zipkin_attrs(get_tracing_attrs()).items()
-        metadata = ()
-
         for i in range(self.grpc_run_retries + 1):
             try:
-                response = self.runner.Run(req, timeout=GRPC_RUN_TIMEOUT, metadata=metadata)
+                response = self.runner.SimpleRun(req, timeout=GRPC_RUN_TIMEOUT)
                 for _ in response:
                     # Drain response so it is processed and not queued
                     pass

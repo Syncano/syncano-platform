@@ -27,7 +27,7 @@ def strip_meta_from_uwsgi_info(request_meta):
             stripped[key] = request_meta[key]
 
     ip_header = request_meta.get('HTTP_X_FORWARDED_FOR', request_meta.get('HTTP_X_REAL_IP',
-                                 request_meta.get('REMOTE_ADDR', '')))
+                                                                          request_meta.get('REMOTE_ADDR', '')))
     stripped['REMOTE_ADDR'] = ip_header.split(',', 2)[0]
     return stripped
 

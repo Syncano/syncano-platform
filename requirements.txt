@@ -58,3 +58,4 @@ tornado==5.1.1
 URLObject==2.4.3
 uWSGI==2.0.18
 zipstream==1.1.4
+git+https://github.com/Syncano/syncanoapis.git@c3fc1e3188db524a3fa1140ab35979eea3449305#subdirectory=gen/python
