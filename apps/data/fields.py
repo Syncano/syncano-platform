@@ -3,10 +3,10 @@ import rapidjson as json
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.postgres import fields as pg_fields
+from django.core.exceptions import ValidationError
 from django.core.files.base import File
 from django.db import models
 from django.db.models.fields.files import FieldFile
-from django.core.exceptions import ValidationError
 
 from apps.data.adapters import Json, PostGISAdapter
 from apps.data.mixins import NoTrimWhitespaceMixin
