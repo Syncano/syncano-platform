@@ -3,6 +3,7 @@ import rapidjson as json
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.postgres import fields as pg_fields
+from django.core.exceptions import ValidationError
 from django.core.files.base import File
 from django.db import models
 from django.db.models.fields.files import FieldFile
@@ -35,6 +36,11 @@ class ReferenceField(models.IntegerField):
         return super().to_python(value)
 
 
+class FileURL():
+    def __init__(self, url):
+        self.url = url
+
+
 class HStoreFileField(models.FileField):
     serializer_class = 'apps.data.field_serializers.HStoreFileFieldSerializer'
 
@@ -52,12 +58,31 @@ class HStoreFileField(models.FileField):
 
         if file:
             if not file._committed:
-                # Commit the file to storage prior to saving the model
-                content = file.file
-                _files[self.source] = content.size
-                file.save(file.name, content, save=False)
+                if isinstance(file.file, FileURL):
+                    storage_prefix = file.storage.url('')
+                    if file.name.startswith(storage_prefix):
+                        file.name = file.name[len(storage_prefix):]
+                        new_file_name = self.generate_filename(model_instance, file.name)
+
+                        try:
+                            file.storage.copy(file.name, new_file_name)
+                        except Exception:
+                            raise ValidationError({self.attname: 'Existing file does not exist.'})
+
+                        file.name = new_file_name
+                        file.file = None
+                        _files[self.source] = file.storage.size(file.name)
+                    else:
+                        raise ValidationError({self.attname: 'File URL is invalid.'})
+                else:
+                    # Commit the file to storage prior to saving the model
+                    content = file.file
+                    _files[self.source] = content.size
+                    file.save(file.name, content, save=False)
+
         elif self.source in _files:
             del _files[self.source]
+
         return file
 
     def create_attr(self, instance, value):
@@ -73,9 +98,13 @@ class HStoreFileField(models.FileField):
             file_copy.file = value
             file_copy._committed = False
             value = file_copy
+        elif isinstance(value, FileURL):
+            file_copy = self.attr_class(instance, self, value.url)
+            file_copy.file = value
+            file_copy._committed = False
+            value = file_copy
         elif isinstance(value, FieldFile) and not hasattr(value, 'field'):
             self.instance = instance
-            self.field = self.field
             self.storage = self.field.storage
         return value
 

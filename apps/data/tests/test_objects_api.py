@@ -608,6 +608,29 @@ class TestObjectListAPI(TestObjectMixin, SyncanoAPITestBase):
         usage = InstanceIndicator.objects.get(instance=self.instance, type=InstanceIndicator.TYPES.STORAGE_SIZE).value
         self.assertEqual(usage, len(file_content))
 
+    @override_settings(POST_TRANSACTION_SUCCESS_EAGER=True)
+    def test_adding_file_from_local_url(self):
+        file_content = 'This is the content.'
+        f = SimpleUploadedFile('f.ext', file_content.encode())
+        response = self.client.post(self.url, {'file': f}, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        old_file = response.data['file']
+        response = self.client.post(self.url, {'file': old_file['value']})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        new_file = response.data['file']
+        self.assertNotEqual(new_file, old_file)
+        self.assert_file(new_file, file_content)
+        self.assert_file(old_file, exists=True)
+
+        usage = InstanceIndicator.objects.get(instance=self.instance, type=InstanceIndicator.TYPES.STORAGE_SIZE).value
+        self.assertEqual(usage, len(file_content) * 2)
+
+    def test_adding_file_from_nonlocal_url_string_fails(self):
+        response = self.client.post(self.url, {'file': 'http://onet.pl/a.jpg'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_creating_object_with_utf8_content(self):
         data = {'string': 'Zażółć gęślą jaźń 春卷'}
         response = self.client.post(self.url, data)
