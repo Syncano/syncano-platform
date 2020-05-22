@@ -44,8 +44,9 @@ class FileURL():
 class HStoreFileField(models.FileField):
     serializer_class = 'apps.data.field_serializers.HStoreFileFieldSerializer'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, accepted_prefix=None, *args, **kwargs):
         self.old_value = None
+        self.accepted_prefix = accepted_prefix
         super().__init__(*args, **kwargs)
 
     def pre_save(self, model_instance, add):
@@ -59,8 +60,12 @@ class HStoreFileField(models.FileField):
         if file:
             if not file._committed:
                 if isinstance(file.file, FileURL):
-                    storage_prefix = file.storage.url('')
-                    if file.name.startswith(storage_prefix):
+                    accepted_prefix = storage_prefix = file.storage.url('')
+
+                    if self.accepted_prefix is not None and callable(self.accepted_prefix):
+                        accepted_prefix = self.accepted_prefix(storage_prefix)
+
+                    if file.name.startswith(accepted_prefix):
                         file.name = file.name[len(storage_prefix):]
                         new_file_name = self.generate_filename(model_instance, file.name)
 

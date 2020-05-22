@@ -27,6 +27,7 @@ FIELD_CLASS_MAP = {
     'datetime': ('apps.data.fields.DateTimeField', {}),
     'file': ('apps.data.fields.HStoreFileField', {
         'upload_to': upload_file_to,
+        'accepted_prefix': lambda prefix: prefix + get_current_instance().get_storage_prefix() + '/',
         'storage': default_storage,
         'max_length': None,
     }),
