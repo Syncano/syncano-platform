@@ -11,6 +11,7 @@ from rest_framework.settings import api_settings
 from rest_framework.utils import humanize_datetime
 
 from apps.core.field_serializers import JSONField
+from apps.data.fields import FileURL
 from apps.data.mixins import (
     IncrementableFieldSerializerMixin,
     OpDictFieldSerializerMixin,
@@ -40,6 +41,12 @@ class HStoreFileFieldSerializer(serializers.FileField):
         if value:
             value = value.url
             return {'type': 'file', 'value': value}
+
+    def to_internal_value(self, data):
+        if isinstance(data, str):
+            return FileURL(data)
+
+        return super().to_internal_value(data)
 
 
 class ReferenceFieldSerializer(RelatedModelFieldSerializerMixin, serializers.IntegerField):

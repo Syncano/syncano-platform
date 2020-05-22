@@ -237,6 +237,9 @@ class SchemaValidator:
 
 
 def check_extension_length(value):
+    if not hasattr(value, 'name'):
+        return
+
     _, ext = os.path.splitext(value.name)
     if len(ext) > 16:
         raise serializers.ValidationError('File provided has too long extension. Max 16 characters.')

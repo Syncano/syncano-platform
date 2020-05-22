@@ -53,6 +53,13 @@ class FileSystemStorage(StorageWithTransactionSupportMixin, storage.FileSystemSt
     def copy(self, src_name, dest_name):
         self.save(dest_name, self.open(src_name))
 
+        return dest_name
+
+    def size(self, name):
+        filename = os.path.join(self.location, name)
+
+        return os.path.getsize(filename)
+
     def delete_files(self, prefix, **kwargs):
         path_to_del = os.path.join(self.location, prefix)
         if os.path.exists(path_to_del):
@@ -72,11 +79,20 @@ class S3BotoStorage(StorageWithTransactionSupportMixin, s3boto3.S3Boto3Storage):
         return super().url(name)
 
     def copy(self, src_name, dest_name):
+        src_name = self._normalize_name(self._clean_name(src_name))
+        dest_name = self._normalize_name(self._clean_name(dest_name))
+
         self.bucket.copy(
-            {'Bucket': self.bucket_name, 'Key': src_name},
-            dest_name,
+            {'Bucket': self.bucket_name, 'Key': self._encode_name(src_name)},
+            self._encode_name(dest_name),
             ExtraArgs={'ACL': settings.AWS_DEFAULT_ACL},
         )
+
+        return dest_name
+
+    def size(self, name):
+        name = self._normalize_name(self._clean_name(name))
+        return self.bucket.Object(self._encode_name(name)).size
 
     def delete_files(self, prefix, buckets, **kwargs):
         if not prefix.endswith('/'):
@@ -93,9 +109,7 @@ class S3BotoStorage(StorageWithTransactionSupportMixin, s3boto3.S3Boto3Storage):
 
         if storage and storage == self:
             # If already exists, just copy it.
-            cleaned_name = self._normalize_name(name)
-            self.copy(content.name, cleaned_name)
-            return cleaned_name
+            return self.copy(content.name, name)
 
         return super()._save(name, content)
 
@@ -117,11 +131,22 @@ class GoogleCloudStorage(StorageWithTransactionSupportMixin, gcloud.GoogleCloudS
         return url
 
     def copy(self, src_name, dest_name):
+        src_name = self._normalize_name(gcloud.clean_name(src_name))
+        dest_name = self._normalize_name(gcloud.clean_name(dest_name))
         bucket = self.bucket
-        bucket.copy_blob(bucket.blob(src_name), bucket, dest_name)
+
+        bucket.copy_blob(bucket.blob(self._encode_name(src_name)), bucket, self._encode_name(dest_name))
+
+        return dest_name
+
+    def size(self, name):
+        name = self._normalize_name(gcloud.clean_name(name))
+
+        return self.bucket.get_blob(self._encode_name(name)).size
 
     def delete(self, name):
         name = self._normalize_name(gcloud.clean_name(name))
+
         self.bucket.delete_blobs([self._encode_name(name)], on_error=lambda blob: None)
 
     def delete_files(self, prefix, buckets, **kwargs):
@@ -141,9 +166,7 @@ class GoogleCloudStorage(StorageWithTransactionSupportMixin, gcloud.GoogleCloudS
 
         if storage and storage == self:
             # If already exists, just copy it.
-            cleaned_name = self._normalize_name(name)
-            self.copy(content.name, cleaned_name)
-            return cleaned_name
+            return self.copy(content.name, name)
 
         return super()._save(name, content)
 
