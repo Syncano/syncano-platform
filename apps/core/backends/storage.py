@@ -9,6 +9,7 @@ from django.utils.encoding import filepath_to_uri
 from django.utils.functional import LazyObject
 from google.oauth2 import service_account
 from storages.backends import gcloud, s3boto3
+from storages.utils import setting
 
 from apps.core.helpers import add_post_transaction_error_operation, add_post_transaction_success_operation, get_loc_env
 from apps.instances.helpers import get_current_instance, get_instance_db
@@ -115,6 +116,8 @@ class S3BotoStorage(StorageWithTransactionSupportMixin, s3boto3.S3Boto3Storage):
 
 
 class GoogleCloudStorage(StorageWithTransactionSupportMixin, gcloud.GoogleCloudStorage):
+    preserve_acl = setting('GS_PRESERVE_ACL', True)
+
     def __init__(self, location=settings.LOCATION, storage_url=None, **settings):
         self._location = location
         self._storage_url = storage_url
@@ -135,11 +138,12 @@ class GoogleCloudStorage(StorageWithTransactionSupportMixin, gcloud.GoogleCloudS
         dest_name = self._normalize_name(gcloud.clean_name(dest_name))
         bucket = self.bucket
 
-        destination_blob = bucket.copy_blob(bucket.blob(self._encode_name(src_name)),
+        source_blob = bucket.blob(self._encode_name(src_name))
+        destination_blob = bucket.copy_blob(source_blob,
                                             bucket, self._encode_name(dest_name))
 
-        if self.default_acl:
-            destination_blob.acl.save_predefined(self.default_acl)
+        if self.preserve_acl and self.default_acl:
+            destination_blob.acl.save(acl=source_blob.acl)
 
         return dest_name
 
