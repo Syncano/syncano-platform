@@ -135,7 +135,11 @@ class GoogleCloudStorage(StorageWithTransactionSupportMixin, gcloud.GoogleCloudS
         dest_name = self._normalize_name(gcloud.clean_name(dest_name))
         bucket = self.bucket
 
-        bucket.copy_blob(bucket.blob(self._encode_name(src_name)), bucket, self._encode_name(dest_name))
+        destination_blob = bucket.copy_blob(bucket.blob(self._encode_name(src_name)),
+                                            bucket, self._encode_name(dest_name))
+
+        if self.default_acl:
+            destination_blob.acl.save_predefined(self.default_acl)
 
         return dest_name
 
