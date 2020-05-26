@@ -251,7 +251,6 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_S3_SECURE_URLS = True  # use https
 AWS_QUERYSTRING_AUTH = False  # don't add complex authentication-related query parameters for requests
 AWS_DEFAULT_ACL = 'public-read'
-GS_DEFAULT_ACL = 'publicRead'
 
 DEFAULT_FILE_STORAGE = 'apps.core.backends.storage.DefaultStorage'
 
