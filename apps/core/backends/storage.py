@@ -93,7 +93,7 @@ class S3BotoStorage(StorageWithTransactionSupportMixin, s3boto3.S3Boto3Storage):
 
     def size(self, name):
         name = self._normalize_name(self._clean_name(name))
-        return self.bucket.Object(self._encode_name(name)).size
+        return self.bucket.Object(self._encode_name(name)).content_length
 
     def delete_files(self, prefix, buckets, **kwargs):
         if not prefix.endswith('/'):
