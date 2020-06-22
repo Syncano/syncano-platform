@@ -1,14 +1,15 @@
 import django  # isort:skip
-import logging
-import os
-import docker
+import os  # isort:skip
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.development")  # noqa
 django.setup()  # noqa
 
-from django.conf import settings
-from apps.core.helpers import docker_client
+import logging
 
+import docker
+from django.conf import settings
+
+from apps.core.helpers import docker_client
 
 logger = logging.getLogger('django')
 
