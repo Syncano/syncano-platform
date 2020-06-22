@@ -10,9 +10,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.development")  # noqa
 django.setup()  # noqa
 
 
-
 logger = logging.getLogger(__name__)
-
 
 try:
     docker_client.api.inspect_network(settings.DOCKER_NETWORK)
