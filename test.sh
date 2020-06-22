@@ -43,7 +43,8 @@ done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
 if $SETUP; then
-    python tools/setup_codebox.py
+    echo "=== setup docker ==="
+    PYTHONPATH="$PWD:$PYTHONPATH" python tools/setup_codebox.py
 fi
 
 if $LINTER; then

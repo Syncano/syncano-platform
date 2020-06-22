@@ -11,13 +11,13 @@ from django.conf import settings
 
 from apps.core.helpers import docker_client
 
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 try:
     docker_client.api.inspect_network(settings.DOCKER_NETWORK)
-    logger.info('Network "%s" already exists.', settings.DOCKER_NETWORK)
+    print('Network "%s" already exists.' % settings.DOCKER_NETWORK)
 except Exception:
-    logger.info('Creating network "%s".', settings.DOCKER_NETWORK)
+    print('Creating network "%s".' % settings.DOCKER_NETWORK)
 
     ipam_pool_config = docker.types.IPAMPool(settings.DOCKER_NETWORK_SUBNET)
     ipam_config = docker.types.IPAMConfig(pool_configs=[ipam_pool_config])
@@ -27,7 +27,7 @@ except Exception:
 
 containers = docker_client.api.containers(filters={'label': 'workerId'})
 
-logger.info('Removing old containers: %d.', len(containers))
+print('Removing old containers: %d.' % len(containers))
 
 for container in containers:
     try:

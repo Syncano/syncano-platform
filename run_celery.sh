@@ -8,7 +8,7 @@ if [ "$CELERY_TYPE" = "beat" ]; then
     exec single-beat celery beat -A settings.celeryconf -s /tmp/celerybeat-schedule ${@:2}
 else
     if [ "$CELERY_TYPE" = "codebox_runner" ]; then
-        PYTHONPATH="$PYTHONPATH:$PWD" python tools/setup_codebox.py
+        python tools/setup_codebox.py
         CELERY_OPTS="-c ${LEGACY_CODEBOX_RUNNER_CONCURRENCY:-2}"
     fi
 
