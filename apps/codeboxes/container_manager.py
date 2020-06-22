@@ -4,7 +4,6 @@ import shutil
 import socket
 import subprocess
 import tempfile
-import docker
 
 from django.conf import settings
 from docker.errors import APIError
