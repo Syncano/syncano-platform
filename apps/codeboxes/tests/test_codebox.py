@@ -263,7 +263,7 @@ for x in range(3):
 @tag('legacy_codebox')
 class TestContainerManager(CodeBoxCleanupTestMixin, TestCase):
     def setUp(self):
-        self.container_manager = ContainerManager()
+        self.container_manager = ContainerManager
 
     def test_codebox_runner_creates_docker_container(self):
         runtime_name = LATEST_PYTHON_RUNTIME

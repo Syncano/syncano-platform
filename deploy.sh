@@ -142,6 +142,16 @@ echo "* Deploying Worker."
 envsubst deploy/yaml/worker-deployment.yml.j2 | kubectl apply -f -
 envsubst deploy/yaml/worker-hpa.yml.j2 | kubectl apply -f -
 
+# Deploy legacy Codebox.
+if [ "${LEGACY_CODEBOX_ENABLED}" == "true" ]; then
+    kubectl create configmap platform-legacy-codebox-dind --from-file=deploy/dind-run.sh -o yaml --dry-run | kubectl apply -f -
+    REPLICAS=$(kubectl get deployment/platform-legacy-codebox -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "${LEGACY_CODEBOX_MIN}")
+    export REPLICAS
+    echo "* Deploying legacy Codebox."
+    envsubst deploy/yaml/codebox-daemonset.yml.j2 | kubectl apply -f -
+    envsubst deploy/yaml/codebox-deployment.yml.j2 | kubectl apply -f -
+    envsubst deploy/yaml/codebox-hpa.yml.j2 | kubectl apply -f -
+fi
 
 # Wait for web and worker deployments to finish.
 echo

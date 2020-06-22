@@ -1,0 +1,68 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: platform-legacy-codebox-docker
+  labels:
+    app: platform-legacy-codebox-docker
+    version: "1"
+spec:
+  selector:
+    matchLabels:
+      app: platform-legacy-codebox-docker
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: platform-legacy-codebox-docker
+    spec:
+      tolerations:
+        - key: "type"
+          operator: "Equal"
+          value: "legacy_codebox"
+          effect: "NoSchedule"
+      nodeSelector:
+        type: legacy_codebox
+      hostPID: true
+      hostNetwork: true
+      volumes:
+        - name: dind-scripts
+          configMap:
+            name: platform-legacy-codebox-dind
+            defaultMode: 0744
+        - name: dind-data
+          hostPath:
+            path: /mnt/codebox/dind
+        - name: docker-run
+          hostPath:
+            path: /mnt/codebox/run
+        - name: script-storage
+          hostPath:
+            path: /mnt/codebox/storage
+        - name: cgroup
+          hostPath:
+            path: /sys/fs/cgroup
+
+      containers:
+        - name: dind
+          image: docker:18-dind
+          command:
+            - "/scripts/dind-run.sh"
+          securityContext:
+            privileged: true
+          env:
+            - name: DOCKER_WHITELIST
+              value: "{{ DOCKER_WHITELIST }}"
+          volumeMounts:
+            - name: dind-scripts
+              mountPath: /scripts
+            - name: dind-data
+              mountPath: /var/lib/docker
+            - name: script-storage
+              mountPath: "{{ DOCKER_SHARED_DIRECTORY }}"
+              mountPropagation: HostToContainer
+            - name: docker-run
+              mountPath: /var/run
+            - name: cgroup
+              mountPath: /sys/fs/cgroup
+              readOnly: true
