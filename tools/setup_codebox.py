@@ -21,7 +21,7 @@ except Exception:
                                      check_duplicate=True,
                                      ipam=ipam_config)
 
-for container in docker_client.api.containers(filters={'manager': 'workerId'}):
+for container in docker_client.api.containers(filters={'label': 'workerId'}):
     try:
         docker_client.api.remove_container(container['Id'], v=True, force=True)
     except docker.errors.APIError:
