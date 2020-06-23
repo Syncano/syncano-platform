@@ -9,6 +9,7 @@ import logging
 import docker
 from django.conf import settings
 
+from apps.codeboxes.runtimes import IMAGE
 from apps.core.helpers import docker_client
 
 logger = logging.getLogger(__name__)
@@ -34,3 +35,7 @@ for container in containers:
         docker_client.api.remove_container(container['Id'], v=True, force=True)
     except docker.errors.APIError:
         logger.warning("Docker container %s couldn't be removed.", container['Id'])
+
+
+print('Pulling container image: %s.' % IMAGE)
+docker_client.images.pull(IMAGE)

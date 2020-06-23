@@ -30,6 +30,8 @@ spec:
           operator: "Equal"
           value: "legacy_codebox"
           effect: "NoSchedule"
+      nodeSelector:
+        type: legacy_codebox
       terminationGracePeriodSeconds: 330
       securityContext:
         fsGroup: 1000
