@@ -8,6 +8,7 @@ usage() {
 
 LINTER=true
 COVERAGE=true
+SETUP=true
 POSITIONAL=()
 
 # Parse arguments.
@@ -16,6 +17,7 @@ for PARAM in "$@"; do
     --fast)
         LINTER=false
         COVERAGE=false
+        SETUP=false
         ;;
     --with-migrations)
         export TEST_MIGRATIONS=true
@@ -25,6 +27,9 @@ for PARAM in "$@"; do
         ;;
     --skip-coverage)
         COVERAGE=false
+        ;;
+    --skip-setup)
+        SETUP=false
         ;;
     --help)
         usage
@@ -36,6 +41,11 @@ for PARAM in "$@"; do
 done
 
 set -- "${POSITIONAL[@]}" # restore positional parameters
+
+if $SETUP; then
+    echo "=== setup docker ==="
+    PYTHONPATH="$PWD:$PYTHONPATH" python tools/setup_codebox.py
+fi
 
 if $LINTER; then
     make lint

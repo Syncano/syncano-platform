@@ -111,7 +111,7 @@ services:
       - .:/home/syncano/app
     environment:
       - INSTANCE_TYPE=codebox
-      - CODEBOX_RUNNER_CONCURRENCY=2
+      - LEGACY_CODEBOX_RUNNER_CONCURRENCY=2
       - COLORS_ENABLED=true
       - DJANGO_DEBUG=true
       - LEGACY_CODEBOX_ENABLED=true

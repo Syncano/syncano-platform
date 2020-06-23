@@ -1,0 +1,86 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: platform-legacy-codebox
+  labels:
+    app: platform
+    type: legacy-codebox
+spec:
+  replicas: {{ REPLICAS }}
+  selector:
+    matchLabels:
+      app: platform
+      type: legacy-codebox
+  progressDeadlineSeconds: 600
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 50%
+    type: RollingUpdate
+
+  template:
+    metadata:
+      labels:
+        buildtime: {{ BUILDTIME }}
+        app: platform
+        type: legacy-codebox
+    spec:
+      tolerations:
+        - key: "type"
+          operator: "Equal"
+          value: "legacy_codebox"
+          effect: "NoSchedule"
+      nodeSelector:
+        type: legacy_codebox
+      terminationGracePeriodSeconds: 330
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: script-storage
+          hostPath:
+            path: /mnt/codebox/storage
+        - name: docker-run
+          hostPath:
+            path: /mnt/codebox/run
+{%- if GCP_LOCATIONS %}
+  {%- for item in GCP_LOCATIONS.split(',') %}
+        - name: {{ item }}-storage-credentials
+          secret:
+            secretName: {{ item }}-storage-credentials
+  {%- endfor %}
+{%- endif %}
+
+      containers:
+        - name: web
+          image: {{ IMAGE }}
+          volumeMounts:
+            - name: script-storage
+              mountPath: "{{ DOCKER_SHARED_DIRECTORY }}"
+              mountPropagation: Bidirectional
+            - name: docker-run
+              mountPath: /var/run
+{%- if GCP_LOCATIONS %}
+  {%- for item in GCP_LOCATIONS.split(',') %}
+            - name: {{ item }}-storage-credentials
+              mountPath: /secrets/{{ item }}-storage
+              readOnly: true
+  {%- endfor %}
+{%- endif %}
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          resources:
+            requests:
+              memory: "1024Mi"
+              cpu: 500m
+            limits:
+              memory: "1536Mi"
+              cpu: 1000m
+          env:
+            - name: INSTANCE_TYPE
+              value: codebox
+          envFrom:
+            - configMapRef:
+                name: platform
+            - secretRef:
+                name: platform

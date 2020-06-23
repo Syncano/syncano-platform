@@ -30,6 +30,7 @@ class ContainerManager:
     def prepare_container(cls, runtime_name):
         runtime = RUNTIMES[runtime_name]
         source_dir, tmp_dir = cls._create_container_directories()
+
         try:
             container_data = cls._create_container(runtime, source_dir, tmp_dir)
             docker_client.api.start(container_data['id'])
@@ -109,7 +110,8 @@ class ContainerManager:
                 }
             },
             'dns': ['8.8.8.8', '8.8.4.4'],
-            'read_only': True
+            'read_only': True,
+            'network_mode': settings.DOCKER_NETWORK,
         }
         if not settings.CI:
             host_config_kwargs['mem_limit'] = '320m'
@@ -118,7 +120,7 @@ class ContainerManager:
             container_info = docker_client.api.create_container(
                 image=image,
                 user='syncano',
-                labels={'host': socket.gethostname()},
+                labels={'workerId': socket.gethostname()},
                 command='sleep infinity',
                 host_config=docker_client.api.create_host_config(**host_config_kwargs)
             )
