@@ -1,12 +1,12 @@
 kind: HorizontalPodAutoscaler
 apiVersion: autoscaling/v1
 metadata:
-  name: platform-codebox
+  name: platform-legacy-codebox
 spec:
   minReplicas: {{ LEGACY_CODEBOX_MIN }}
   maxReplicas: {{ LEGACY_CODEBOX_MAX }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: platform-codebox
+    name: platform-legacy-codebox
   targetCPUUtilizationPercentage: 70
