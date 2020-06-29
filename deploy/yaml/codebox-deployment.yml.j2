@@ -6,6 +6,7 @@ metadata:
     app: platform
     type: legacy-codebox
 spec:
+  minReadySeconds: 300
   replicas: {{ REPLICAS }}
   selector:
     matchLabels:
@@ -71,10 +72,6 @@ spec:
             runAsUser: 0
           resources:
             requests:
-              memory: "1024Mi"
-              cpu: 500m
-            limits:
-              memory: "1536Mi"
               cpu: 1000m
           env:
             - name: INSTANCE_TYPE

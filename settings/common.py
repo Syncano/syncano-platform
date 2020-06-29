@@ -39,7 +39,7 @@ DATABASE_ROUTERS = (
 )
 
 API_HOST = os.environ.get('API_HOST', 'api.syncano.io')
-CACHE_SYNC_HOSTS = os.environ.get('CACHE_SYNC_HOSTS', 'api-eu1.syncano.io').split(',')
+CACHE_SYNC_HOSTS = os.environ.get('CACHE_SYNC_HOSTS', '').split(',')
 SPACE_HOST = os.environ.get('SPACE_HOST')
 
 
