@@ -57,7 +57,7 @@ jobs:
               gcloud auth activate-service-account --key-file=gcloud-service-key.json
               gcloud container clusters get-credentials syncano-stg --zone europe-west1 --project syncano-staging
 
-              make deploy-staging
+              make deploy-staging push-cache
 
             elif [ "$CIRCLE_BRANCH" == "stable" ]; then
               echo $GCLOUD_EU1_SERVICE_KEY > gcloud-service-key.json
