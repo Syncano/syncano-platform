@@ -76,7 +76,9 @@ class WebhookViewSet(CacheableObjectMixin,
 class WebhookPublicView(InstanceBasedMixin,
                         RunWebhookMixin,
                         generics.GenericAPIView):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (
+        OwnerInGoodStanding,
+    )
     throttle_classes = (InstanceRateThrottle, )
     authentication_classes = []
     lookup_field = 'public_link'
