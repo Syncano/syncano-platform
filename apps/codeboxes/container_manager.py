@@ -109,7 +109,7 @@ class ContainerManager:
                     'mode': 'rw'
                 }
             },
-            'dns': ['8.8.8.8', '8.8.4.4'],
+            'dns': settings.DOCKER_DNS,
             'read_only': True,
             'network_mode': settings.DOCKER_NETWORK,
         }
