@@ -58,14 +58,10 @@ makemigrations: require-docker-compose ## Make django migrations
 
 deploy-staging: require-kubectl ## Deploy application to staging
 	echo "=== deploying staging ==="
-	kubectl config use-context k8s.syncano.rocks
+	kubectl config use-context gke_syncano-staging_europe-west1_syncano-stg
 	./deploy.sh staging $(GITSHA) $(ARGS)
 
 deploy-production: require-kubectl ## Deploy application to production
-	echo "=== deploying us1 ==="
-	kubectl config use-context k8s.syncano.io
-	./deploy.sh us1 $(GITSHA) $(ARGS)
-
 	echo "=== deploying eu1 ==="
 	kubectl config use-context gke_pioner-syncano-prod-9cfb_europe-west1_syncano-eu1
 	./deploy.sh eu1 $(GITSHA) --no-codebox --skip-push
