@@ -405,6 +405,7 @@ class SocketImporter:
         """
         self.ensure_dict(handlers_spec, 'event_handlers')
         event_handlers = []
+
         for eh_name, script_spec in handlers_spec.items():
             eh_dep = self.parse_event_handler_name(eh_name)
 
@@ -425,8 +426,10 @@ class SocketImporter:
             # Put remaining keys into metadata
             if isinstance(script_spec, dict):
                 metadata = script_spec
+
             script_dep['metadata'] = metadata
             event_handlers.append(script_dep)
+
         return event_handlers
 
     def parse_event_handler_name(self, name):  # noqa: C901

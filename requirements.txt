@@ -18,11 +18,11 @@ djangorestframework==3.7.7
 dnspython==1.15.0
 docker==3.5.1
 drf-extensions==0.4.0
-gevent==1.3.7
+gevent==20.6.2
 google-cloud-storage==1.13.0
-greenlet==0.4.15
+greenlet==0.4.16
 grpcio==1.24.1
-hiredis==0.2.0
+hiredis==1.0.1
 jinja2==2.10.1
 jsonfield==2.0.2
 jsonschema==2.6.0
@@ -47,7 +47,7 @@ python-rapidjson==0.6.3
 pytz==2018.7
 PyYAML==3.13
 raven==6.10.0
-redis==3.3.8
+redis==3.5.3
 requests==2.20.0
 requests-oauthlib==1.0.0
 rest_condition==1.0.3
@@ -56,6 +56,6 @@ single-beat==0.4.1
 stripe==1.84.2
 tornado==5.1.1
 URLObject==2.4.3
-uWSGI==2.0.18
+uWSGI==2.0.19.1
 zipstream==1.1.4
 git+https://github.com/Syncano/syncanoapis.git@v1.0.0#subdirectory=gen/python

@@ -1,12 +1,18 @@
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
-apiVersion: autoscaling/v1
 metadata:
   name: platform-worker
 spec:
-  minReplicas: {{ WORKER_MIN }}
-  maxReplicas: {{ WORKER_MAX }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: platform-worker
-  targetCPUUtilizationPercentage: 70
+  minReplicas: {{ WORKER_MIN }}
+  maxReplicas: {{ WORKER_MAX }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
