@@ -50,6 +50,7 @@ class RedisPubSubHandler(BasicHandler):
 
     PUBLISH_MESSAGE_TYPE = 'message'
     SUBSCRIBE_MESSAGE_TYPE = 'subscribe'
+    SUBSCRIBE_MAX_TRIES = 10
 
     def __init__(self):
         self.redis_client = redis
@@ -69,7 +70,7 @@ class RedisPubSubHandler(BasicHandler):
         """
         raise NotImplementedError  # pragma: no cover
 
-    def subscribe(self, channel, client_uuid=None, maxsize=None, timeout=settings.DEFAULT_SUBSCRIPTION_TIMEOUT):
+    def subscribe(self, channel, client_uuid=None, maxsize=None, timeout=settings.DEFAULT_SUBSCRIPTION_TIMEOUT, try_=1):
         """
         Subscribe to channel and store additional_data in channel_data with it.
         """
@@ -93,7 +94,14 @@ class RedisPubSubHandler(BasicHandler):
             self.channel_data[channel] = Event()
             self.reset()
             gevent.sleep(0.1)
-            return self.subscribe(channel, client_uuid, maxsize, timeout)
+
+            if try_ > self.SUBSCRIBE_MAX_TRIES:
+                uwsgi.reload()
+
+                raise RuntimeError('Subscribe failed. Max tries exceeded.')
+
+            return self.subscribe(channel, client_uuid, maxsize, timeout, try_ + 1)
+
         return queue
 
     def unsubscribe(self, channel, client_uuid=None):
