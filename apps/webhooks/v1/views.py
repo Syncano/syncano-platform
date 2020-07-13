@@ -2,7 +2,7 @@
 import logging
 
 from django.conf import settings
-from rest_framework import generics, permissions, status, viewsets
+from rest_framework import generics, status, viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer

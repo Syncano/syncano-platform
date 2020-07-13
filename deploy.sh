@@ -5,10 +5,9 @@ export VERSION="$2"
 TARGET="$1"
 PUSH=true
 MIGRATIONS=false
-DEPLOY_CODEBOX=false
 DEFAULT_CARE_ARGUMENTS=""
 
-usage() { echo "* Usage: $0 <environment> <version> [--skip-gitlog][--codebox][--skip-push][--migration]" >&2; exit 1; }
+usage() { echo "* Usage: $0 <environment> <version> [--skip-gitlog][--skip-push][--migration]" >&2; exit 1; }
 [[ -n $TARGET ]] || usage
 [[ -n $VERSION ]] || usage
 
@@ -26,7 +25,6 @@ fi
 # Parse last git message (for PR integration).
 GITLOG=$(git log -1)
 [[ $GITLOG == *"[migration]"* ]] && MIGRATIONS=true
-[[ $GITLOG == *"[codebox]"* ]] && DEPLOY_CODEBOX=true
 
 # Parse arguments.
 for PARAM in "${@:3}"; do
@@ -36,12 +34,6 @@ for PARAM in "${@:3}"; do
           ;;
         --skip-push)
           PUSH=false
-          ;;
-        --codebox)
-          DEPLOY_CODEBOX=true
-          ;;
-        --no-codebox)
-          DEPLOY_CODEBOX=false
           ;;
         *)
           usage
@@ -160,13 +152,3 @@ kubectl rollout status deployment/platform-web
 
 echo ". Waiting for Worker deployment to finish..."
 kubectl rollout status deployment/platform-worker
-
-
-# Deploy codeboxes if needed.
-if $DEPLOY_CODEBOX; then
-    echo "* Deploying codeboxes."
-    pushd deploy
-    python deploy.py --tag "$VERSION" --target "$TARGET"
-    git clean -f
-    popd
-fi

@@ -52,7 +52,7 @@ spec:
 {%- endif %}
 
       containers:
-        - name: web
+        - name: codebox
           image: {{ IMAGE }}
           volumeMounts:
             - name: script-storage
@@ -81,3 +81,11 @@ spec:
                 name: platform
             - secretRef:
                 name: platform
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - celery -b $BROKER_URL inspect ping -d codebox_runner@$HOSTNAME
+            initialDelaySeconds: 300
+            periodSeconds: 180

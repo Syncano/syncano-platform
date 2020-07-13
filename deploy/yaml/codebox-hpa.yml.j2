@@ -1,12 +1,31 @@
 kind: HorizontalPodAutoscaler
-apiVersion: autoscaling/v1
+apiVersion: autoscaling/v2beta2
 metadata:
   name: platform-legacy-codebox
 spec:
-  minReplicas: {{ LEGACY_CODEBOX_MIN }}
-  maxReplicas: {{ LEGACY_CODEBOX_MAX }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: platform-legacy-codebox
-  targetCPUUtilizationPercentage: 70
+  minReplicas: {{ LEGACY_CODEBOX_MIN }}
+  maxReplicas: {{ LEGACY_CODEBOX_MAX }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+
+    - type: Object
+      object:
+        metric:
+          name: rabbitmq_codebox_runner_queue
+        describedObject:
+          apiVersion: "/v1"
+          kind: Service
+          name: amqp-rabbitmq-ha
+        target:
+          type: Value
+          value: 25
+
