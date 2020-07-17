@@ -96,7 +96,7 @@ class RedisPubSubHandler(BasicHandler):
             gevent.sleep(0.1)
 
             if try_ > self.SUBSCRIBE_MAX_TRIES:
-                uwsgi.reload()
+                uwsgi.stop()
 
                 raise RuntimeError('Subscribe failed. Max tries exceeded.')
 
@@ -121,13 +121,14 @@ class RedisPubSubHandler(BasicHandler):
                 del self.client_data[channel]
                 self.pubsub.unsubscribe(channel)
 
-    def listen(self):
+    def listen(self): # noqa
         """
         Listen for redis messages and process them accordingly.
         """
         for message in self.pubsub.listen():
             if not message:
                 continue
+
             channel = message['channel'].decode()
 
             if message['type'] == self.SUBSCRIBE_MESSAGE_TYPE:
@@ -140,17 +141,25 @@ class RedisPubSubHandler(BasicHandler):
 
                 # Process actual message received
                 if channel in self.client_data:
+                    to_unsub = []
+
                     for client_uuid, client_queue in self.client_data[channel].items():
                         try:
                             client_queue.put(data, block=False)
                         except Full:
-                            self.pubsub.unsubscribe(channel, client_uuid=client_uuid)
+                            to_unsub.append(client_uuid)
+
+                    for unsub_client in to_unsub:
+                        self.unsubscribe(channel, client_uuid=unsub_client)
 
     def reset(self):
         self.redis_client = Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
         self.client_data.clear()
         self.channel_data.clear()
         self._pubsub = self.redis_client.pubsub()
+        if self.pubsub_thread is not None:
+            gevent.kill(self.pubsub_thread)
+        self.pubsub_thread = None
 
 
 class WebSocketHandler(BasicHandler):

@@ -88,4 +88,5 @@ spec:
                 - -c
                 - celery -b $BROKER_URL inspect ping -d codebox_runner@$HOSTNAME
             initialDelaySeconds: 300
+            timeoutSeconds: 5
             periodSeconds: 180
