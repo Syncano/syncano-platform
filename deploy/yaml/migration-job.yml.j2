@@ -25,6 +25,8 @@ spec:
                 name: platform
             - secretRef:
                 name: platform
+            - secretRef:
+                name: syncano-db-credentials
 {%- if GCP_LOCATIONS %}
           volumeMounts:
   {%- for item in GCP_LOCATIONS.split(',') %}
