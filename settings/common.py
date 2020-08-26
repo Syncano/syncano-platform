@@ -152,32 +152,33 @@ REST_FRAMEWORK = {
 
 # Database
 ORIGINAL_BACKEND = 'django.contrib.gis.db.backends.postgis'
-db_addr = os.environ.get('DB_ADDR', 'postgresql').split(':')
-instances_db_addr = os.environ.get('DB_INSTANCES_ADDR', os.environ.get('DB_ADDR', 'postgresql')).split(':')
+db_host = os.environ.get('DB_HOST', os.environ.get('PGHOST', 'postgresql'))
+instances_db_host = os.environ.get('DB_INSTANCES_HOST') or db_host
 
 DATABASES = {
     'default': {
         'ENGINE': 'apps.instances.postgresql_backend',
-        'NAME': os.environ.get('DB_NAME', 'syncano'),
-        'USER': os.environ.get('DB_USER', 'syncano'),
-        'PASSWORD': os.environ.get('DB_PASS', 'syncano'),
-        'HOST': db_addr[0],
-        'PORT': '' if len(db_addr) == 1 else db_addr[1],
+        'NAME': os.environ.get('DB_NAME', os.environ.get('PGDATABASE', 'syncano')),
+        'USER': os.environ.get('DB_USER', os.environ.get('PGUSER', 'syncano')),
+        'PASSWORD': os.environ.get('DB_PASS', os.environ.get('PGPASSWORD', 'syncano')),
+        'HOST': os.environ.get('DB_HOST', os.environ.get('PGHOST', 'postgresql')),
+        'PORT': os.environ.get('DB_PORT', os.environ.get('PGPORT', '')),
         'CONN_MAX_AGE': int(os.environ.get('DB_CONN_MAX_AGE', 0))
     },
-    'instances': {
-        'ENGINE': 'apps.instances.postgresql_backend',
-        # We should ignore empty string as env var so it works fine with docker-compose
-        'NAME': os.environ.get('DB_INSTANCES_NAME', os.environ.get('DB_NAME', 'syncano')),
-        'USER': os.environ.get('DB_INSTANCES_USER', os.environ.get('DB_USER', 'syncano')),
-        'PASSWORD': os.environ.get('DB_INSTANCES_PASS', os.environ.get('DB_PASS', 'syncano')),
-        'HOST': instances_db_addr[0],
-        'PORT': '' if len(instances_db_addr) == 1 else instances_db_addr[1],
-        'TEST': {'SERIALIZE': False},
-        'CONN_MAX_AGE': int(os.environ.get('DB_INSTANCES_CONN_MAX_AGE',
-                                           os.environ.get('DB_CONN_MAX_AGE', 0))),
-    },
 }
+
+DATABASES['instances'] = {
+    'ENGINE': 'apps.instances.postgresql_backend',
+    'NAME': os.environ.get('DB_INSTANCES_NAME') or DATABASES['default']['NAME'],
+    'USER': os.environ.get('DB_INSTANCES_USER') or DATABASES['default']['USER'],
+    'PASSWORD': os.environ.get('DB_INSTANCES_PASS') or DATABASES['default']['PASSWORD'],
+    'HOST': os.environ.get('DB_INSTANCES_HOST') or DATABASES['default']['HOST'],
+    'PORT': os.environ.get('DB_PORT') or DATABASES['default']['PORT'],
+    'TEST': {'SERIALIZE': False},
+    'CONN_MAX_AGE': int(os.environ.get('DB_INSTANCES_CONN_MAX_AGE',
+                                       os.environ.get('DB_CONN_MAX_AGE', 0))),
+}
+
 
 # Redis
 REDIS_DB = 0
