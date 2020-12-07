@@ -103,7 +103,7 @@ if $MIGRATIONS; then
     for _ in {1..300}; do
         echo ". Waiting for migration job."
         sleep 1
-        PODNAME=$(kubectl get pods -l job-name=platform-migration -a --sort-by=.status.startTime -o name 2>/dev/null | tail -n1)
+        PODNAME=$(kubectl get pods -l job-name=platform-migration --sort-by=.status.startTime -o name 2>/dev/null | tail -n1)
         [ -z "$PODNAME" ] && continue
 
         kubectl attach "$PODNAME" 2> /dev/null || true

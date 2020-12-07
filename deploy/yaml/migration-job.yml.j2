@@ -10,6 +10,7 @@ spec:
       imagePullSecrets:
         - name: syncano-k8s-pull-secret
       restartPolicy: Never
+      backoffLimit: 0
       containers:
         - name: platform-web
           image: {{ IMAGE }}
