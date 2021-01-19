@@ -25,7 +25,7 @@ require-%:
 	fi
 
 run: require-docker-compose ## Start whole platform locally
-	docker-compose up web
+	docker-compose up web proxy
 
 pull-cache: require-docker ## Pull platform image for cache
 	docker pull $(DOCKERIMAGE) || true
