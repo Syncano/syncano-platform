@@ -13,10 +13,10 @@ django-storages==1.7.1
 django-timezone-utils==0.13
 Django==2.0.13
 djangorestframework-hstore==1.3
-djangorestframework==3.8.1
+djangorestframework==3.7.7
 dnspython==1.15.0
 docker==3.5.1
-drf-extensions==0.4.0
+drf-extensions==0.3.1
 gevent==20.6.2
 google-cloud-storage==1.13.0
 greenlet==0.4.16
