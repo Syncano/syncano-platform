@@ -57,7 +57,7 @@ jobs:
               gcloud auth activate-service-account --key-file=gcloud-service-key.json
               gcloud container clusters get-credentials syncano-eu1 --zone europe-west1 --project pioner-syncano-prod-9cfb
 
-              make deploy-production push_cache
+              make deploy-production push-cache
             fi
 
             make clean
