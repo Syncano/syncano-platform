@@ -58,7 +58,7 @@ if not hasattr(Atomic, '_djts_patched'):
 
         try:
             result = original_atomic_exit(self, exc_type, exc_value, traceback)
-        except:
+        except Exception:
             post_exit_atomic_block.send(sender=None,
                                         using=self.using,
                                         outermost=outermost,
