@@ -56,7 +56,6 @@ SHARED_APPS = (
     'raven.contrib.django.raven_compat',
     'rest_framework',
     'corsheaders',
-    'django_atomic_signals',
     'django_extensions',
 
     'apps.core',

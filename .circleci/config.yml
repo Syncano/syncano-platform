@@ -53,18 +53,11 @@ jobs:
             make decrypt
 
             if [ "$CIRCLE_BRANCH" == "master" ]; then
-              echo $GCLOUD_STG_SERVICE_KEY > gcloud-service-key.json
-              gcloud auth activate-service-account --key-file=gcloud-service-key.json
-              gcloud container clusters get-credentials syncano-stg --zone europe-west1 --project syncano-staging
-
-              make deploy-staging push-cache
-
-            elif [ "$CIRCLE_BRANCH" == "stable" ]; then
               echo $GCLOUD_EU1_SERVICE_KEY > gcloud-service-key.json
               gcloud auth activate-service-account --key-file=gcloud-service-key.json
               gcloud container clusters get-credentials syncano-eu1 --zone europe-west1 --project pioner-syncano-prod-9cfb
 
-              make deploy-production
+              make deploy-production push_cache
             fi
 
             make clean

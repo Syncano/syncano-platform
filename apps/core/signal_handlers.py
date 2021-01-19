@@ -1,7 +1,7 @@
 # coding=UTF8
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
-from django_atomic_signals import post_exit_atomic_block, pre_enter_atomic_block
+from apps.core.atomic_signals.signals import post_exit_atomic_block, pre_enter_atomic_block
 
 from apps.core.abstract_models import AclAbstractModel, CacheableAbstractModel, LiveAbstractModel
 from apps.core.helpers import (

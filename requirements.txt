@@ -3,7 +3,6 @@ analytics-python==1.2.9
 billiard==3.6.3.0
 boto3==1.14.17
 celery==4.4.6
-django-atomic-signals==1.1.0
 django-cors-headers==3.2.1
 django-filter==1.1.0
 git+https://github.com/djangonauts/django-hstore.git@aac755f587ff8ea95c1f43e7f3df8e339b848b6b
