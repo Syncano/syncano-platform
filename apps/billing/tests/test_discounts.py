@@ -22,7 +22,7 @@ class TestDiscount(TestCase):
         self.assertRaises(ValidationError, coupon.redeem, instance=instance, customer=customer)
 
     def test_cannot_use_the_same_coupon_many_times_on_instance(self):
-        redeem_by = datetime.datetime.strptime('2020-11-12', "%Y-%m-%d").date()
+        redeem_by = datetime.datetime.strptime('2030-11-12', "%Y-%m-%d").date()
         coupon = G(Coupon, name='test',
                    duration=2, redeem_by=redeem_by)
         instance = G(Instance, name='testinstance')

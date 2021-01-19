@@ -28,7 +28,7 @@ class TestDiscountsViewSet(CleanupTestCaseMixin, APITestCase):
         self.apikey = self.admin.key
         self.instance = G(Instance, name='testinstance')
         self.admin.add_to_instance(self.instance)
-        redeem_by = datetime.datetime.strptime('2020-11-12', "%Y-%m-%d").date()
+        redeem_by = datetime.datetime.strptime('2030-11-12', "%Y-%m-%d").date()
         self.coupon = G(Coupon, redeem_by=redeem_by, name='test')
 
     def test_getting_discounts_is_successful(self):
@@ -125,7 +125,7 @@ class TestCouponsViewSet(CleanupTestCaseMixin, APITestCase):
             "percent_off": 0,
             "currency": "usd",
             "duration": 1,
-            "redeem_by": "2020-11-11"
+            "redeem_by": "2030-11-11"
         }
 
         response = self.client.post(self.url, data)
@@ -139,7 +139,7 @@ class TestCouponsViewSet(CleanupTestCaseMixin, APITestCase):
             "percent_off": 0,
             "currency": "USD",
             "duration": 1,
-            "redeem_by": "2020-11-11"
+            "redeem_by": "2030-11-11"
         }
 
         response = self.client.post(self.url, data)
@@ -153,7 +153,7 @@ class TestCouponsViewSet(CleanupTestCaseMixin, APITestCase):
             "percent_off": 0,
             "currency": "usd",
             "duration": 0,
-            "redeem_by": "2020-11-11"
+            "redeem_by": "2030-11-11"
         }
 
         response = self.client.post(self.url, data)
@@ -166,7 +166,7 @@ class TestCouponsViewSet(CleanupTestCaseMixin, APITestCase):
             "amount_off": 10.0,
             "currency": "usd",
             "duration": 1,
-            "redeem_by": "2020-11-11"
+            "redeem_by": "2030-11-11"
         }
 
         response = self.client.post(self.url, data)
@@ -178,7 +178,7 @@ class TestCouponsViewSet(CleanupTestCaseMixin, APITestCase):
             "currency": "usd",
             "duration": 1,
             "percent_off": 15,
-            "redeem_by": "2020-11-11"
+            "redeem_by": "2030-11-11"
         }
 
         response = self.client.post(self.url, data)
@@ -191,7 +191,7 @@ class TestCouponsViewSet(CleanupTestCaseMixin, APITestCase):
             "duration": 1,
             "percent_off": 0,
             "amount_off": 0.0,
-            "redeem_by": "2020-11-11"
+            "redeem_by": "2030-11-11"
         }
 
         response = self.client.post(self.url, data_with_zeros)
@@ -203,7 +203,7 @@ class TestCouponsViewSet(CleanupTestCaseMixin, APITestCase):
             "duration": 1,
             "percent_off": 40,
             "amount_off": 30.0,
-            "redeem_by": "2020-11-11"
+            "redeem_by": "2030-11-11"
         }
 
         response = self.client.post(self.url, data_with_non_zeros)
@@ -224,7 +224,7 @@ class TestCouponsViewSet(CleanupTestCaseMixin, APITestCase):
     def test_viewing_coupons(self):
         # create a coupon
         coupon_name = 'imacoupon'
-        redeem_by = datetime.datetime.strptime('2020-11-12', "%Y-%m-%d").date()
+        redeem_by = datetime.datetime.strptime('2030-11-12', "%Y-%m-%d").date()
         G(Coupon, name=coupon_name, redeem_by=redeem_by)
 
         response = self.client.get(self.url)
