@@ -51,7 +51,7 @@ test: require-docker-compose ## Run tests in container
 	docker-compose run --rm test ./test.sh ${ARGS}
 
 migrate: require-docker-compose ## Migrate container database
-	docker-compose run --rm web ./run_care.sh
+	docker-compose run --rm web ./manage.py migrate
 
 makemigrations: require-docker-compose ## Make django migrations
 	docker-compose run --rm --no-deps web ./manage.py makemigrations
