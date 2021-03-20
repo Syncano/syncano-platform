@@ -22,7 +22,7 @@ google-cloud-storage==1.13.0
 greenlet==0.4.16
 grpcio==1.30.0
 hiredis==1.0.1
-jinja2==2.11.2
+jinja2==2.11.3
 jsonfield==2.0.2
 jsonschema==2.6.0
 kombu==4.6.11
