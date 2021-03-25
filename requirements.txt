@@ -44,7 +44,7 @@ python-dateutil==2.7.5
 python-gcm==0.4
 python-rapidjson==0.6.3
 pytz==2018.7
-PyYAML==3.13
+PyYAML==5.4
 raven==6.10.0
 redis==3.5.3
 requests==2.20.0
